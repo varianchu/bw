@@ -1,0 +1,36 @@
+<!-- By default, the configuration file will be scanned for changes once every minute.
+You can specify a different scanning period by setting the scanPeriod attribute of the <configuration> element.
+Values can be specified in units of milliseconds, seconds, minutes or hours. -->
+<configuration scan="false" scanPeriod="30 seconds">
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder
+			by default -->
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+	<!-- TODO: add other appenders-->
+
+	<!--
+		OBI: we may specify package level logging and override the root logger
+	 -->
+	<!-- logger name="org.springframework" level="INFO">
+		<appender-ref ref="STDOUT" />
+	</logger-->
+
+	<!-- logger name="com.dagitab.corebanking.web.controller" level="DEBUG">
+		<appender-ref ref="STDOUT" />
+	</logger-->
+
+	<logger name="com.altostratus.test" level="DEBUG">
+		<appender-ref ref="STDOUT" />
+	</logger>
+
+	<!-- you may set the log level to TRACE, DEBUG , INFO, WARN, ERROR  -->
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+	</root>
+
+</configuration>

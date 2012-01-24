@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.0.xsd">
+
+	<!-- use-expressions='true' allows calls to isAnonymous(), hasRole(''), hasAnyRole(['','']), isAuthenticated(), isRememberMe(), isFullyAuthenticated() -->
+	<http auto-config="true" use-expressions='true' access-denied-page="/login" >
+	    <intercept-url pattern="/css/**" filters="none"/>
+	    <intercept-url pattern="/images/**" filters="none" />
+	    <intercept-url pattern="/js/**" filters="none" />
+		<intercept-url pattern="/layouts/**" filters="none" />
+		<intercept-url pattern="/views/views.xml" filters="none" />
+		<intercept-url pattern="/views/login.jsp" filters="none" />
+
+		<!-- TODO: exclude fully authenticated user from login -->
+		<intercept-url pattern="/login" access="isAnonymous()" />
+		<!-- /** should be secured by default, remove permitAll, should be isFullyAuthenticated() or better denyAll -->
+		<intercept-url pattern="/**" access="isFullyAuthenticated()" />
+		<form-login login-page="/login" authentication-failure-url="/login?error=true" default-target-url="/" />
+	    <session-management>
+	        <concurrency-control max-sessions="1" error-if-maximum-exceeded="false"/>
+	    </session-management>
+	    <session-management invalid-session-url="/invalidSession" />
+		<logout logout-success-url="/login" />
+	</http>
+
+	<authentication-manager>
+		<authentication-provider user-service-ref="userManagementService">
+	    	<password-encoder ref="passwordEncoder"/>
+    	</authentication-provider>
+	</authentication-manager>
+
+	<beans:bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+    	<beans:constructor-arg value="1" />
+  	</beans:bean>
+</beans:beans>
