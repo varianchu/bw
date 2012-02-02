@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.altostratus.core.dao.GenericDaoJpa;
 import com.altostratus.core.model.Role;
 import com.altostratus.core.model.User;
+import com.altostratus.core.repository.UserRepository;
 import com.altostratus.core.util.QueryUtil;
 
 @Service("userManagementService")
@@ -36,6 +37,9 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
 	@Autowired
 	GenericDaoJpa<Role, Long> roleDao;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	@Override
 	public User getUserByUsername(String username) {
@@ -67,7 +71,8 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 		}
 
 		try {
-			return (User) userDao.save(user);
+			return userRepository.save(user);
+//			return (User) userDao.save(user);
 		} catch (DataIntegrityViolationException e) {
 			//e.printStackTrace();
 			return null;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.turkey.franchiseeinventorydist</groupId>
-    <artifactId>online-ordering-basic</artifactId>
+    <groupId>com.altostratus</groupId>
+    <artifactId>bionicwheels</artifactId>
     <packaging>war</packaging>
     <version>0.1.0.BUILD-SNAPSHOT</version>
     <name>franchisee-inventory-distribution</name>
@@ -45,6 +45,7 @@
         <hibernate3-maven-plugin.version>2.2</hibernate3-maven-plugin.version>
         <commons-collections.version>3.2.1</commons-collections.version>
         <cf-maven-plugin.version>1.0.0.M1</cf-maven-plugin.version>
+        <spring-data-jpa.version>1.0.2.RELEASE</spring-data-jpa.version>
     </properties>
     <repositories>
         <repository>
@@ -304,6 +305,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
+            <classifier/>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>${spring-data-jpa.version}</version>
             <classifier/>
         </dependency>
         <dependency>
