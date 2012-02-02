@@ -3,3 +3,4 @@
 target/
 .springBeans
 .classpath
+src/main/resources/META-INF/spring/database.properties
