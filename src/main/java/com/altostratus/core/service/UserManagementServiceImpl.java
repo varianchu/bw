@@ -25,9 +25,10 @@ import com.altostratus.core.util.QueryUtil;
 
 @Service("userManagementService")
 @Transactional
-public class UserManagementServiceImpl implements UserManagementService, UserDetailsService
-{
-	private Logger logger = LoggerFactory.getLogger(UserManagementServiceImpl.class);
+public class UserManagementServiceImpl implements UserManagementService,
+		UserDetailsService {
+	private Logger logger = LoggerFactory
+			.getLogger(UserManagementServiceImpl.class);
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -43,17 +44,19 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
 	@Override
 	public User getUserByUsername(String username) {
-		List<User> users = userDao.findByQuery("SELECT u FROM User u WHERE u.username=:username",
+		List<User> users = userDao.findByQuery(
+				"SELECT u FROM User u WHERE u.username=:username",
 				QueryUtil.toMap("username", username));
-        if (users == null || users.isEmpty()) {
-            throw new UsernameNotFoundException("user '" + username + "' not found...");
-        } else {
-        	User u = users.get(0);
-        	for(Role r : u.getRoles()) {
-        		logger.info("ROLE: " + r.getAuthority());
-        	}
-            return users.get(0);
-        }
+		if (users == null || users.isEmpty()) {
+			throw new UsernameNotFoundException("user '" + username
+					+ "' not found...");
+		} else {
+			User u = users.get(0);
+			for (Role r : u.getRoles()) {
+				logger.info("ROLE: " + r.getAuthority());
+			}
+			return users.get(0);
+		}
 	}
 
 	@Override
@@ -67,17 +70,18 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 		// Get and prepare password management-related artifacts
 		boolean passwordChanged = false;
 		if (passwordEncoder != null) {
-			user.setPassword(passwordEncoder.encodePassword(user.getPassword(), null));
+			user.setPassword(passwordEncoder.encodePassword(user.getPassword(),
+					null));
 		}
 
 		try {
 			return userRepository.save(user);
-//			return (User) userDao.save(user);
+			// return (User) userDao.save(user);
 		} catch (DataIntegrityViolationException e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			return null;
 		} catch (JpaSystemException e) { // needed for JPA
-			//e.printStackTrace();
+			// e.printStackTrace();
 			return null;
 		}
 	}
@@ -87,7 +91,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 		try {
 			userDao.remove(id);
 			return true;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -95,39 +99,42 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
 	@Override
 	public List<User> getUsersWithRole(Role role) {
-		List<User> users = userDao.findByQuery("SELECT u FROM User u WHERE u.role=:role",
+		List<User> users = userDao.findByQuery(
+				"SELECT u FROM User u WHERE u.role=:role",
 				QueryUtil.toMap("role", role));
-        if (users == null || users.isEmpty()) {
-        	// TODO: Error handling here
-        	return null;
-        } else {
-            return users;
-        }
+		if (users == null || users.isEmpty()) {
+			// TODO: Error handling here
+			return null;
+		} else {
+			return users;
+		}
 	}
-	//Varian added
+
+	// Varian added
 	@Override
 	public List<User> getUsersWithOneRole(Role role) {
-        List<User> users2 = userDao.getAll();
-        List<User> users = new ArrayList<User>();
-        for(User u : users2){
-        	if(u.getRoles().get(0).equals(role)){
-        		users.add(u);
-        	}
-        }
-        return users;
+		List<User> users2 = userDao.getAll();
+		List<User> users = new ArrayList<User>();
+		for (User u : users2) {
+			if (u.getRoles().get(0).equals(role)) {
+				users.add(u);
+			}
+		}
+		return users;
 	}
 
 	@Override
 	public Role getRoleByName(String name) {
 		logger.info("Getting role by name " + name);
-		List<Role> roles = roleDao.findByQuery("SELECT r FROM Role r WHERE r.name=:name",
+		List<Role> roles = roleDao.findByQuery(
+				"SELECT r FROM Role r WHERE r.name=:name",
 				QueryUtil.toMap("name", name));
 		if (roles == null || roles.isEmpty()) {
-        	// TODO: Error handling here
-        	return null;
-        } else {
-            return roles.get(0);
-        }
+			// TODO: Error handling here
+			return null;
+		} else {
+			return roles.get(0);
+		}
 	}
 
 	@Override
@@ -145,7 +152,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 		try {
 			roleDao.remove(id);
 			return true;
-		} catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -162,7 +169,7 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 		UserDetails user = getUserByUsername(username);
 		logger.info("USER LOGGING IN: " + user.getUsername());
 		logger.info("PASSWORD: " + user.getPassword());
-		for(GrantedAuthority g : user.getAuthorities()) {
+		for (GrantedAuthority g : user.getAuthorities()) {
 			logger.info("ROLE: " + g.getAuthority());
 		}
 		return user;
@@ -170,10 +177,12 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
 	@Override
 	public String getUserPassword(String username) {
-		List<User> users = userDao.findByQuery("SELECT u FROM User u WHERE u.username=:username",
+		List<User> users = userDao.findByQuery(
+				"SELECT u FROM User u WHERE u.username=:username",
 				QueryUtil.toMap("username", username));
-		if(users == null || users.isEmpty()) {
-			throw new UsernameNotFoundException("user '" + username + "' not found...");
+		if (users == null || users.isEmpty()) {
+			throw new UsernameNotFoundException("user '" + username
+					+ "' not found...");
 		} else {
 			return users.get(0).getPassword();
 		}
@@ -186,12 +195,13 @@ public class UserManagementServiceImpl implements UserManagementService, UserDet
 
 	@Override
 	public List<User> getBasicUsers() {
-		List<User> users = userDao.findByQuery("SELECT u FROM User u WHERE u.userType=:userType",
+		List<User> users = userDao.findByQuery(
+				"SELECT u FROM User u WHERE u.userType=:userType",
 				QueryUtil.toMap("userType", "USER"));
 		logger.info("Size of basic users: " + users.size());
 		List<User> returnedUsers = new ArrayList<User>();
-		if(users.size() > 0) {
-			for(User user : users) {
+		if (users.size() > 0) {
+			for (User user : users) {
 				user.setRole(user.getRoles().get(0));
 				returnedUsers.add(user);
 			}

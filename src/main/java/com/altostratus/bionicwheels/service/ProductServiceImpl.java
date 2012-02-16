@@ -15,9 +15,8 @@ import com.altostratus.bionicwheels.repository.jpa.ProductRepository;
 
 @Service("productService")
 @Transactional
-public class ProductServiceImpl implements ProductService
-{
-	@PersistenceContext(unitName="persistenceUnit")
+public class ProductServiceImpl implements ProductService {
+	@PersistenceContext(unitName = "persistenceUnit")
 	private EntityManager em;
 
 	@Autowired

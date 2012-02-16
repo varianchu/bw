@@ -26,7 +26,7 @@ public class Customer extends BaseObject implements Serializable {
 	private Long id;
 
 	@Column(name = "customer_name", nullable = false, length = 35)
-	private String cutomerName;
+	private String customerName;
 
 	@Column(name = "contact_number", nullable = false)
 	private String contactNumber;
@@ -46,6 +46,9 @@ public class Customer extends BaseObject implements Serializable {
 	@Column(name = "company", length = 20)
 	private String company;
 
+	@Column(name = "remarks", length = 50)
+	private String remarks;
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = { CascadeType.REMOVE })
 	private List<Car> cars;
 
@@ -57,12 +60,12 @@ public class Customer extends BaseObject implements Serializable {
 		this.id = id;
 	}
 
-	public String getCutomerName() {
-		return cutomerName;
+	public String getCustomerName() {
+		return customerName;
 	}
 
-	public void setCutomerName(String cutomerName) {
-		this.cutomerName = cutomerName;
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
 	}
 
 	public String getContactNumber() {
@@ -113,6 +116,14 @@ public class Customer extends BaseObject implements Serializable {
 		this.company = company;
 	}
 
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
+	}
+
 	public List<Car> getCars() {
 		return cars;
 	}
@@ -137,6 +148,6 @@ public class Customer extends BaseObject implements Serializable {
 	}
 
 	public String toString() {
-		return cutomerName;
+		return customerName;
 	}
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,6 +29,9 @@ public class Car extends BaseObject implements Serializable {
 
 	@Column(name = "car_model", nullable = false)
 	private String carModel;
+
+	@Column(name = "plate_number")
+	private String plateNumber;
 
 	@Column(name = "last_change_oil")
 	private Date lastChangeOil;
@@ -61,6 +65,14 @@ public class Car extends BaseObject implements Serializable {
 
 	public void setCarModel(String carModel) {
 		this.carModel = carModel;
+	}
+
+	public String getPlateNumber() {
+		return plateNumber;
+	}
+
+	public void setPlateNumber(String plateNumber) {
+		this.plateNumber = plateNumber;
 	}
 
 	public Date getLastChangeOil() {
