@@ -13,10 +13,10 @@
 		<br/>
 		<br/>
 		<c:if test="${not empty param.error}">
-			  <font color="red">
-			    Your login attempt was not successful, try again.<br/><br/>
+			  <div class="alert alert-error">
+			    Your login attempt was not successful, try again.<br/>
 			    Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.
-			  </font>
+			  </div>
 		</c:if>
 	</form>
 	</div>

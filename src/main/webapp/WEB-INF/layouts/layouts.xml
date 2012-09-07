@@ -13,6 +13,7 @@
   </definition>
 
   <definition name="none" template="/WEB-INF/layouts/none.jsp">
+  	<put-attribute name="menu" value="/WEB-INF/views/menu.jsp" />
   </definition>
 
 </tiles-definitions>

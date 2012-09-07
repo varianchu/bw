@@ -1,0 +1,43 @@
+/* Elements */
+.core-box {
+	border: 0 none;
+    font-size: 12px;
+    margin-bottom: 10px;
+    min-width: 20px;
+}
+
+.core-box-header {
+	font-size: 12px;
+    padding: 8px 5px;
+}
+
+.core-box-content {
+	-moz-border-bottom-colors: none;
+    -moz-border-image: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    border-color: -moz-use-text-color #AAAAAA #AAAAAA;
+    border-right: 1px solid #AAAAAA;
+    border-style: none solid solid;
+    border-width: medium 1px 1px;
+    padding: 10px;
+}
+
+/* Form Elements */
+input[type="text"], input[type="password"], select, textarea {
+    background: url("core/images/input-bg.png") repeat-x scroll center top #FFFFFF;
+    border: 1px solid #999999;
+    margin: 0;
+    padding: 5px;
+}
+
+.core-form td.label {
+	padding: 5px;
+	text-align: right;
+}
+
+.core-form td.element {
+	padding: 5px;
+	text-align: left;
+}

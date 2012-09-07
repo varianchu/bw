@@ -62,7 +62,8 @@ public class CustomerCarServiceImpl implements CustomerCarService {
 
 	@Override
 	public List<Customer> getAllCustomersWithCarMake(String carMake) {
-
+		// to prevent multiple occurrences of the same customer with cars that
+		// have the same car make.
 		Set<Customer> customersSet = new HashSet<Customer>();
 		List<Customer> customersFromRepo = customerRepository
 				.findByCars_CarMake(carMake);

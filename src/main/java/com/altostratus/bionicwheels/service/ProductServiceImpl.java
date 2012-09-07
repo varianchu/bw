@@ -9,8 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.altostratus.bionicwheels.model.Brand;
 import com.altostratus.bionicwheels.model.Category;
+import com.altostratus.bionicwheels.model.InventoryTransactionProduct;
 import com.altostratus.bionicwheels.model.Product;
+import com.altostratus.bionicwheels.model.Supplier;
 import com.altostratus.bionicwheels.repository.jpa.ProductRepository;
 
 @Service("productService")
@@ -50,7 +53,38 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public void removeProduct(Long id) {
-		productRepository.delete(id);
+		Product product = productRepository.findOne(id);
+		List<InventoryTransactionProduct> itp = product
+				.getInventoryTransactionProducts();
+		if (itp.size() == 0) {
+			productRepository.delete(id);
+		} else {
+			for (InventoryTransactionProduct inventoryTransactionProduct : itp) {
+				inventoryTransactionProduct.setProduct(null);
+			}
+			productRepository.delete(id);
+		}
+	}
+
+	@Override
+	public List<Product> getProductsBySupplier(Supplier supplier) {
+		return productRepository.findBySupplier(supplier);
+	}
+
+	@Override
+	public List<Product> getProductsBelowNumber(Double number) {
+		return productRepository.findByTotalQtyLessThan(number);
+	}
+
+	@Override
+	public List<Product> getProductsAboveNumber(Double number) {
+		return productRepository.findByTotalQtyGreaterThan(number);
+	}
+
+	@Override
+	public List<Product> getProductsByBrand(Brand brand) {
+		// TODO Auto-generated method stub
+		return productRepository.findByBrand(brand);
 	}
 
 }

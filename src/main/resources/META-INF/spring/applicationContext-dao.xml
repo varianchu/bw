@@ -25,4 +25,5 @@ xsi:schemaLocation="http://www.springframework.org/schema/aop
     <bean autowire="byName" id="roleDao" class="com.altostratus.core.dao.GenericDaoJpa">
     	<constructor-arg value="com.altostratus.core.model.Role"/>
     </bean>
+    
 </beans>

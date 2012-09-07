@@ -72,7 +72,7 @@ xsi:schemaLocation="
 <!--         </list> -->
 <!--     </property> -->
 <!-- 	</bean> -->
-
+	
     <bean class="org.springframework.web.servlet.view.tiles2.TilesConfigurer" id="tilesConfigurer">
     <property name="definitions">
       <list>
@@ -82,4 +82,5 @@ xsi:schemaLocation="
       </list>
     </property>
   </bean>
+  
 </beans>
