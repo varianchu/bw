@@ -15,7 +15,7 @@
 						<c:forEach var="location" items="${urls}">
 						<ul class="thumbs noscript">
 							<li>
-								<a class="thumb" name="leaf" href="${location.imageDir}" title="Title #0">
+								<a class="thumb" href="${location.imageDir}" title="Title #0">
 									<img src="${location.thumbnailDir}" alt="Title #0" />
 								</a>
 								<div class="caption">

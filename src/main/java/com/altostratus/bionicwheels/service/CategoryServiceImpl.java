@@ -47,4 +47,10 @@ public class CategoryServiceImpl implements CategoryService {
 		// TODO Auto-generated method stub
 		categoryRepository.delete(id);
 	}
+
+	@Override
+	public Category getCategoryByName(String categoryName) {
+		// TODO Auto-generated method stub
+		return categoryRepository.findByCategoryName(categoryName);
+	}
 }

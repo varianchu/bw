@@ -13,4 +13,6 @@ public interface CategoryService {
 
 	public void removeCategory(Long id);
 
+	public Category getCategoryByName(String categoryName);
+
 }

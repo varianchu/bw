@@ -36,10 +36,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.altostratus.bionicwheels.model.BarGraphModel;
+import com.altostratus.bionicwheels.model.BarGraphModel2;
+import com.altostratus.bionicwheels.model.Brand;
+import com.altostratus.bionicwheels.model.Category;
 import com.altostratus.bionicwheels.model.Product;
+import com.altostratus.bionicwheels.model.Settings;
+import com.altostratus.bionicwheels.model.Supplier;
 import com.altostratus.bionicwheels.reports.model.ProductInventoryReport;
 import com.altostratus.bionicwheels.reports.model.ProductInventorySubReport;
+import com.altostratus.bionicwheels.service.BrandService;
+import com.altostratus.bionicwheels.service.CategoryService;
 import com.altostratus.bionicwheels.service.ProductService;
+import com.altostratus.bionicwheels.service.SettingsService;
+import com.altostratus.bionicwheels.service.SupplierService;
 import com.altostratus.core.service.UserManagementService;
 
 @Controller
@@ -52,15 +62,237 @@ public class DefaultController {
 	@Autowired
 	ProductService productService;
 
+	@Autowired
+	CategoryService categoryService;
+
+	@Autowired
+	SettingsService settingsService;
+
+	@Autowired
+	BrandService brandService;
+
+	@Autowired
+	SupplierService supplierService;
+
 	private Logger logger = LoggerFactory.getLogger(DefaultController.class);
 
 	@RequestMapping(value = { "", "/", "/dashboard", "/favicon.ico" }, method = RequestMethod.GET)
 	public ModelAndView dashboard(HttpServletRequest request) {
-		logger.info("Entering dashbaord");
+		logger.info("Entering dashboard");
 
-		ModelAndView mnv = new ModelAndView("index");
+		List<BarGraphModel> bgms = new ArrayList<BarGraphModel>();
+		List<BarGraphModel2> bgms2 = new ArrayList<BarGraphModel2>();
+		Long id = (long) 1;
 
-		return mnv;
+		Settings settings = settingsService.getSettings(id);
+
+		if (settings == null || productService.getAllProducts().size() == 0
+				|| categoryService.getAllCategories().size() == 0) {
+
+			ModelAndView mnv = new ModelAndView("indexstart");
+			return mnv;
+
+		} else {
+
+			ModelAndView mnv = new ModelAndView("index");
+
+			if (settings.getFilterBy().equalsIgnoreCase("CATEGORY")) {
+				logger.info("testing");
+				List<Category> categories = categoryService.getAllCategories();
+
+				for (Category category : categories) {
+
+					BarGraphModel bgm = new BarGraphModel();
+
+					Double aboveNum = settings.getCeilingValue();
+					Double belowNum = settings.getFloorValue();
+
+					Integer sizeOfAboveNum = productService
+							.getProductsByCategoryAboveNumber(category,
+									aboveNum).size();
+					// logger.info(sizeOfAboveNum.toString());
+					Integer sizeOfBelowNum = productService
+							.getProductsByCategoryBelowNumber(category,
+									belowNum).size();
+					Integer totalSize = productService.getProductsByCategory(
+							category).size();
+
+					Integer qty = totalSize - (sizeOfAboveNum + sizeOfBelowNum);
+
+					bgm.setAboveQty(sizeOfAboveNum.toString());
+					bgm.setBelowQty(sizeOfBelowNum.toString());
+					bgm.setQty(qty.toString());
+					bgm.setCategoryName(category.getCategoryName());
+
+					bgms.add(bgm);
+				}
+				logger.info("testing2");
+				logger.info("settings category choice is: "
+						+ settings.getCategoryChoice());
+				// error starts here
+				Category category = categoryService.getCategoryByName(settings
+						.getCategoryChoice());
+				logger.info("Category is: " + category.getCategoryName());
+				List<Product> products = productService
+						.getProductsByCategory(category);
+				logger.info("testing3");
+				for (Product product : products) {
+					if (product.getProductTire() == null) {
+						BarGraphModel2 bgm2 = new BarGraphModel2();
+						bgm2.setProductName(product.getProductName());
+						bgm2.setQty(product.getTotalQty().toString());
+						bgm2.setCeilingValue(settings.getCeilingValue()
+								.toString());
+						bgm2.setFloorValue(settings.getFloorValue().toString());
+
+						bgms2.add(bgm2);
+					} else if (product.getProductTire() != null) {
+						BarGraphModel2 bgm2 = new BarGraphModel2();
+						bgm2.setProductName(product.getProductTire().toString());
+						bgm2.setQty(product.getTotalQty().toString());
+						bgm2.setCeilingValue(settings.getCeilingValue()
+								.toString());
+						bgm2.setFloorValue(settings.getFloorValue().toString());
+
+						bgms2.add(bgm2);
+					}
+				}
+				mnv.addObject("title", "Category");
+				mnv.addObject("title2", settings.getCategoryChoice());
+				mnv.addObject("bgms", bgms);
+				mnv.addObject("bgms2", bgms2);
+				return mnv;
+
+			} else if (settings.getFilterBy().equalsIgnoreCase("BRAND")) {
+
+				List<Brand> brands = brandService.getAllBrands();
+
+				for (Brand brand : brands) {
+
+					BarGraphModel bgm = new BarGraphModel();
+
+					Double aboveNum = settings.getCeilingValue();
+					Double belowNum = settings.getFloorValue();
+
+					Integer sizeOfAboveNum = productService
+							.getProductsByBrandAboveNumber(brand, aboveNum)
+							.size();
+					// logger.info(sizeOfAboveNum.toString());
+					Integer sizeOfBelowNum = productService
+							.getProductsByBrandBelowNumber(brand, belowNum)
+							.size();
+					Integer totalSize = productService
+							.getProductsByBrand(brand).size();
+
+					Integer qty = totalSize - (sizeOfAboveNum + sizeOfBelowNum);
+
+					bgm.setAboveQty(sizeOfAboveNum.toString());
+					bgm.setBelowQty(sizeOfBelowNum.toString());
+					bgm.setQty(qty.toString());
+					bgm.setCategoryName(brand.getBrandName());
+
+					bgms.add(bgm);
+				}
+
+				Brand brand = brandService.getBrandByBrandName(settings
+						.getBrandChoice());
+
+				List<Product> products = productService
+						.getProductsByBrand(brand);
+
+				for (Product product : products) {
+					if (product.getProductTire() == null) {
+						BarGraphModel2 bgm2 = new BarGraphModel2();
+						bgm2.setProductName(product.getProductName());
+						bgm2.setQty(product.getTotalQty().toString());
+						bgm2.setCeilingValue(settings.getCeilingValue()
+								.toString());
+						bgm2.setFloorValue(settings.getFloorValue().toString());
+
+						bgms2.add(bgm2);
+					} else if (product.getProductTire() != null) {
+						BarGraphModel2 bgm2 = new BarGraphModel2();
+						bgm2.setProductName(product.getProductTire().toString());
+						bgm2.setQty(product.getTotalQty().toString());
+						bgm2.setCeilingValue(settings.getCeilingValue()
+								.toString());
+						bgm2.setFloorValue(settings.getFloorValue().toString());
+
+						bgms2.add(bgm2);
+					}
+				}
+				mnv.addObject("title", "Brand");
+				mnv.addObject("title2", settings.getBrandChoice());
+				mnv.addObject("bgms", bgms);
+				mnv.addObject("bgms2", bgms2);
+				return mnv;
+
+			} else {
+
+				List<Supplier> suppliers = supplierService.getAllSuppliers();
+
+				for (Supplier supplier : suppliers) {
+
+					BarGraphModel bgm = new BarGraphModel();
+
+					Double aboveNum = settings.getCeilingValue();
+					Double belowNum = settings.getFloorValue();
+
+					Integer sizeOfAboveNum = productService
+							.getProductsBySupplierAboveNumber(supplier,
+									aboveNum).size();
+					// logger.info(sizeOfAboveNum.toString());
+					Integer sizeOfBelowNum = productService
+							.getProductsBySupplierBelowNumber(supplier,
+									belowNum).size();
+					Integer totalSize = productService.getProductsBySupplier(
+							supplier).size();
+
+					Integer qty = totalSize - (sizeOfAboveNum + sizeOfBelowNum);
+
+					bgm.setAboveQty(sizeOfAboveNum.toString());
+					bgm.setBelowQty(sizeOfBelowNum.toString());
+					bgm.setQty(qty.toString());
+					bgm.setCategoryName(supplier.getSupplierName());
+
+					bgms.add(bgm);
+				}
+
+				Supplier supplier = supplierService
+						.getSupplierBySupplierName(settings.getSupplierChoice());
+
+				List<Product> products = productService
+						.getProductsBySupplier(supplier);
+
+				for (Product product : products) {
+					if (product.getProductTire() == null) {
+						BarGraphModel2 bgm2 = new BarGraphModel2();
+						bgm2.setProductName(product.getProductName());
+						bgm2.setQty(product.getTotalQty().toString());
+						bgm2.setCeilingValue(settings.getCeilingValue()
+								.toString());
+						bgm2.setFloorValue(settings.getFloorValue().toString());
+
+						bgms2.add(bgm2);
+					} else if (product.getProductTire() != null) {
+						BarGraphModel2 bgm2 = new BarGraphModel2();
+						bgm2.setProductName(product.getProductTire().toString());
+						bgm2.setQty(product.getTotalQty().toString());
+						bgm2.setCeilingValue(settings.getCeilingValue()
+								.toString());
+						bgm2.setFloorValue(settings.getFloorValue().toString());
+
+						bgms2.add(bgm2);
+					}
+				}
+				mnv.addObject("title", "Supplier");
+				mnv.addObject("title2", settings.getSupplierChoice());
+				mnv.addObject("bgms", bgms);
+				mnv.addObject("bgms2", bgms2);
+				return mnv;
+			}
+		}
+
 	}
 
 	@RequestMapping(value = { "/excel" }, method = RequestMethod.GET)

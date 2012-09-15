@@ -226,7 +226,9 @@ public class InventoryTransactionProductController {
 			mnv.addObject("headsup", headsUpMsgs);
 			mnv.addObject("referenceNumber", inventoryTransactionService
 					.getAllInventoryTransactions().size());
-			mnv.addObject("getDate", new Date());
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			String s = df.format(new Date());
+			mnv.addObject("getDate", s);
 			logger.info("FAIL, Entering Index Again");
 			return mnv;
 		}

@@ -87,4 +87,50 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.findByBrand(brand);
 	}
 
+	@Override
+	public List<Product> getProductsByBrandAboveNumber(Brand brand,
+			Double number) {
+		// TODO Auto-generated method stub
+		return productRepository.findByBrandAndTotalQtyGreaterThan(brand,
+				number);
+	}
+
+	@Override
+	public List<Product> getProductsByBrandBelowNumber(Brand brand,
+			Double number) {
+		// TODO Auto-generated method stub
+		return productRepository.findByBrandAndTotalQtyLessThan(brand, number);
+	}
+
+	@Override
+	public List<Product> getProductsByCategoryAboveNumber(Category category,
+			Double number) {
+		// TODO Auto-generated method stub
+		return productRepository.findByCategoryAndTotalQtyGreaterThan(category,
+				number);
+	}
+
+	@Override
+	public List<Product> getProductsByCategoryBelowNumber(Category category,
+			Double number) {
+		// TODO Auto-generated method stub
+		return productRepository.findByCategoryAndTotalQtyLessThan(category,
+				number);
+	}
+
+	@Override
+	public List<Product> getProductsBySupplierAboveNumber(Supplier supplier,
+			Double number) {
+		// TODO Auto-generated method stub
+		return productRepository.findBySupplierAndTotalQtyGreaterThan(supplier,
+				number);
+	}
+
+	@Override
+	public List<Product> getProductsBySupplierBelowNumber(Supplier supplier,
+			Double number) {
+		// TODO Auto-generated method stub
+		return productRepository.findBySupplierAndTotalQtyLessThan(supplier,
+				number);
+	}
 }

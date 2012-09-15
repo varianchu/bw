@@ -6,8 +6,8 @@ import javax.persistence.Table;
 import com.altostratus.core.model.User;
 
 @Entity
-@Table(name = "sales_ladies")
-public class SalesLady extends User {
+@Table(name = "sales_person")
+public class SalesPerson extends User {
 
 	// @Id
 	// @GeneratedValue(strategy = GenerationType.AUTO)

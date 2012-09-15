@@ -27,4 +27,22 @@ public interface ProductService {
 	public List<Product> getProductsByBrand(Brand brand);
 
 	public void removeProduct(Long id);
+
+	public List<Product> getProductsByCategoryBelowNumber(Category category,
+			Double number);
+
+	public List<Product> getProductsByCategoryAboveNumber(Category category,
+			Double number);
+
+	public List<Product> getProductsByBrandBelowNumber(Brand brand,
+			Double number);
+
+	public List<Product> getProductsByBrandAboveNumber(Brand brand,
+			Double number);
+
+	public List<Product> getProductsBySupplierBelowNumber(Supplier supplier,
+			Double number);
+
+	public List<Product> getProductsBySupplierAboveNumber(Supplier supplier,
+			Double number);
 }

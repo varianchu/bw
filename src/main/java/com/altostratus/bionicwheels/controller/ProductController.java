@@ -78,12 +78,16 @@ public class ProductController {
 		mnv.addObject("categories", categoryService.getAllCategories());
 		List<Supplier> suppliers = supplierService.getAllSuppliers();
 		mnv.addObject("suppliers", suppliers);
-		List<Brand> brands = brandService
-				.getAllBrandSuppliers(suppliers.get(0));
+		// error here because of suppliers.get(0)
 		List<String> brandNames = new ArrayList<String>();
-
-		for (Brand brand : brands) {
-			brandNames.add(brand.getBrandName());
+		if (suppliers.size() == 0) {
+			brandNames.add("");
+		} else {
+			List<Brand> brands = brandService.getAllBrandSuppliers(suppliers
+					.get(0));
+			for (Brand brand : brands) {
+				brandNames.add(brand.getBrandName());
+			}
 		}
 
 		mnv.addObject("brands", brandNames);

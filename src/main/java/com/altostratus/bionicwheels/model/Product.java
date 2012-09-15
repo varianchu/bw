@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -67,6 +68,9 @@ public class Product extends BaseObject implements Serializable {
 	@ManyToOne(cascade = { CascadeType.PERSIST })
 	@JoinColumn(name = "brand_id")
 	private Brand brand;
+
+	@OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE)
+	private ProductTire productTire;
 
 	@Column(name = "image_url")
 	private String imageUrl;
@@ -185,6 +189,14 @@ public class Product extends BaseObject implements Serializable {
 
 	public void setBrand(Brand brand) {
 		this.brand = brand;
+	}
+
+	public ProductTire getProductTire() {
+		return productTire;
+	}
+
+	public void setProductTire(ProductTire productTire) {
+		this.productTire = productTire;
 	}
 
 	public boolean equals(Object other) {

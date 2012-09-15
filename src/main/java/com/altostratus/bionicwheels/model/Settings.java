@@ -20,12 +20,28 @@ public class Settings extends BaseObject implements Serializable {
 		FIFO, LIFO
 	}
 
+	public static enum FILTER_BY {
+		CATEGORY, SUPPLIER, BRAND
+	}
+
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@Column(name = "stock_process", nullable = false)
 	private String stockProcess;
+
+	@Column(name = "filter_by", nullable = false)
+	private String filterBy;
+
+	@Column(name = "category_choice")
+	private String categoryChoice;
+
+	@Column(name = "brand_choice")
+	private String brandChoice;
+
+	@Column(name = "supplier_choice")
+	private String supplierChoice;
 
 	@Column(name = "ceilingValue", nullable = false)
 	private Double ceilingValue;
@@ -49,6 +65,14 @@ public class Settings extends BaseObject implements Serializable {
 		this.stockProcess = stockProcess;
 	}
 
+	public String getFilterBy() {
+		return filterBy;
+	}
+
+	public void setFilterBy(String filterBy) {
+		this.filterBy = filterBy;
+	}
+
 	public Double getCeilingValue() {
 		return ceilingValue;
 	}
@@ -63,6 +87,30 @@ public class Settings extends BaseObject implements Serializable {
 
 	public void setFloorValue(Double floorValue) {
 		this.floorValue = floorValue;
+	}
+
+	public String getCategoryChoice() {
+		return categoryChoice;
+	}
+
+	public void setCategoryChoice(String categoryChoice) {
+		this.categoryChoice = categoryChoice;
+	}
+
+	public String getBrandChoice() {
+		return brandChoice;
+	}
+
+	public void setBrandChoice(String brandChoice) {
+		this.brandChoice = brandChoice;
+	}
+
+	public String getSupplierChoice() {
+		return supplierChoice;
+	}
+
+	public void setSupplierChoice(String supplierChoice) {
+		this.supplierChoice = supplierChoice;
 	}
 
 	public boolean equals(Object other) {

@@ -46,4 +46,10 @@ public class SupplierServiceImpl implements SupplierService {
 		// TODO Auto-generated method stub
 		supplierRepository.delete(id);
 	}
+
+	@Override
+	public Supplier getSupplierBySupplierName(String supplierName) {
+		// TODO Auto-generated method stub
+		return supplierRepository.findBySupplierName(supplierName);
+	}
 }

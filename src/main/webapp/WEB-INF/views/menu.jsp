@@ -20,17 +20,17 @@
 		<a href="#" class="dropdown-toggle">Customer Management</a>
 		<ul class="dropdown-menu">
 			<li><a href="#">Customer's Car</a></li>
-			<li><a href="#">Customer Information</a></li>
+			<li><a href="/customer">Customer Information</a></li>
 		</ul>
 	</li>
 	<li class="dropdown" data-dropdown="dropdown">
 		<a href="#" class="dropdown-toggle">Reports</a>
 		<ul class="dropdown-menu">
-			<li><a href="#">Download Inventory Count</a></li>
-			<li><a href="#">Test</a></li>
+			<li><a href="/inventory-report">Download All Inventory Count</a></li>
+			<li><a href="#">Generate Report By Filter</a></li>
 		</ul>
 	</li>
-	<li><a href="admin/view_products">Gallery</a></li>
+	<li><a href="/admin/view_products">Gallery</a></li>
 	<li class="dropdown" data-dropdown="dropdown">
 		<a href="#" class="dropdown-toggle">Settings</a>
 		<ul class="dropdown-menu">

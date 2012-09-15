@@ -30,7 +30,7 @@ public class Category extends BaseObject implements Serializable {
 	@Column(name = "description", nullable = true, length = 50)
 	private String description;
 
-	@Column(name = "category_name", nullable = false, length = 30)
+	@Column(name = "category_name", nullable = false, unique = true, length = 30)
 	private String categoryName;
 	// with cascade type remove original
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.REMOVE)
@@ -92,6 +92,6 @@ public class Category extends BaseObject implements Serializable {
 	}
 
 	public String toString() {
-		return categoryName + " (" + code + ")";
+		return categoryName;
 	}
 }

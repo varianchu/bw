@@ -12,6 +12,10 @@
   <definition name="index" extends="default">
 	<put-attribute name="body" value="/WEB-INF/views/index.jsp" />
   </definition>
+  
+  <definition name="indexstart" extends="default">
+	<put-attribute name="body" value="/WEB-INF/views/indexstart.jsp" />
+  </definition>
 
   <definition name="dataAccessFailure" extends="plain">
     <put-attribute name="body" value="/WEB-INF/views/dataAccessFailure.jsp" />

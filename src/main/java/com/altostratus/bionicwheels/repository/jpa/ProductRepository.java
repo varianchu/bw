@@ -21,4 +21,23 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	List<Product> findByTotalQtyGreaterThan(Double number);
 
 	List<Product> findByBrand(Brand brand);
+
+	List<Product> findByCategoryAndTotalQtyLessThan(Category category,
+			Double number);
+
+	List<Product> findByCategoryAndTotalQtyGreaterThan(Category category,
+			Double number);
+
+	// List<Product> findByCategoryAndTotalQtyBetween(Category category,
+	// Double number1, Double number2);
+
+	List<Product> findByBrandAndTotalQtyLessThan(Brand brand, Double number);
+
+	List<Product> findByBrandAndTotalQtyGreaterThan(Brand brand, Double number);
+
+	List<Product> findBySupplierAndTotalQtyLessThan(Supplier supplier,
+			Double number);
+
+	List<Product> findBySupplierAndTotalQtyGreaterThan(Supplier supplier,
+			Double number);
 }

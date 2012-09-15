@@ -35,6 +35,13 @@
 	<br />
 	<br />
 	<label>Upload Image:</label><form:input path = "fileData" type = "file"/>
+	<div class="control-group" id="test">
+		<label class="control-label" for="textArea">Text Area</label>
+		<div class ="controls">
+			<textarea class="input-xlarge" id="textarea" rows="3"></textarea>
+		</div>
+	</div>
+	<input type="button" value="Tire Fields" class="btn btn-primary" onClick="showFields()"/>
 	<hr></hr>
 	<input type="submit" value="Save Product" class="btn btn-primary"/>
 </form:form>
@@ -85,6 +92,13 @@
 </div>
 </div>
 <script type="text/javascript">
+
+$('#test').hide();
+
+function showFields(){
+	$('#test').show();
+}
+
 function sendBrand(){
 	var urlString = "/admin/setbrandname/"
 	var e = document.getElementById("brand");
