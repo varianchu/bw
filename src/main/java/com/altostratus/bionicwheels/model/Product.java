@@ -72,6 +72,9 @@ public class Product extends BaseObject implements Serializable {
 	@OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE)
 	private ProductTire productTire;
 
+	@OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE)
+	private ProductMagWheels productMagWheels;
+
 	@Column(name = "image_url")
 	private String imageUrl;
 
@@ -197,6 +200,14 @@ public class Product extends BaseObject implements Serializable {
 
 	public void setProductTire(ProductTire productTire) {
 		this.productTire = productTire;
+	}
+
+	public ProductMagWheels getProductMagWheels() {
+		return productMagWheels;
+	}
+
+	public void setProductMagWheels(ProductMagWheels productMagWheels) {
+		this.productMagWheels = productMagWheels;
 	}
 
 	public boolean equals(Object other) {

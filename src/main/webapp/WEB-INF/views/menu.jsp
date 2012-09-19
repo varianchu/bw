@@ -6,6 +6,8 @@
 			<li><a href="/admin/supplier">Supplier Information</a></li>
 			<li><a href="/admin/brand">Brand Information</a></li>
 			<li><a href="/admin/product">Product Information</a></li>
+			<li><a href="/admin/search-tires">Search Tire</a></li>
+			<li><a href="/admin/search-mags">Search Mag Wheels</a></li>
 		</ul>
 	</li>
 	<li class="dropdown" data-dropdown="dropdown">

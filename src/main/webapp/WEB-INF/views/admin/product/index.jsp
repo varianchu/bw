@@ -9,6 +9,8 @@
 <form:form action = "/admin/product" method = "POST" modelAttribute = "product" enctype="multipart/form-data">
 	<form:hidden path="id"/>
 	<form:hidden path="inventoryId"/>
+	<form:hidden path="tireId"/>
+	<form:hidden path="magsId"/>
 	<label>Product Name:</label><form:input type="text" path="productName"/>
 	<form:errors path="productName" style="color:red;"/>
 	<label>Product Code:</label><form:input type="text" path="code"/>
@@ -17,7 +19,7 @@
 	<label>Unit of Measure:</label><form:select items="${uoms}" path="unitOfMeasure"/>
 	<label>Category:</label><form:select items="${categories}" path="categoryId" itemValue="id"/>
 	<label>Supplier:</label><form:select id = "supplier" items="${suppliers}" path="supplierId" itemValue="id" onchange="getBrands()"/>
-	<label>Brands:</label><form:select id = "brand" onchange="sendBrand()" path="brandName">
+	<label>Brands:</label><form:select id = "brand" path="brandName">
 	<form:option value="0" label="---Brand---"/>
 		<c:forEach var = "brand" items="${brands}">
 			<form:option value="${brand}"></form:option>
@@ -35,13 +37,64 @@
 	<br />
 	<br />
 	<label>Upload Image:</label><form:input path = "fileData" type = "file"/>
+	<hr></hr>
+	<input type="button" value="Tire Fields" class="btn btn-primary" onClick="showTireFields()"/>
+	<input type="button" value="MagWheel Fields" class="btn btn-primary" onClick="showMagWheelFields()"/>
+	<input type="button" value="Hide Fields" class="btn btn-primary" onClick="hideFields()"/>
+	<hr></hr>
 	<div class="control-group" id="test">
-		<label class="control-label" for="textArea">Text Area</label>
+		<label class="control-label">Cross Section Width</label>
 		<div class ="controls">
-			<textarea class="input-xlarge" id="textarea" rows="3"></textarea>
+			<form:input type="text" path="crossSectionWidth"></form:input>
+			<form:errors path = "crossSectionWidth"/>
+		</div>
+		<label class="control-label">Profile</label>
+		<div class ="controls">
+			<form:input type="text" path="profile"></form:input>
+			<form:errors path = "profile"/>
+		</div>
+		<label class="control-label">Construction</label>
+		<div class ="controls">
+			<form:select path="construction" items="${tireconstruction}"></form:select>
+		</div>
+		<label class="control-label">Diameter</label>
+		<div class ="controls">
+			<form:input type="text" path="diameter"></form:input>
+			<form:errors path = "diameter"/>
 		</div>
 	</div>
-	<input type="button" value="Tire Fields" class="btn btn-primary" onClick="showFields()"/>
+	<div class="control-group" id="test2">
+		<label class="control-label">Style</label>
+		<div class ="controls">
+			<form:input type="text" path="style"></form:input>
+			<form:errors path = "style"/>
+		</div>
+		<label class="control-label">Size</label>
+		<div class ="controls">
+			<form:input type="text" path="size"></form:input>
+			<form:errors path = "size"/>
+		</div>
+		<label class="control-label">Spokes</label>
+		<div class ="controls">
+			<form:input path="spokes" type="text"></form:input>
+			<form:errors path = "spokes"/>
+		</div>
+		<label class="control-label">Offset</label>
+		<div class ="controls">
+			<form:input type="text" path="offset"></form:input>
+			<form:errors path = "offset"/>
+		</div>
+		<label class="control-label">PCD</label>
+		<div class ="controls">
+			<form:input type="text" path="pcd"></form:input>
+			<form:errors path = "pcd"/>
+		</div>
+		<label class="control-label">Finish</label>
+		<div class ="controls">
+			<form:input type="text" path="finish"></form:input>
+			<form:errors path = "finish"/>
+		</div>
+	</div>
 	<hr></hr>
 	<input type="submit" value="Save Product" class="btn btn-primary"/>
 </form:form>
@@ -94,26 +147,61 @@
 <script type="text/javascript">
 
 $('#test').hide();
+$('#test2').hide();
 
-function showFields(){
+function showTireFields(){
+	$('#test2').hide();
 	$('#test').show();
+	var url = "/admin/enable-tire"
+		
+	 	$.ajax({
+	 		url: url,
+	 		success: function(data) {
+	 			    $('.result').html(data);
+	 		}
+	 	});
 }
 
-function sendBrand(){
-	var urlString = "/admin/setbrandname/"
-	var e = document.getElementById("brand");
-	var text = e.options[e.selectedIndex].text;
-	
-	var url = urlString + text;
-	
-	$.ajax({
-		url: url,
-		success: function(data) {
-			    $('.result').html(data);
-		}
-	});
-	
+function showMagWheelFields(){
+	$('#test').hide();
+	$('#test2').show();
+	var url = "/admin/enable-mags"
+		
+	 	$.ajax({
+	 		url: url,
+	 		success: function(data) {
+	 			    $('.result').html(data);
+	 		}
+	 	});
 }
+
+function hideFields(){
+	$('#test').hide();
+	var url = "/admin/disable-all"
+		
+	 	$.ajax({
+	 		url: url,
+	 		success: function(data) {
+	 			    $('.result').html(data);
+	 		}
+	 	});
+}
+
+// function sendBrand(){
+// 	var urlString = "/admin/setbrandname/"
+// 	var e = document.getElementById("brand");
+// 	var text = e.options[e.selectedIndex].text;
+	
+// 	var url = urlString + text;
+	
+// 	$.ajax({
+// 		url: url,
+// 		success: function(data) {
+// 			    $('.result').html(data);
+// 		}
+// 	});
+	
+// }
 
 function getBrands(){
 	

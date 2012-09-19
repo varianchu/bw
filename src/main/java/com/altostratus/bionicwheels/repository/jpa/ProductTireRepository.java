@@ -13,8 +13,8 @@ public interface ProductTireRepository extends JpaRepository<ProductTire, Long> 
 	List<ProductTire> findByCrossSectionWidthAndProfileAndDiameter(
 			String crossSectionWidth, Integer profile, String diameter);
 
-	List<ProductTire> findByProduct_BrandAndProduct_TotalQty(Brand brand,
-			Double totalQty);
+	List<ProductTire> findByProduct_BrandAndProduct_TotalQtyGreaterThan(
+			Brand brand, Double totalQty);
 
 	List<ProductTire> findByProduct_Brand(Brand brand);
 

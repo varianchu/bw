@@ -126,7 +126,7 @@ public class DefaultController {
 
 					bgms.add(bgm);
 				}
-				logger.info("testing2");
+				// logger.info("testing2");
 				logger.info("settings category choice is: "
 						+ settings.getCategoryChoice());
 				// error starts here
@@ -135,7 +135,10 @@ public class DefaultController {
 				logger.info("Category is: " + category.getCategoryName());
 				List<Product> products = productService
 						.getProductsByCategory(category);
-				logger.info("testing3");
+				// logger.info("testing3");
+				// if you have extra time change the
+				// productService.getProductsByCategory in repo to
+				// category.getProducts()
 				for (Product product : products) {
 					if (product.getProductTire() == null) {
 						BarGraphModel2 bgm2 = new BarGraphModel2();
@@ -147,6 +150,8 @@ public class DefaultController {
 
 						bgms2.add(bgm2);
 					} else if (product.getProductTire() != null) {
+						logger.info("product-tire is: "
+								+ product.getProductTire().toString());
 						BarGraphModel2 bgm2 = new BarGraphModel2();
 						bgm2.setProductName(product.getProductTire().toString());
 						bgm2.setQty(product.getTotalQty().toString());
@@ -211,6 +216,8 @@ public class DefaultController {
 
 						bgms2.add(bgm2);
 					} else if (product.getProductTire() != null) {
+						logger.info("product-tire is: "
+								+ product.getProductTire().toString());
 						BarGraphModel2 bgm2 = new BarGraphModel2();
 						bgm2.setProductName(product.getProductTire().toString());
 						bgm2.setQty(product.getTotalQty().toString());
@@ -275,6 +282,8 @@ public class DefaultController {
 
 						bgms2.add(bgm2);
 					} else if (product.getProductTire() != null) {
+						logger.info("product-tire is: "
+								+ product.getProductTire().toString());
 						BarGraphModel2 bgm2 = new BarGraphModel2();
 						bgm2.setProductName(product.getProductTire().toString());
 						bgm2.setQty(product.getTotalQty().toString());

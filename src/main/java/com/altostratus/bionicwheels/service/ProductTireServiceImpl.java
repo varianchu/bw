@@ -61,8 +61,9 @@ public class ProductTireServiceImpl implements ProductTireService {
 	public List<ProductTire> getProductTiresByBrandTotalQty(Brand brand,
 			Double totalQty) {
 		// TODO Auto-generated method stub
-		return productTireRepository.findByProduct_BrandAndProduct_TotalQty(
-				brand, totalQty);
+		return productTireRepository
+				.findByProduct_BrandAndProduct_TotalQtyGreaterThan(brand,
+						totalQty);
 	}
 
 	@Override
@@ -94,5 +95,11 @@ public class ProductTireServiceImpl implements ProductTireService {
 	public List<ProductTire> getProductTiresBySupplier(Supplier supplier) {
 		// TODO Auto-generated method stub
 		return productTireRepository.findByProduct_Supplier(supplier);
+	}
+
+	@Override
+	public void removeProductTire(ProductTire productTire) {
+		// TODO Auto-generated method stub
+		productTireRepository.delete(productTire);
 	}
 }

@@ -16,6 +16,8 @@ public interface ProductTireService {
 
 	public void removeProductTire(Long id);
 
+	public void removeProductTire(ProductTire productTire);
+
 	public List<ProductTire> getProductTiresByCrossSectionWidthProfileDiameter(
 			String crossSectionWidth, Integer profile, String diameter);
 

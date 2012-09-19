@@ -18,7 +18,20 @@ public class DummyProduct {
 	private Double cost = 0.0;
 	private Double srp = 0.0;
 	private Long inventoryId;
+	private Long tireId;
 	private Boolean newPrice;
+	private String crossSectionWidth;
+	private Integer profile;
+	private String construction;
+	private String diameter;
+
+	private Long magsId;
+	private String style;
+	private String size;
+	private Integer spokes;
+	private Integer offset;
+	private String pcd;
+	private String finish;
 
 	public Long getId() {
 		return id;
@@ -138,6 +151,102 @@ public class DummyProduct {
 
 	public void setTotalQty(Double totalQty) {
 		this.totalQty = totalQty;
+	}
+
+	public String getCrossSectionWidth() {
+		return crossSectionWidth;
+	}
+
+	public void setCrossSectionWidth(String crossSectionWidth) {
+		this.crossSectionWidth = crossSectionWidth;
+	}
+
+	public Integer getProfile() {
+		return profile;
+	}
+
+	public void setProfile(Integer profile) {
+		this.profile = profile;
+	}
+
+	public String getConstruction() {
+		return construction;
+	}
+
+	public void setConstruction(String construction) {
+		this.construction = construction;
+	}
+
+	public String getDiameter() {
+		return diameter;
+	}
+
+	public void setDiameter(String diameter) {
+		this.diameter = diameter;
+	}
+
+	public Long getTireId() {
+		return tireId;
+	}
+
+	public void setTireId(Long tireId) {
+		this.tireId = tireId;
+	}
+
+	public Long getMagsId() {
+		return magsId;
+	}
+
+	public void setMagsId(Long magsId) {
+		this.magsId = magsId;
+	}
+
+	public String getStyle() {
+		return style;
+	}
+
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
+
+	public Integer getSpokes() {
+		return spokes;
+	}
+
+	public void setSpokes(Integer spokes) {
+		this.spokes = spokes;
+	}
+
+	public Integer getOffset() {
+		return offset;
+	}
+
+	public void setOffset(Integer offset) {
+		this.offset = offset;
+	}
+
+	public String getPcd() {
+		return pcd;
+	}
+
+	public void setPcd(String pcd) {
+		this.pcd = pcd;
+	}
+
+	public String getFinish() {
+		return finish;
+	}
+
+	public void setFinish(String finish) {
+		this.finish = finish;
 	}
 
 }
