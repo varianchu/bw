@@ -29,12 +29,19 @@ public class CategoryController {
 
 	private Logger logger = LoggerFactory.getLogger(CategoryController.class);
 
+	private String successMessage = null;
+	private String errorMessage = null;
+
 	@RequestMapping(value = "/category", method = RequestMethod.GET)
 	public ModelAndView categoryIndex(HttpServletRequest request) {
 		logger.info("entering category index");
 		ModelAndView mnv = new ModelAndView("admin.category.index");
 		mnv.addObject("category", new Category());
 		mnv.addObject("categories", categoryService.getAllCategories());
+		mnv.addObject("SUCCESS_MESSAGE", successMessage);
+		mnv.addObject("ERROR_MESSAGE", errorMessage);
+		successMessage = null;
+		errorMessage = null;
 		return mnv;
 	}
 
@@ -52,9 +59,19 @@ public class CategoryController {
 	public ModelAndView removeCategory(@PathVariable("id") Long categoryId,
 			HttpServletRequest request) {
 		logger.info("Removing category id: " + categoryId.toString());
-		categoryService.removeCategory(categoryId);
-		ModelAndView mnv = new ModelAndView("redirect:/admin/category");
-		return mnv;
+		try {
+			categoryService.removeCategory(categoryId);
+			successMessage = "Successfully deleted Category";
+			ModelAndView mnv = new ModelAndView("redirect:/admin/category");
+			return mnv;
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.info(e.getMessage());
+			logger.info("remove unsuccessful (Category).");
+			errorMessage = "Delete Category Unsuccessful.";
+			ModelAndView mnv = new ModelAndView("redirect:/admin/category");
+			return mnv;
+		}
 	}
 
 	@RequestMapping(value = "/category", method = RequestMethod.POST)
@@ -72,10 +89,16 @@ public class CategoryController {
 			ModelAndView mnv = new ModelAndView("admin.category.index");
 			mnv.addObject("category", new Category());
 			mnv.addObject("categories", categoryService.getAllCategories());
+			mnv.addObject("ERROR_MESSAGE",
+					"Category not saved. Kindly check inputted fields.");
+			successMessage = null;
 			return mnv;
 		}
-
+		// add success message
 		categoryService.saveCategory(category);
+
+		successMessage = "Successfully saved category.";
+		errorMessage = null;
 		ModelAndView mnv = new ModelAndView("redirect:/admin/category");
 		return mnv;
 	}

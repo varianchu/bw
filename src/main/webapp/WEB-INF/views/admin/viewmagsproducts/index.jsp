@@ -5,9 +5,9 @@
 <h3>SEARCH MAG WHEEL/S</h3>
 <!-- testing -->
 <hr></hr>
-<div class="well span8 offset2">
+<div class="well span8">
 <form:form action = "/admin/search-mags" method = "POST" modelAttribute = "mags">
-	<label>Filter by:</label><form:select id = "filter" path="filterName" onchange="showFields()" class="span3">
+	<label>Filter by:</label><form:select id = "filter" path="filterName" onchange="showFields()" class="span2">
 	<form:option value="0" label="---CHOOSE FILTER---"/>
 		<c:forEach var = "filtervalue" items="${filters}">
 			<form:option value="${filtervalue}"></form:option>
@@ -57,7 +57,7 @@
 	<input type="submit" value="Search Mag Wheels" class="btn btn-primary"/>
 </form:form>
 </div>
-<div class="row span12 alert alert-info">
+<div class="row span8 alert alert-info">
 <table class="table table-striped table-bordered table-condensed data_grid">
   <thead>
   <tr>
@@ -72,7 +72,7 @@
   <tbody>
   <c:forEach var="mags" items="${magwheels}">
   <tr>
-    <td>${mags.product.productNam}</td>
+    <td>${mags.product.productName}</td>
     <td>${mags.product.brand.brandName}</td>
     <td>${mags}</td>
     <td>${mags.product.totalQty}</td>
@@ -98,11 +98,7 @@ $('#sizeId').hide();
 $('#brandId').hide();
 $('#supplier').hide();
 $('#pcdId').hide();
-
-<c:if test ="${empty magwheels}">
-$('#filter').val('0');
-alert('no mag wheels found.');
-</c:if>
+$('#filter').val('0').attr('selected',true);
 
 function showFields(){
 	var filter = document.getElementById('filter');
@@ -162,5 +158,4 @@ $('table.data_grid').dataTable({
 	"sPaginationType": "full_numbers"
 });
 
-$('.dropdown-toggle').dropdown();
 </script>

@@ -29,12 +29,19 @@ public class SupplierController {
 
 	private Logger logger = LoggerFactory.getLogger(SupplierController.class);
 
+	private String successMessage = null;
+	private String errorMessage = null;
+
 	@RequestMapping(value = "/supplier", method = RequestMethod.GET)
 	public ModelAndView supplierIndex(HttpServletRequest request) {
 		logger.info("entering supplier index");
 		ModelAndView mnv = new ModelAndView("admin.supplier.index");
 		mnv.addObject("supplier", new Supplier());
 		mnv.addObject("suppliers", supplierService.getAllSuppliers());
+		mnv.addObject("SUCCESS_MESSAGE", successMessage);
+		mnv.addObject("ERROR_MESSAGE", errorMessage);
+		successMessage = null;
+		errorMessage = null;
 		return mnv;
 	}
 
@@ -69,10 +76,14 @@ public class SupplierController {
 			ModelAndView mnv = new ModelAndView("admin.supplier.index");
 			mnv.addObject("supplier", new Supplier());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
+			mnv.addObject("ERROR_MESSAGE", "Supplier not saved.");
+			successMessage = null;
 			return mnv;
 		}
 
 		supplierService.saveSupplier(supplier);
+		successMessage = "Successfully saved supplier.";
+		errorMessage = null;
 		ModelAndView mnv = new ModelAndView("redirect:/admin/supplier");
 		return mnv;
 	}

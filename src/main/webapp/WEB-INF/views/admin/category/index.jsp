@@ -4,12 +4,12 @@
 <div>
 <h3>CATEGORY INFORMATION</h3>
 <hr></hr>
-<div class="well span8 offset2">
+<div class="well span8">
 <form:form action = "/admin/category" method = "POST" modelAttribute = "category">
 	<form:hidden path="id"/>
-	<label>Category Name:</label><form:input type="text" path="categoryName"/>
+	<label>Category Name:</label><form:input type="text" path="categoryName" placeholder="Category Name"/>
 	<form:errors path="categoryName" style="color:red;"/>
-	<label>Category Code:</label><form:input type="text" path="code"/>
+	<label>Category Code:</label><form:input type="text" path="code" placeholder="Category Code" class="span2"/>
 	<form:errors path="code" style="color:red;"/>
 	<label>Description:</label><form:textarea type="text" class="input-xlarge" path="description"/>
 	<hr></hr>
@@ -17,7 +17,7 @@
 </form:form>
 </div>
 
-<table class="table table-striped table-bordered table-condensed">
+<table class="table table-striped table-bordered table-condensed alert-info">
   <thead>
   <tr>
    <td>Category Name</td>
@@ -36,20 +36,16 @@
     	<li>
     		<a href="/admin/category/edit/${category.id}"><img alt="edit" src="/images/update.png">&nbsp; Edit </a>
     	</li>
-    	<li class="dropdown" data-dropdown="dropdown">
-			<a href="#" class="dropdown-toggle"><img alt="delete" src="/images/delete.png">&nbsp; Remove</a>
-				<ul class="dropdown-menu">
+		<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Remove <b class="caret"></b></a>
+            	<ul class="dropdown-menu">
 					<li><a href="/admin/category/remove/${category.id}">Delete it!</a></li>
 					<li><a href="#">Cancel</a></li>
 				</ul>
-		</li>
+       	</li>
 	</ul>
 	</td>
   </tr>
   </c:forEach>
 </table>
 </div>
-
-<script type="text/javascript">
-    $('.dropdown-toggle').dropdown();
-</script>

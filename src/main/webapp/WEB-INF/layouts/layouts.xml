@@ -7,6 +7,7 @@
 
   <definition name="default" template="/WEB-INF/layouts/default.jsp">
   	<put-attribute name="menu" value="/WEB-INF/views/menu.jsp" />
+  	<put-attribute name="sidenav" value="/WEB-INF/views/sidenav.jsp" />
   </definition>
 
   <definition name="plain" template="/WEB-INF/layouts/plain.jsp">
@@ -14,6 +15,9 @@
 
   <definition name="none" template="/WEB-INF/layouts/none.jsp">
   	<put-attribute name="menu" value="/WEB-INF/views/menu.jsp" />
+  </definition>
+  
+  <definition name="blank" template="/WEB-INF/layouts/blank.jsp">
   </definition>
 
 </tiles-definitions>

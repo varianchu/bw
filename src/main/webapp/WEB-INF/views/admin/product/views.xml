@@ -7,5 +7,12 @@
 <definition name="admin.product.index" extends="default">
     <put-attribute name="body" value="/WEB-INF/views/admin/product/index.jsp" />
 </definition>
+
+<definition name="admin.viewproducts.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/product/viewproducts.jsp" />
+</definition>
+
+<definition name="admin.barcode.index" extends="blank">
+</definition>
    
- </tiles-definitions> 
+</tiles-definitions> 

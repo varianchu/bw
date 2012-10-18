@@ -19,12 +19,12 @@
 <hr></hr>
 <button class="btn btn-primary" id="addProductForTransaction" type="button">Add Product to Transaction</button>
 </div>
-
-<div class="well offset4">
+<div class="row"></div>
+<div class="well">
 
 <form:form action = "/admin/stocktransaction" method = "POST" modelAttribute = "transaction">
 	<form:hidden path="id"/>
-	<label>Transaction Date:</label><form:input type="text" path="dateCreatedValue" id="ButtonCreationDemoInput" value="${getDate}"/><button id="ButtonCreationDemoButton">
+	<label>Transaction Date:</label><form:input type="text" path="dateCreatedValue" id="ButtonCreationDemoInput" value="${getDate}"/><button id="ButtonCreationDemoButton" type="button">
     <img src="/images/calendar.png" alt="[calendar icon]"/>
   </button>
 	<label>Transaction Type:</label><form:select type="text" path="transactionType" items="${transactionType}"/>

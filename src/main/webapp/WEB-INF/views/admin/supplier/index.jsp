@@ -4,20 +4,20 @@
 <div>
 <h3>SUPPLIER INFORMATION</h3>
 <hr></hr>
-<div class="well span8 offset2">
+<div class="well span8">
 <form:form action = "/admin/supplier" method = "POST" modelAttribute = "supplier">
 	<form:hidden path="id"/>
-	<label>Supplier Name:</label><form:input type="text" path="supplierName"/>
+	<label>Supplier Name:</label><form:input type="text" path="supplierName" placeholder="Supplier Name"/>
 	<form:errors path = "supplierName" style="color:red;"></form:errors>
-	<label>Supplier Address:</label><form:input type="text" path="address"/>
-	<label>Contact Number:</label><form:input type="text" path="contactNumber"/>
+	<label>Supplier Address:</label><form:input type="text" path="address" class="span4" placeholder="Address"/>
+	<label>Contact Number:</label><form:input type="text" path="contactNumber" placeholder="Contact Number" class="span2"/>
 	<label>Notes:</label><form:textarea type="text" class="input-xlarge" path="notes"/>
 	<hr></hr>
 	<input type="submit" value="Save Supplier" class="btn btn-primary"/>
 </form:form>
 </div>
 
-<table class="table table-striped table-bordered table-condensed">
+<table class="table table-striped table-bordered table-condensed alert-info">
   <thead>
   <tr>
    <td>Supplier Name</td>
@@ -38,13 +38,13 @@
     	<li>
     		<a href="/admin/supplier/edit/${supplier.id}"><img alt="edit" src="/images/update.png">&nbsp; Edit </a>
     	</li>
-    	<li class="dropdown" data-dropdown="dropdown">
-			<a href="#" class="dropdown-toggle"><img alt="delete" src="/images/delete.png">&nbsp; Remove</a>
-				<ul class="dropdown-menu">
+    	<li class="dropdown">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Remove <b class="caret"></b></a>
+            	<ul class="dropdown-menu">
 					<li><a href="/admin/supplier/remove/${supplier.id}">Delete it!</a></li>
 					<li><a href="#">Cancel</a></li>
 				</ul>
-		</li>
+       	</li>
 	</ul>
 	</td>
   </tr>

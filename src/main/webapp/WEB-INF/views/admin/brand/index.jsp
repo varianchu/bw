@@ -4,10 +4,10 @@
 <div>
 <h3>BRAND INFORMATION</h3>
 <hr></hr>
-<div class="well span8 offset2">
+<div class="well span8">
 <form:form action = "/admin/brand" method = "POST" modelAttribute = "brand">
 	<form:hidden path="id"/>
-	<label>Brand Name:</label><form:input type="text" path="brandName"/>
+	<label>Brand Name:</label><form:input type="text" path="brandName" placeholder="Brand Name"/>
 	<form:errors path="brandName" style="color:red;"/>
 	<label>Supplier:</label><form:select items="${suppliers}" path="supplierId" itemValue="id"/>
 	<form:errors path="supplier" style="color:red;"/>
@@ -17,7 +17,7 @@
 </form:form>
 </div>
 
-<table class="table table-striped table-bordered table-condensed">
+<table class="table table-striped table-bordered table-condensed alert-info">
   <thead>
   <tr>
    <td>Brand Name</td>
@@ -49,7 +49,3 @@
   </c:forEach>
 </table>
 </div>
-
-<script type="text/javascript">
-    $('.dropdown-toggle').dropdown();
-</script>

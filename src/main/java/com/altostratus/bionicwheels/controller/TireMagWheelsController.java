@@ -70,7 +70,11 @@ public class TireMagWheelsController {
 							tire.getCrossSectionWidth(), tire.getProfile(),
 							tire.getDiameter());
 			mnv.addObject("tire", new DummyTireProduct());
-			mnv.addObject("tires", tires);
+			if (tires.size() != 0) {
+				mnv.addObject("tires", tires);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Tire Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyTireProduct.FILTERS.values());
@@ -80,7 +84,11 @@ public class TireMagWheelsController {
 			List<ProductTire> tires = productTireService
 					.getProductTiresByBrandTotalQty(brand, tire.getQty());
 			mnv.addObject("tire", new DummyTireProduct());
-			mnv.addObject("tires", tires);
+			if (tires.size() != 0) {
+				mnv.addObject("tires", tires);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Tire Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyTireProduct.FILTERS.values());
@@ -91,7 +99,11 @@ public class TireMagWheelsController {
 			List<ProductTire> tires = productTireService
 					.getProductTiresByBrand(brand);
 			mnv.addObject("tire", new DummyTireProduct());
-			mnv.addObject("tires", tires);
+			if (tires.size() != 0) {
+				mnv.addObject("tires", tires);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Tire Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyTireProduct.FILTERS.values());
@@ -102,7 +114,11 @@ public class TireMagWheelsController {
 			List<ProductTire> tires = productTireService
 					.getProductTiresBySupplier(supplier);
 			mnv.addObject("tire", new DummyTireProduct());
-			mnv.addObject("tires", tires);
+			if (tires.size() != 0) {
+				mnv.addObject("tires", tires);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Tire Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyTireProduct.FILTERS.values());
@@ -112,7 +128,11 @@ public class TireMagWheelsController {
 					.getProductTireByCrossSectionWidth(tire
 							.getCrossSectionWidth2());
 			mnv.addObject("tire", new DummyTireProduct());
-			mnv.addObject("tires", tires);
+			if (tires.size() != 0) {
+				mnv.addObject("tires", tires);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Tire Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyTireProduct.FILTERS.values());
@@ -121,7 +141,11 @@ public class TireMagWheelsController {
 			List<ProductTire> tires = productTireService
 					.getProductTireByProfile(tire.getProfile2());
 			mnv.addObject("tire", new DummyTireProduct());
-			mnv.addObject("tires", tires);
+			if (tires.size() != 0) {
+				mnv.addObject("tires", tires);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Tire Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyTireProduct.FILTERS.values());
@@ -130,7 +154,11 @@ public class TireMagWheelsController {
 			List<ProductTire> tires = productTireService
 					.getProductTireByDiameter(tire.getDiameter2());
 			mnv.addObject("tire", new DummyTireProduct());
-			mnv.addObject("tires", tires);
+			if (tires.size() != 0) {
+				mnv.addObject("tires", tires);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Tire Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyTireProduct.FILTERS.values());
@@ -159,7 +187,11 @@ public class TireMagWheelsController {
 			List<ProductMagWheels> magwheels = productMagWheelsService
 					.getAllMagWheelsBySizeAndPCD(mags.getSize(), mags.getPcd());
 			mnv.addObject("mags", new DummyMagsProduct());
-			mnv.addObject("magwheels", magwheels);
+			if (magwheels.size() != 0) {
+				mnv.addObject("magwheels", magwheels);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Mag Wheels Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyMagsProduct.FILTERS.values());
@@ -168,7 +200,11 @@ public class TireMagWheelsController {
 			List<ProductMagWheels> magwheels = productMagWheelsService
 					.getAllMagWheelsBySize(mags.getSize2());
 			mnv.addObject("mags", new DummyMagsProduct());
-			mnv.addObject("magwheels", magwheels);
+			if (magwheels.size() != 0) {
+				mnv.addObject("magwheels", magwheels);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Mag Wheels Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyMagsProduct.FILTERS.values());
@@ -177,7 +213,11 @@ public class TireMagWheelsController {
 			List<ProductMagWheels> magwheels = productMagWheelsService
 					.getAllMagWheelsByPCD(mags.getPcd2());
 			mnv.addObject("mags", new DummyMagsProduct());
-			mnv.addObject("magwheels", magwheels);
+			if (magwheels.size() != 0) {
+				mnv.addObject("magwheels", magwheels);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Mag Wheels Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyMagsProduct.FILTERS.values());
@@ -187,7 +227,11 @@ public class TireMagWheelsController {
 			List<ProductMagWheels> magwheels = productMagWheelsService
 					.getAllMagWheelsByBrand(brand);
 			mnv.addObject("mags", new DummyMagsProduct());
-			mnv.addObject("magwheels", magwheels);
+			if (magwheels.size() != 0) {
+				mnv.addObject("magwheels", magwheels);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Mag Wheels Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyMagsProduct.FILTERS.values());
@@ -198,7 +242,11 @@ public class TireMagWheelsController {
 			List<ProductMagWheels> magwheels = productMagWheelsService
 					.getAllMagWheelsBySupplier(supplier);
 			mnv.addObject("mags", new DummyMagsProduct());
-			mnv.addObject("magwheels", magwheels);
+			if (magwheels.size() != 0) {
+				mnv.addObject("magwheels", magwheels);
+			} else {
+				mnv.addObject("ERROR_MESSAGE", "No Mag Wheels Found!");
+			}
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("filters", DummyMagsProduct.FILTERS.values());

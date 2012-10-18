@@ -11,6 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -18,6 +20,7 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.builder.EqualsBuilder;
 
 import com.altostratus.core.model.BaseObject;
+import com.altostratus.core.model.User;
 
 @Entity
 @Table(name = "inventory_transaction")
@@ -46,6 +49,19 @@ public class InventoryTransaction extends BaseObject implements Serializable {
 
 	@Transient
 	private String dateCreatedValue;
+
+	@ManyToOne(cascade = { CascadeType.PERSIST })
+	@JoinColumn(name = "point_person_id")
+	private User user;
+
+	@Column(name = "point_person_name", nullable = false)
+	private String pointPersonName;
+
+	@Column(name = "total_transaction_cost")
+	private Double totalTransactionCost;
+
+	@Column(name = "total_transaction_sale")
+	private Double totalTransactionSale;
 
 	public Long getId() {
 		return id;
@@ -94,6 +110,38 @@ public class InventoryTransaction extends BaseObject implements Serializable {
 	public void setInventoryTransactionProducts(
 			List<InventoryTransactionProduct> inventoryTransactionProducts) {
 		this.inventoryTransactionProducts = inventoryTransactionProducts;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public String getPointPersonName() {
+		return pointPersonName;
+	}
+
+	public void setPointPersonName(String pointPersonName) {
+		this.pointPersonName = pointPersonName;
+	}
+
+	public Double getTotalTransactionCost() {
+		return totalTransactionCost;
+	}
+
+	public void setTotalTransactionCost(Double totalTransactionCost) {
+		this.totalTransactionCost = totalTransactionCost;
+	}
+
+	public Double getTotalTransactionSale() {
+		return totalTransactionSale;
+	}
+
+	public void setTotalTransactionSale(Double totalTransactionSale) {
+		this.totalTransactionSale = totalTransactionSale;
 	}
 
 	public boolean equals(Object other) {

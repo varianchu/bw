@@ -5,7 +5,7 @@
 <h3>SEARCH TIRE/S</h3>
 <!-- testing -->
 <hr></hr>
-<div class="well span8 offset2">
+<div class="well span8">
 <form:form action = "/admin/search-tires" method = "POST" modelAttribute = "tire">
 <%-- 	<form:hidden path="id"/> --%>
 <%-- 	<label>Supplier:</label><form:select id = "filter" items="${filters}" path="filterName" onchange="showFields()"/> --%>
@@ -83,7 +83,7 @@
 	<input type="submit" value="Search Tire" class="btn btn-primary"/>
 </form:form>
 </div>
-<div class="row span12 alert alert-info">
+<div class="row span8 alert alert-info">
 <table class="table table-striped table-bordered table-condensed data_grid">
   <thead>
   <tr>
@@ -124,11 +124,8 @@ $('#supplier').hide();
 $('#cross').hide();
 $('#pro').hide();
 $('#dia').hide();
+$('#filter').val('0').attr('selected',true);
 
-<c:if test ="${empty tires}">
-	$('#filter').val('0');
-	alert('no tires found.');
-</c:if>
 
 function showFields(){
 	var filter = document.getElementById('filter');
@@ -217,5 +214,4 @@ $('table.data_grid').dataTable({
 	"sPaginationType": "full_numbers"
 });
 
-$('.dropdown-toggle').dropdown();
 </script>

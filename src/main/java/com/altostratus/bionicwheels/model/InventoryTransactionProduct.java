@@ -36,6 +36,12 @@ public class InventoryTransactionProduct {
 	@Column(name = "product_name", nullable = false)
 	private String productName;
 
+	@Column(name = "product_cost", nullable = false)
+	private Double productCost;
+
+	@Column(name = "product_sale", nullable = false)
+	private Double productSale;
+
 	public Long getId() {
 		return id;
 	}
@@ -75,6 +81,22 @@ public class InventoryTransactionProduct {
 
 	public void setProductName(String productName) {
 		this.productName = productName;
+	}
+
+	public Double getProductCost() {
+		return productCost;
+	}
+
+	public void setProductCost(Double productCost) {
+		this.productCost = productCost;
+	}
+
+	public Double getProductSale() {
+		return productSale;
+	}
+
+	public void setProductSale(Double productSale) {
+		this.productSale = productSale;
 	}
 
 	public boolean equals(Object other) {

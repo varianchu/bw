@@ -32,6 +32,8 @@ import com.altostratus.bionicwheels.service.InventoryTransactionService;
 import com.altostratus.bionicwheels.service.ProductService;
 import com.altostratus.bionicwheels.service.SettingsService;
 import com.altostratus.bionicwheels.validator.InventoryTransactionValidator;
+import com.altostratus.core.model.User;
+import com.altostratus.core.service.UserManagementService;
 import com.altostratus.core.util.CustomComparatorAscending;
 import com.altostratus.core.util.CustomComparatorDescending;
 import com.altostratus.core.util.InsufficientStockException;
@@ -57,6 +59,9 @@ public class InventoryTransactionProductController {
 
 	@Autowired
 	SettingsService settingsService;
+
+	@Autowired
+	UserManagementService userManagementService;
 
 	ArrayList<DummyProductQty> arrayList;
 
@@ -182,28 +187,18 @@ public class InventoryTransactionProductController {
 			HttpServletRequest request,
 			@ModelAttribute("transaction") InventoryTransaction inventoryTransaction,
 			BindingResult result) {
+
 		logger.info("[IN SAVE ITP] arraylist size is: " + arrayList.size());
 		ModelAndView mnv = new ModelAndView(
 				"admin.inventorytransactionproduct.index");
 		ArrayList<String> headsUpMsgs = new ArrayList<String>();
 
+		Long inventoryTransactionId = null;
+		Double totalCost = null;
+		Double totalSale = null;
+
 		logger.info("Inventory Transaction is: "
 				+ inventoryTransaction.getTransactionType());
-
-		// logger.info("Inventory Transaction's DATE is: "
-		// + inventoryTransaction.getDateCreated());
-
-		// try {
-		// logger.info("entering try catch");
-		// String stringDate = inventoryTransaction.getDateCreated()
-		// .toString();
-		// DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		// Date date = (Date) formatter.parse(stringDate);
-		// inventoryTransaction.setDateCreated(date);
-		// logger.info("Inventory DATE: " + date);
-		// } catch (Exception e) {
-		// logger.info("error");
-		// }
 
 		try {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -225,7 +220,7 @@ public class InventoryTransactionProductController {
 					InventoryTransaction.TRANSACTION_TYPE.values());
 			mnv.addObject("headsup", headsUpMsgs);
 			mnv.addObject("referenceNumber", inventoryTransactionService
-					.getAllInventoryTransactions().size());
+					.getAllInventoryTransactions().size() + 1);
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 			String s = df.format(new Date());
 			mnv.addObject("getDate", s);
@@ -235,8 +230,29 @@ public class InventoryTransactionProductController {
 
 		if (arrayList.size() != 0) {
 
-			InventoryTransaction it = (InventoryTransaction) inventoryTransactionService
-					.saveInventoryTransaction(inventoryTransaction);
+			InventoryTransaction it = new InventoryTransaction();
+			it.setTransactionType(inventoryTransaction.getTransactionType());
+			it.setReferenceNumber(inventoryTransaction.getReferenceNumber());
+			User user = userManagementService.getUserByUsername(request
+					.getUserPrincipal().getName());
+			it.setUser(user);
+			it.setPointPersonName(user.getUsername() + " - "
+					+ user.getFirstName());
+
+			try {
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+				Date dateCreated = df.parse(inventoryTransaction
+						.getDateCreatedValue());
+				it.setDateCreated(dateCreated);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+				return new ModelAndView("redirect:/admin/stocktransaction");
+			}
+			it = (InventoryTransaction) inventoryTransactionService
+					.saveInventoryTransaction(it);
+
+			inventoryTransactionId = it.getId();
 
 			logger.info("transaction date is " + it.getDateCreated());
 
@@ -281,8 +297,6 @@ public class InventoryTransactionProductController {
 							.getProductName());
 					itp.setQty(dpq.getQty());
 
-					itp = (InventoryTransactionProduct) inventoryTransactionProductService
-							.saveInventoryTransactionProduct(itp);
 					Product product = (Product) productService.getProduct(dpq
 							.getId());
 
@@ -302,7 +316,7 @@ public class InventoryTransactionProductController {
 							product.setTotalQty(qtyAns);
 
 							if (settingsService.getSettings(id)
-									.getStockProcess() == "FIFO") {
+									.getStockProcess().equalsIgnoreCase("FIFO")) {
 
 								Collections.sort(inventoriesOfProduct,
 										new CustomComparatorAscending());
@@ -328,7 +342,10 @@ public class InventoryTransactionProductController {
 										break;
 									}
 								}
-							} else {
+							}
+
+							if (settingsService.getSettings(id)
+									.getStockProcess().equalsIgnoreCase("LIFO")) {
 								Collections.sort(inventoriesOfProduct,
 										new CustomComparatorDescending());
 
@@ -355,6 +372,8 @@ public class InventoryTransactionProductController {
 								}
 							}
 
+							itp = (InventoryTransactionProduct) inventoryTransactionProductService
+									.saveInventoryTransactionProduct(itp);
 							headsUpMsgs
 									.add("Successfully deleted the qty of Product: "
 											+ product.getProductName()
@@ -380,10 +399,12 @@ public class InventoryTransactionProductController {
 				InventoryTransaction.TRANSACTION_TYPE.values());
 		mnv.addObject("headsup", headsUpMsgs);
 		mnv.addObject("referenceNumber", inventoryTransactionService
-				.getAllInventoryTransactions().size());
+				.getAllInventoryTransactions().size() + 1);
 		mnv.addObject("getDate", s);
 		logger.info("Saved, Entering Index Again");
+
+		arrayList.clear();
+
 		return mnv;
-		// return new ModelAndView("redirect:/admin/stocktransaction");
 	}
 }

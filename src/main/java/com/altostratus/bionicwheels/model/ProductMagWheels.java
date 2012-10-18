@@ -46,6 +46,12 @@ public class ProductMagWheels extends BaseObject implements Serializable {
 	@JoinColumn(name = "product_id", nullable = false, unique = true)
 	private Product product;
 
+	@Column(name = "image_url")
+	private String imageUrl;
+
+	@Column(name = "thumbnail_url")
+	private String thumbnailUrl;
+
 	public Long getId() {
 		return id;
 	}
@@ -108,6 +114,22 @@ public class ProductMagWheels extends BaseObject implements Serializable {
 
 	public void setProduct(Product product) {
 		this.product = product;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getThumbnailUrl() {
+		return thumbnailUrl;
+	}
+
+	public void setThumbnailUrl(String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
 	}
 
 	public boolean equals(Object other) {

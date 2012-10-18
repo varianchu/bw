@@ -5,10 +5,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +19,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -24,30 +27,34 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.altostratus.bionicwheels.model.InventoryTransaction;
+
 @Entity
-@Table(name="user")
-@Inheritance(strategy=InheritanceType.JOINED)
-@DiscriminatorColumn(name="user_type", discriminatorType=DiscriminatorType.STRING)
-public class User extends BaseObject implements UserDetails
-{
+@Table(name = "user")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
+public class User extends BaseObject implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	protected Long id;
 
-	@Column(name="username", unique=true, nullable = false, length = 60)
+	@Column(name = "username", unique = true, nullable = false, length = 60)
 	private String username;
 
-	@Column(name="password", nullable = false)
+	@Column(name = "password", nullable = false)
 	private String password;
 
-	@Column(name="first_name", nullable=false)
+	@Column(name = "first_name", nullable = false)
 	private String firstName;
 
-	@Column(name="last_name", nullable=false)
+	@Column(name = "last_name", nullable = false)
 	private String lastName;
 
-	@Column(name="email", nullable=false)
+	@Column(name = "email", nullable = false)
 	private String email;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.PERSIST)
+	private List<InventoryTransaction> inventoryTransactions;
 
 	@Transient
 	private Role role;
@@ -71,16 +78,11 @@ public class User extends BaseObject implements UserDetails
 		this.roleId = roleId;
 	}
 
-	@ManyToMany(targetEntity=Role.class)
-	@JoinTable(name="user_role",
-		joinColumns=
-			@JoinColumn(name="user_id", referencedColumnName="id"),
-		inverseJoinColumns=
-			@JoinColumn(name="role_id", referencedColumnName="id")
-	)
+	@ManyToMany(targetEntity = Role.class)
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private List<Role> roles;
 
-	@Column(name="user_type", nullable=false)
+	@Column(name = "user_type", nullable = false)
 	private String userType = "USER";
 
 	public String getUserType() {
@@ -149,6 +151,15 @@ public class User extends BaseObject implements UserDetails
 		this.password = password;
 	}
 
+	public List<InventoryTransaction> getInventoryTransactions() {
+		return inventoryTransactions;
+	}
+
+	public void setInventoryTransactions(
+			List<InventoryTransaction> inventoryTransactions) {
+		this.inventoryTransactions = inventoryTransactions;
+	}
+
 	@Override
 	public String toString() {
 		return username + " - " + firstName;
@@ -162,7 +173,7 @@ public class User extends BaseObject implements UserDetails
 		if (other instanceof User != true) {
 			return false;
 		}
-		final User o = (User)other;
+		final User o = (User) other;
 		return new EqualsBuilder().append(getId(), o.getId()).isEquals();
 	}
 
@@ -174,7 +185,7 @@ public class User extends BaseObject implements UserDetails
 	@Override
 	public Collection<GrantedAuthority> getAuthorities() {
 		Set<GrantedAuthority> authorities = new LinkedHashSet<GrantedAuthority>();
-		for(Role r : roles) {
+		for (Role r : roles) {
 			authorities.add(r);
 		}
 

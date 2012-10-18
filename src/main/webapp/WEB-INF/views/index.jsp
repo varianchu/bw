@@ -2,18 +2,14 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<div class="span11">
-<h1 class="title">Dashboard</h1>
+<div class="span9">
+<h2 class="title">Dashboard</h2>
 <!-- <div id="divForGraph" class="well span12"> -->
 <!-- </div> -->
-<div id="container" class="offset1" style="height:100%;"></div>
-<div class="row"><br /></div>
-<div id="container2" class="offset1" style="height:100%;">
-
-</div>
-<%-- <c:forEach items="${bgms2}" var="item"> --%>
-<%-- 	${item.productName} = ${item.qty} ${item.ceilingValue} ${item.floorValue} <br /> --%>
-<%-- </c:forEach> --%>
+<hr>
+<div id="container" style="height:100%;"></div>
+<br />
+<div id="container2" style="height:100%;"></div>
 </div>
 <script type="text/javascript">
 	var chart;
@@ -104,7 +100,7 @@
                 spacingBottom: 30
             },
             title: {
-                text: 'Products in this ${title2}'
+                text: 'Products found in ${title2}'
             },
             legend: {
                 layout: 'vertical',

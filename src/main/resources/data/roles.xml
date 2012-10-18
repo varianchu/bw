@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
 	<role id="1" name="ROLE_ADMIN" description="Administrator" />
+	<role id="2" name="SALES_PERSON" description="Sales Person" />
+	<role id="3" name="TIRE_MAGS_PERSON" description="Tire, Mags and Tint Manager" />
 </dataset>

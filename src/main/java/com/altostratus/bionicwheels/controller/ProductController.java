@@ -45,6 +45,8 @@ import com.altostratus.bionicwheels.service.ProductMagWheelsService;
 import com.altostratus.bionicwheels.service.ProductService;
 import com.altostratus.bionicwheels.service.ProductTireService;
 import com.altostratus.bionicwheels.service.SupplierService;
+import com.altostratus.bionicwheels.validator.ProductMagWheelsValidator;
+import com.altostratus.bionicwheels.validator.ProductTireValidator;
 import com.altostratus.bionicwheels.validator.ProductValidator;
 
 @Controller("productController")
@@ -64,6 +66,12 @@ public class ProductController {
 	ProductValidator productValidator;
 
 	@Autowired
+	ProductTireValidator productTireValidator;
+
+	@Autowired
+	ProductMagWheelsValidator productMagsValidator;
+
+	@Autowired
 	InventoryService inventoryService;
 
 	@Autowired
@@ -79,6 +87,11 @@ public class ProductController {
 
 	Boolean isTire = false;
 	Boolean isMags = false;
+
+	private List<Inventory> productInventories = null;
+
+	private String errorMessage = null;
+	private String successMessage = null;
 
 	@RequestMapping(value = "/product", method = RequestMethod.GET)
 	public ModelAndView productIndex(HttpServletRequest request) {
@@ -101,9 +114,13 @@ public class ProductController {
 				brandNames.add(brand.getBrandName());
 			}
 		}
-
+		mnv.addObject("productInventories", productInventories);
 		mnv.addObject("brands", brandNames);
 		mnv.addObject("products", productService.getAllProducts());
+		mnv.addObject("SUCCESS_MESSAGE", successMessage);
+		mnv.addObject("ERROR_MESSAGE", errorMessage);
+		successMessage = null;
+		errorMessage = null;
 		return mnv;
 	}
 
@@ -160,6 +177,8 @@ public class ProductController {
 			dummyProduct.setConstruction(product.getProductTire()
 					.getConstruction());
 			dummyProduct.setDiameter(product.getProductTire().getDiameter());
+			isTire = true;
+			isMags = false;
 		}
 
 		// logger.info("product mag wheels id: "
@@ -174,8 +193,12 @@ public class ProductController {
 			dummyProduct.setOffset(product.getProductMagWheels().getOffset());
 			dummyProduct.setFinish(product.getProductMagWheels().getFinish());
 			logger.info("all set for mags!");
+			isMags = true;
+			isTire = false;
 		}
 
+		productInventories = product.getInventories();
+		mnv.addObject("productInventories", product.getInventories());
 		mnv.addObject("brands", brandNames);
 		mnv.addObject("tireconstruction", ProductTire.CONSTRUCTION.values());
 		mnv.addObject("products", productService.getAllProducts());
@@ -197,81 +220,100 @@ public class ProductController {
 			BindingResult result) {
 		logger.info("Saving product");
 
-		// productValidator.validate(dummyProduct, result);
-		// if (result.hasErrors()) {
-		// logger.info("Failed to save product.");
-		// ModelAndView mnv = new ModelAndView("admin.product.index");
-		// mnv.addObject("product", new DummyProduct());
-		// mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
-		// mnv.addObject("categories", categoryService.getAllCategories());
-		// mnv.addObject("suppliers", supplierService.getAllSuppliers());
-		// mnv.addObject("products", productService.getAllProducts());
-		// return mnv;
-		// }
+		if (isMags == false && isTire == false) {
+
+			productValidator.validate(dummyProduct, result);
+
+			if (result.hasErrors()) {
+				ModelAndView mnv = new ModelAndView("admin.product.index");
+				mnv.addObject("product", new DummyProduct());
+				mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
+				mnv.addObject("categories", categoryService.getAllCategories());
+				mnv.addObject("suppliers", supplierService.getAllSuppliers());
+				mnv.addObject("products", productService.getAllProducts());
+				mnv.addObject("ERROR_MESSAGE",
+						"Product was not saved. Please Check the fields.");
+				List<Supplier> suppliers = supplierService.getAllSuppliers();
+				List<String> brandNames = new ArrayList<String>();
+				if (suppliers.size() == 0) {
+					brandNames.add("");
+				} else {
+					List<Brand> brands = brandService
+							.getAllBrandSuppliers(suppliers.get(0));
+					for (Brand brand : brands) {
+						brandNames.add(brand.getBrandName());
+					}
+				}
+				mnv.addObject("brands", brandNames);
+				return mnv;
+			}
+		}
+		if (isTire == true) {
+
+			productTireValidator.validate(dummyProduct, result);
+			if (result.hasErrors()) {
+				ModelAndView mnv = new ModelAndView("admin.product.index");
+				mnv.addObject("product", new DummyProduct());
+				mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
+				mnv.addObject("categories", categoryService.getAllCategories());
+				List<Supplier> suppliers = supplierService.getAllSuppliers();
+				mnv.addObject("suppliers", suppliers);
+				mnv.addObject("products", productService.getAllProducts());
+				mnv.addObject("tireconstruction",
+						ProductTire.CONSTRUCTION.values());
+				List<String> brandNames = new ArrayList<String>();
+				if (suppliers.size() == 0) {
+					brandNames.add("");
+				} else {
+					List<Brand> brands = brandService
+							.getAllBrandSuppliers(suppliers.get(0));
+					for (Brand brand : brands) {
+						brandNames.add(brand.getBrandName());
+					}
+				}
+				mnv.addObject("brands", brandNames);
+				mnv.addObject("ERROR_MESSAGE",
+						"Product was not saved. Please Check the fields of Tire and Product.");
+				return mnv;
+			}
+
+		}
+
+		if (isMags == true) {
+
+			productMagsValidator.validate(dummyProduct, result);
+			if (result.hasErrors()) {
+				ModelAndView mnv = new ModelAndView("admin.product.index");
+				mnv.addObject("product", new DummyProduct());
+				mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
+				mnv.addObject("categories", categoryService.getAllCategories());
+				List<Supplier> suppliers = supplierService.getAllSuppliers();
+				mnv.addObject("suppliers", suppliers);
+				mnv.addObject("products", productService.getAllProducts());
+				mnv.addObject("tireconstruction",
+						ProductTire.CONSTRUCTION.values());
+				List<String> brandNames = new ArrayList<String>();
+				if (suppliers.size() == 0) {
+					brandNames.add("");
+				} else {
+					List<Brand> brands = brandService
+							.getAllBrandSuppliers(suppliers.get(0));
+					for (Brand brand : brands) {
+						brandNames.add(brand.getBrandName());
+					}
+				}
+				mnv.addObject("brands", brandNames);
+				mnv.addObject("ERROR_MESSAGE",
+						"Product was not saved. Please Check the fields of Mag Wheels and Product.");
+				return mnv;
+			}
+
+		}
 
 		Product product = new Product();
-		// change the picture to mags next time. no need for pics for other
-		// stocks
-		MultipartFile file = dummyProduct.getFileData();
-		String fileName = null;
-		String fileNameThumbnail = null;
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
 
 		logger.info("brandName from dummy product is: "
 				+ dummyProduct.getBrandName().toString());
-
-		try {
-
-			if (file.getSize() > 0) {
-				inputStream = file.getInputStream();
-				if (file.getSize() > 10000000) {
-					logger.info("Failed to upload image.");
-					ModelAndView mnv = new ModelAndView("admin.product.index");
-					mnv.addObject("product", new DummyProduct());
-					mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
-					mnv.addObject("categories",
-							categoryService.getAllCategories());
-					mnv.addObject("suppliers",
-							supplierService.getAllSuppliers());
-					mnv.addObject("products", productService.getAllProducts());
-					mnv.addObject("fail", "failed to upload image.");
-					mnv.addObject("tireconstruction",
-							ProductTire.CONSTRUCTION.values());
-					return mnv;
-				}
-
-				ServletContext context = request.getSession()
-						.getServletContext();
-				fileName = context.getRealPath(request.getContextPath());
-				fileNameThumbnail = fileName + "/product-catalogue/"
-						+ dummyProduct.getCode() + "_thumbnail.png";
-				fileName += "/product-catalogue/" + dummyProduct.getCode()
-						+ ".png";
-				outputStream = new FileOutputStream(fileName);
-				logger.info(fileName);
-
-				int readBytes = 0;
-				byte[] buffer = new byte[10000000];
-				while ((readBytes = inputStream.read(buffer, 0, 10000)) != -1) {
-					outputStream.write(buffer, 0, readBytes);
-				}
-				outputStream.close();
-				inputStream.close();
-
-				BufferedImage img = new BufferedImage(75, 75,
-						BufferedImage.TYPE_INT_RGB);
-				img.createGraphics().drawImage(
-						ImageIO.read(new File(fileName)).getScaledInstance(75,
-								75, Image.SCALE_SMOOTH), 0, 0, null);
-				ImageIO.write(img, "png", new File(fileNameThumbnail));
-
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			logger.info(e.getMessage());
-			e.printStackTrace();
-		}
 
 		if (dummyProduct.getId() != null) {
 			product.setId(dummyProduct.getId());
@@ -279,25 +321,32 @@ public class ProductController {
 		}
 
 		product.setCode(dummyProduct.getCode());
+		logger.info(dummyProduct.getCode());
 		product.setTotalQty(dummyProduct.getTotalQty());
+		logger.info(dummyProduct.getTotalQty().toString());
 		product.setProductName(dummyProduct.getProductName());
+		logger.info(dummyProduct.getProductName());
 		product.setDescription(dummyProduct.getDescription());
+		logger.info("description: " + dummyProduct.getDescription());
 		product.setUnitOfMeasure(dummyProduct.getUnitOfMeasure());
+		logger.info(dummyProduct.getUnitOfMeasure());
 		product.setCategory(categoryService.getCategory(dummyProduct
 				.getCategoryId()));
+		logger.info("Category id: " + dummyProduct.getCategoryId());
 		product.setSupplier(supplierService.getSupplier(dummyProduct
 				.getSupplierId()));
-
+		logger.info("Supplier id: " + dummyProduct.getSupplierId());
 		Brand brand = brandService.getBrandByBrandName(dummyProduct
 				.getBrandName());
 		product.setBrand(brand);
 
 		logger.info("brand is " + brand.getBrandName());
 
-		product.setImageUrl(fileName);
-		product.setThumbnailUrl(fileNameThumbnail);
+		// product.setImageUrl(fileName);
+		// product.setThumbnailUrl(fileNameThumbnail);
 
 		product = (Product) productService.saveProduct(product);
+		logger.info("product saved! YEY!");
 
 		if (dummyProduct.getId() == null) {
 			try {
@@ -311,7 +360,7 @@ public class ProductController {
 				String barcodeFileName = context.getRealPath(request
 						.getContextPath());
 				File outputFile = new File(barcodeFileName
-						+ "/product-catalogue/barcode-" + product.getCode()
+						+ "/barcode-catalogue/barcode-" + product.getCode()
 						+ ".jpg");
 				OutputStream out = new FileOutputStream(outputFile);
 				logger.info("barcode is generated in " + outputFile);
@@ -351,6 +400,9 @@ public class ProductController {
 			logger.info("this product's inventory id link is: "
 					+ product.getInventoryId());
 		} else {
+			// do checkbox! error here!
+			logger.info("testing pls. help!" + inventories.size());
+			logger.info("get new price: " + dummyProduct.getNewPrice());
 			if (dummyProduct.getNewPrice() == true) {
 				Inventory newInventory = new Inventory();
 				newInventory.setCost(dummyProduct.getCost());
@@ -368,7 +420,9 @@ public class ProductController {
 				logger.info("inventory id for new price for PRODUCT: "
 						+ product.getProductName() + " is "
 						+ product.getInventoryId());
-			} else {
+			}
+			if (dummyProduct.getNewPrice() == null
+					|| dummyProduct.getNewPrice() == false) {
 				// logger.info("HELLO THERE!");
 				logger.info("product is: " + product + "product id is: "
 						+ product.getId());
@@ -460,6 +514,7 @@ public class ProductController {
 			} else {
 				mags = new ProductMagWheels();
 			}
+
 			mags.setFinish(dummyProduct.getFinish());
 			mags.setOffset(dummyProduct.getOffset());
 			mags.setPcd(dummyProduct.getPcd());
@@ -467,6 +522,71 @@ public class ProductController {
 			mags.setSize(dummyProduct.getSize());
 			mags.setSpokes(dummyProduct.getSpokes());
 			mags.setStyle(dummyProduct.getStyle());
+
+			MultipartFile file = dummyProduct.getFileData();
+			String fileName = null;
+			String fileNameThumbnail = null;
+			InputStream inputStream = null;
+			OutputStream outputStream = null;
+
+			logger.info("brandName from dummy product is: "
+					+ dummyProduct.getBrandName().toString());
+
+			try {
+
+				if (file.getSize() > 0) {
+					inputStream = file.getInputStream();
+					if (file.getSize() > 10000000) {
+						logger.info("Failed to upload image.");
+						ModelAndView mnv = new ModelAndView(
+								"admin.product.index");
+						mnv.addObject("product", new DummyProduct());
+						mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
+						mnv.addObject("categories",
+								categoryService.getAllCategories());
+						mnv.addObject("suppliers",
+								supplierService.getAllSuppliers());
+						mnv.addObject("products",
+								productService.getAllProducts());
+						mnv.addObject("fail", "failed to upload image.");
+						mnv.addObject("tireconstruction",
+								ProductTire.CONSTRUCTION.values());
+						return mnv;
+					}
+
+					ServletContext context = request.getSession()
+							.getServletContext();
+					fileName = context.getRealPath(request.getContextPath());
+					fileNameThumbnail = fileName + "/product-catalogue/"
+							+ dummyProduct.getCode() + "_thumbnail.png";
+					fileName += "/product-catalogue/" + dummyProduct.getCode()
+							+ ".png";
+					outputStream = new FileOutputStream(fileName);
+					logger.info(fileName);
+
+					int readBytes = 0;
+					byte[] buffer = new byte[10000000];
+					while ((readBytes = inputStream.read(buffer, 0, 10000)) != -1) {
+						outputStream.write(buffer, 0, readBytes);
+					}
+					outputStream.close();
+					inputStream.close();
+
+					BufferedImage img = new BufferedImage(75, 75,
+							BufferedImage.TYPE_INT_RGB);
+					img.createGraphics().drawImage(
+							ImageIO.read(new File(fileName)).getScaledInstance(
+									75, 75, Image.SCALE_SMOOTH), 0, 0, null);
+					ImageIO.write(img, "png", new File(fileNameThumbnail));
+
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				logger.info(e.getMessage());
+				e.printStackTrace();
+			}
+			mags.setImageUrl(fileName);
+			mags.setThumbnailUrl(fileNameThumbnail);
 			mags = productMagWheelsService.saveMagWheels(mags);
 			logger.info("Mags is saved!");
 		}
@@ -504,34 +624,45 @@ public class ProductController {
 		}
 		product = productService.saveProduct(product);
 		ModelAndView mnv = new ModelAndView("redirect:/admin/product");
+		successMessage = "Successfully saved " + product.getProductName()
+				+ ". Kindly check the view products section for details.";
+		isTire = false;
+		isMags = false;
 		return mnv;
 	}
 
 	// change to magwheels only
-	@RequestMapping(value = "/view_products", method = RequestMethod.GET)
-	public ModelAndView viewProducts(HttpServletRequest request) {
+	@RequestMapping(value = "/view-products-gallery", method = RequestMethod.GET)
+	public ModelAndView viewProductsGallery(HttpServletRequest request) {
 		logger.info("entering view products index");
-		ModelAndView mnv = new ModelAndView("admin.viewproducts.index");
+		ModelAndView mnv = new ModelAndView("admin.viewproductsgallery.index");
 		ArrayList<ImageDirectoryModel> productURLs = new ArrayList<ImageDirectoryModel>();
-		for (Product p : productService.getAllProducts()) {
-			ImageDirectoryModel imageDirectoryModel = new ImageDirectoryModel();
-			if (p.getImageUrl() == null) {
-				imageDirectoryModel.setImageDir("/images/bioniclogo.jpg");
-				imageDirectoryModel
-						.setThumbnailDir("/images/bionicthumbnail.jpg");
-				productURLs.add(imageDirectoryModel);
-			} else {
-				String productURL = "/product-catalogue/" + p.getCode()
-						+ ".png";
-				String thumbnailURL = "/product-catalogue/" + p.getCode()
-						+ "_thumbnail.png";
-				imageDirectoryModel.setImageDir(productURL);
-				imageDirectoryModel.setThumbnailDir(thumbnailURL);
+		// for (Product p : productService.getAllProducts()) {
+		// ImageDirectoryModel imageDirectoryModel = new ImageDirectoryModel();
+		// if (p.getImageUrl() == null) {
+		// imageDirectoryModel.setImageDir("/images/bioniclogo.jpg");
+		// imageDirectoryModel
+		// .setThumbnailDir("/images/bionicthumbnail.jpg");
+		// productURLs.add(imageDirectoryModel);
+		// } else {
+		// String productURL = "/product-catalogue/" + p.getCode()
+		// + ".png";
+		// String thumbnailURL = "/product-catalogue/" + p.getCode()
+		// + "_thumbnail.png";
+		// imageDirectoryModel.setImageDir(productURL);
+		// imageDirectoryModel.setThumbnailDir(thumbnailURL);
+		//
+		// productURLs.add(imageDirectoryModel);
+		// }
+		// }
+		// mnv.addObject("urls", productURLs);
+		return mnv;
+	}
 
-				productURLs.add(imageDirectoryModel);
-			}
-		}
-		mnv.addObject("urls", productURLs);
+	@RequestMapping(value = "/view-products", method = RequestMethod.GET)
+	public ModelAndView viewAllProducts(HttpServletRequest request) {
+		ModelAndView mnv = new ModelAndView("admin.viewproducts.index");
+		mnv.addObject("products", productService.getAllProducts());
 		return mnv;
 	}
 
@@ -549,8 +680,8 @@ public class ProductController {
 			brandNames.add(brand.getBrandName());
 		}
 
-		ModelAndView mnv = new ModelAndView("admin.product.index");
-		mnv.addObject("brands", brands);
+		// ModelAndView mnv = new ModelAndView("admin.product.index");
+		// mnv.addObject("brands", brands);
 
 		return brandNames;
 
@@ -586,5 +717,15 @@ public class ProductController {
 		logger.info("isTire: " + isTire);
 		logger.info("isMags: " + isMags);
 
+	}
+
+	@RequestMapping(value = "/barcode/{barcodeName}", method = RequestMethod.GET)
+	public ModelAndView getBarcode(
+			@PathVariable("barcodeName") String barcodeName,
+			HttpServletRequest request) {
+		ModelAndView mnv = new ModelAndView("admin.barcode.index");
+		mnv.addObject("barcode", "/barcode-catalogue/barcode-" + barcodeName
+				+ ".jpg");
+		return mnv;
 	}
 }

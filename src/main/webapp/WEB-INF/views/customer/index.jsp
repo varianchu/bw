@@ -4,7 +4,7 @@
 <div>
 <h3>CUSTOMER INFORMATION</h3>
 <hr></hr>
-<div class="well span8 offset2">
+<div class="well span8">
 <form:form action = "/new-customer" method = "POST" modelAttribute = "customer">
 	<form:hidden path="id"/>
 	<label>Customer Name:</label><form:input type="text" path="customerName" placeholder="Customer Name"/>

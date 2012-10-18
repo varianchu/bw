@@ -17,6 +17,7 @@ public class DummyProduct {
 	private Double qty = 0.0;
 	private Double cost = 0.0;
 	private Double srp = 0.0;
+	private String srpString;
 	private Long inventoryId;
 	private Long tireId;
 	private Boolean newPrice;
@@ -247,6 +248,14 @@ public class DummyProduct {
 
 	public void setFinish(String finish) {
 		this.finish = finish;
+	}
+
+	public String getSrpString() {
+		return srpString;
+	}
+
+	public void setSrpString(String srpString) {
+		this.srpString = srpString;
 	}
 
 }

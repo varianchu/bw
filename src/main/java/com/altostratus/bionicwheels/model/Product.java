@@ -66,7 +66,7 @@ public class Product extends BaseObject implements Serializable {
 	private Long inventoryId;
 
 	@ManyToOne(cascade = { CascadeType.PERSIST })
-	@JoinColumn(name = "brand_id")
+	@JoinColumn(name = "brand_id", nullable = false)
 	private Brand brand;
 
 	@OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -75,11 +75,11 @@ public class Product extends BaseObject implements Serializable {
 	@OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE)
 	private ProductMagWheels productMagWheels;
 
-	@Column(name = "image_url")
-	private String imageUrl;
-
-	@Column(name = "thumbnail_url")
-	private String thumbnailUrl;
+	// @Column(name = "image_url")
+	// private String imageUrl;
+	//
+	// @Column(name = "thumbnail_url")
+	// private String thumbnailUrl;
 
 	public Long getId() {
 		return id;
@@ -154,21 +154,21 @@ public class Product extends BaseObject implements Serializable {
 		this.inventoryTransactionProducts = inventoryTransactionProducts;
 	}
 
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-
-	public String getThumbnailUrl() {
-		return thumbnailUrl;
-	}
-
-	public void setThumbnailUrl(String thumbnailUrl) {
-		this.thumbnailUrl = thumbnailUrl;
-	}
+	// public String getImageUrl() {
+	// return imageUrl;
+	// }
+	//
+	// public void setImageUrl(String imageUrl) {
+	// this.imageUrl = imageUrl;
+	// }
+	//
+	// public String getThumbnailUrl() {
+	// return thumbnailUrl;
+	// }
+	//
+	// public void setThumbnailUrl(String thumbnailUrl) {
+	// this.thumbnailUrl = thumbnailUrl;
+	// }
 
 	public List<Inventory> getInventories() {
 		return inventories;

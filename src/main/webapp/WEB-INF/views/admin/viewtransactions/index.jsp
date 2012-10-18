@@ -8,7 +8,7 @@ ${fail}
 
 <hr></hr>
 
-<div class="well span5 offset3">
+<div class="well span5 offset1">
 	<form:form action = "/admin/view_transactions" method = "POST" modelAttribute = "transactionDates">
 		<label>Transaction Start Date:</label><form:input type="text" id="ButtonCreationDemoInput1" path="date1"/><button id="ButtonCreationDemoButton1" type="button">
     		<img src="/images/calendar.png" alt="[calendar icon]"/>
@@ -21,7 +21,7 @@ ${fail}
   	
 </div>
 	
-<div class="row alert alert-info span9 offset1">
+<div class="row alert alert-info span8">
 	<table class="table table-striped table-bordered table-condensed data_grid">
   		<thead>
   			<tr>
