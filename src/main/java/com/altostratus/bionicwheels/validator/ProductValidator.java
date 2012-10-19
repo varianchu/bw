@@ -70,6 +70,13 @@ public class ProductValidator implements Validator {
 							"Product code should be unique.");
 					break;
 				}
+
+				if (dummyProduct.getProductName().equalsIgnoreCase(
+						p.getProductName())) {
+					errors.rejectValue("productName", "field.required",
+							"Product Name is already in the database.");
+					break;
+				}
 				// ValidationUtils.rejectIfEmptyOrWhitespace(errors, "",
 				// errorCode,
 				// errorArgs)

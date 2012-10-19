@@ -35,7 +35,7 @@ public class Product extends BaseObject implements Serializable {
 	@Column(name = "code", nullable = false, unique = true)
 	private String code;
 
-	@Column(name = "product_name", nullable = false, length = 40)
+	@Column(name = "product_name", nullable = false, length = 40, unique = true)
 	private String productName;
 
 	@Column(name = "description", nullable = true, length = 50, columnDefinition = "TEXT")

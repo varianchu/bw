@@ -98,6 +98,11 @@ public class InventoryTransactionProductController {
 			productInfo.add(product.getTotalQty().toString());
 			productInfo.add(product.getUnitOfMeasure().toString());
 
+			Inventory inventory = inventoryService.getInventory(product
+					.getInventoryId());
+			productInfo.add(inventory.getCost().toString());
+			productInfo.add(inventory.getSrp().toString());
+
 			return productInfo;
 		} else {
 			ArrayList<String> productInfo = new ArrayList<String>();
@@ -105,15 +110,17 @@ public class InventoryTransactionProductController {
 			productInfo.add("NO PRODUCT CODE!");
 			productInfo.add("NO QUANTITY FOUND!");
 			productInfo.add("NO UNIT OF MEASURE FOUND!");
+			productInfo.add("NO INVENTORY FOUND!");
+			productInfo.add("NO INVENTORY FOUND!");
 			return productInfo;
 		}
 	}
 
 	// used AJAX for array updating
-	@RequestMapping(value = "/addtransactionproduct/{id}/{qty}/")
+	@RequestMapping(value = "/addtransactionproduct/{id}/{qty}/{price}/")
 	public @ResponseBody
 	String addTransactionProductToArrayList(@PathVariable("id") Long id,
-			@PathVariable("qty") Double qty) {
+			@PathVariable("qty") Double qty, @PathVariable("price") Double price) {
 		// Real Product
 		Product product = productService.getProduct(id);
 		boolean checker = false;
@@ -128,29 +135,48 @@ public class InventoryTransactionProductController {
 				DummyProductQty dpq = new DummyProductQty();
 				dpq.setId(id);
 				dpq.setQty(qty);
+				dpq.setPrice(price);
 
 				arrayList.add(dpq);
 				logger.info("START UP: ARRAY LIST SIZE IS " + arrayList.size());
 
 			} else {
+				// checks whether the newly added dummyProduct is already found
+				// in the arraylist.
 				for (DummyProductQty dummyProductQty : arrayList) {
 
 					if (dummyProductQty.getId() == id) {
-						dummyProductQty.setQty(dummyProductQty.getQty() + qty);
-						logger.info("ID is: " + dummyProductQty.getId());
-						logger.info("QTY is: " + dummyProductQty.getQty()
-								+ " and quantity is updated");
-						checker = true;
+						if (dummyProductQty.getPrice() != price) {
+							DummyProductQty dpq = new DummyProductQty();
+							dpq.setId(id);
+							dpq.setQty(qty);
+							dpq.setPrice(price);
+
+							arrayList.add(dpq);
+							logger.info("ADDED A NEW DPQ OBJECT BECAUSE OF NEW PRICE BUT SAME PRODUCT.");
+						} else {
+							dummyProductQty.setQty(dummyProductQty.getQty()
+									+ qty);
+							dummyProductQty.setPrice(price);
+							logger.info("ID is: " + dummyProductQty.getId());
+							logger.info("QTY is: " + dummyProductQty.getQty()
+									+ " and quantity is updated");
+							logger.info("Unit Price is: "
+									+ dummyProductQty.getPrice());
+							checker = true;
+						}
 					}
 				}
 				if (checker == false) {
 					DummyProductQty dpq = new DummyProductQty();
 					dpq.setId(id);
 					dpq.setQty(qty);
+					dpq.setPrice(price);
 
 					arrayList.add(dpq);
 					logger.info("new product ID is: " + dpq.getId());
 					logger.info("new product QTY is: " + dpq.getQty());
+					logger.info("new product UNIT PRICE is: " + dpq.getPrice());
 					logger.info("array list size is: " + arrayList.size());
 				}
 			}
@@ -164,15 +190,16 @@ public class InventoryTransactionProductController {
 		}
 	}
 
-	@RequestMapping(value = "/deleteproductintransaction/{id}/{qty}/")
+	@RequestMapping(value = "/deleteproductintransaction/{id}/{qty}/{price}/")
 	public @ResponseBody
 	void deleteTransactionProductToArrayList(@PathVariable("id") Long id,
-			@PathVariable("qty") Double qty) {
+			@PathVariable("qty") Double qty, @PathVariable("price") Double price) {
 		logger.info("delete product id: " + id + " with quantity: " + qty);
 		for (DummyProductQty dpq : arrayList) {
 			if (dpq.getId() == id) {
 				logger.info("DUMMY PRODUCT ID IS: " + dpq.getId()
-						+ " DUMMY PRODUCT QTY IS: " + dpq.getQty());
+						+ " DUMMY PRODUCT QTY IS: " + dpq.getQty()
+						+ " DUMMY PRODUCT PRICE IS: " + dpq.getPrice());
 				logger.info("does contain? " + arrayList.contains(dpq));
 				arrayList.remove(dpq);
 				logger.info("arraylist size is: " + arrayList.size());
@@ -194,8 +221,8 @@ public class InventoryTransactionProductController {
 		ArrayList<String> headsUpMsgs = new ArrayList<String>();
 
 		Long inventoryTransactionId = null;
-		Double totalCost = null;
-		Double totalSale = null;
+		Double totalCost = 0.0;
+		Double totalSale = 0.0;
 
 		logger.info("Inventory Transaction is: "
 				+ inventoryTransaction.getTransactionType());
@@ -266,6 +293,12 @@ public class InventoryTransactionProductController {
 					itp.setProductName(productService.getProduct(dpq.getId())
 							.getProductName());
 					itp.setQty(dpq.getQty());
+					itp.setProductCost(inventoryService.getInventory(
+							productService.getProduct(dpq.getId())
+									.getInventoryId()).getCost());
+					itp.setProductSale(inventoryService.getInventory(
+							productService.getProduct(dpq.getId())
+									.getInventoryId()).getSrp());
 
 					logger.info("Inventory transaction id: " + it.getId());
 					logger.info("Inventory transaction product is: "
@@ -296,6 +329,12 @@ public class InventoryTransactionProductController {
 					itp.setProductName(productService.getProduct(dpq.getId())
 							.getProductName());
 					itp.setQty(dpq.getQty());
+					itp.setProductCost(inventoryService.getInventory(
+							productService.getProduct(dpq.getId())
+									.getInventoryId()).getCost());
+					itp.setProductSale(inventoryService.getInventory(
+							productService.getProduct(dpq.getId())
+									.getInventoryId()).getSrp());
 
 					Product product = (Product) productService.getProduct(dpq
 							.getId());
@@ -330,12 +369,24 @@ public class InventoryTransactionProductController {
 									if (tempQty < 0) {
 										Inventory realInventory = inventoryService
 												.getInventory(inventory.getId());
+
+										// placed computation here
+										totalCost = totalCost
+												+ (realInventory.getCost() * realInventory
+														.getQty());
 										realInventory.setQty((double) 0);
 										realInventory = inventoryService
 												.saveInventory(realInventory);
+										// place new sale price here same in
+										// LIFO and else statement below.
+
 									} else {
 										Inventory realInventory = inventoryService
 												.getInventory(inventory.getId());
+										Double lastInventoryQty = realInventory
+												.getQty() - tempQty;
+										totalCost = totalCost
+												+ (realInventory.getCost() * lastInventoryQty);
 										realInventory.setQty(tempQty);
 										realInventory = inventoryService
 												.saveInventory(realInventory);
@@ -358,12 +409,19 @@ public class InventoryTransactionProductController {
 									if (tempQty < 0) {
 										Inventory realInventory = inventoryService
 												.getInventory(inventory.getId());
+										totalCost = totalCost
+												+ (realInventory.getCost() * realInventory
+														.getQty());
 										realInventory.setQty((double) 0);
 										realInventory = inventoryService
 												.saveInventory(realInventory);
 									} else {
 										Inventory realInventory = inventoryService
 												.getInventory(inventory.getId());
+										Double lastInventoryQty = realInventory
+												.getQty() - tempQty;
+										totalCost = totalCost
+												+ (realInventory.getCost() * lastInventoryQty);
 										realInventory.setQty(tempQty);
 										realInventory = inventoryService
 												.saveInventory(realInventory);
@@ -371,6 +429,9 @@ public class InventoryTransactionProductController {
 									}
 								}
 							}
+
+							totalSale = totalSale
+									+ (dpq.getQty() * dpq.getPrice());
 
 							itp = (InventoryTransactionProduct) inventoryTransactionProductService
 									.saveInventoryTransactionProduct(itp);
@@ -390,6 +451,15 @@ public class InventoryTransactionProductController {
 			headsUpMsgs
 					.add("No Product for Transaction to be processed! Please add products for transaction");
 		}
+
+		InventoryTransaction transaction = inventoryTransactionService
+				.getInventoryTransaction(inventoryTransactionId);
+
+		transaction.setTotalTransactionCost(totalCost);
+		transaction.setTotalTransactionSale(totalSale);
+
+		transaction = (InventoryTransaction) inventoryTransactionService
+				.saveInventoryTransaction(transaction);
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		String s = df.format(new Date());
