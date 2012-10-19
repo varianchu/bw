@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.altostratus.bionicwheels.model.InventoryTransaction;
 import com.altostratus.bionicwheels.repository.jpa.InventoryTransactionRepository;
+import com.altostratus.core.model.User;
 
 @Service("inventoryTransactionService")
 @Transactional
@@ -56,5 +57,13 @@ public class InventoryTransactionServiceImpl implements
 		// TODO Auto-generated method stub
 		return inventoryTransactionRepository.findByDateCreatedBetween(
 				startDate, endDate);
+	}
+
+	@Override
+	public List<InventoryTransaction> getAllInventoryTransactionsWithinDateByUser(
+			User user, Date startDate, Date endDate) {
+		// TODO Auto-generated method stub
+		return inventoryTransactionRepository.findByUserAndDateCreatedBetween(
+				user, startDate, endDate);
 	}
 }

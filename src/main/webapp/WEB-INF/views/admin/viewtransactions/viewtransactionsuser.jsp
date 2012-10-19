@@ -2,17 +2,22 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <div>
-<h3>VIEW TRANSACTIONS</h3>
+<h3 id="transactionTitle">VIEW TRANSACTIONS BY USER</h3>
 <hr></hr>
 
 <div class="well span5 offset1">
-	<form:form action = "/admin/view_transactions" method = "POST" modelAttribute = "transactionDates">
+	<form:form action = "/admin/view_transactions_user" method = "POST" modelAttribute = "transactionDatesUser">
 		<label>Transaction Start Date:</label><form:input type="text" id="ButtonCreationDemoInput1" path="date1"/><button id="ButtonCreationDemoButton1" type="button">
     		<img src="/images/calendar.png" alt="[calendar icon]"/>
   		</button>
 		<label>Transaction End Date:</label><form:input type="text" id="ButtonCreationDemoInput2" path="date2"/><button id="ButtonCreationDemoButton2" type="button">
     		<img src="/images/calendar.png" alt="[calendar icon]"/>
   		</button>
+  		<br />
+  		<br />
+  		<form:select path="userId" itemValue="id" items="${users}" id="selectUser"></form:select>
+  		<br />
+  		<br />
   		<input type="submit" value="Get Transactions" class="btn btn-primary"/>
 	</form:form>
   	
@@ -25,15 +30,21 @@
   				<td>Reference Number</td>
    				<td>Transaction Date</td>
    				<td>Transaction Type</td>
+   				<td>Total Cost of Goods</td>
+   				<td>Total Sale of Goods</td>
    			 </tr>
   		</thead>
   		<tbody>
   		<c:forEach var = "transaction" items="${transactions}">
+  		<c:if test="${(transaction.totalTransactionCost != 0.0) && (transaction.totalTransactionSale != 0.0)}">
   			<tr>
   				<td><a href = "/admin/view_transaction/${transaction.id}">${transaction.referenceNumber}</a></td>
     			<td>${transaction.dateCreated}</td>
     			<td>${transaction.transactionType}</td>
+    			<td>&#8369; ${transaction.totalTransactionCost}</td>
+    			<td>&#8369; ${transaction.totalTransactionSale}</td>
   			</tr>
+  		</c:if>
   		</c:forEach>
   		</tbody>
   	</table>

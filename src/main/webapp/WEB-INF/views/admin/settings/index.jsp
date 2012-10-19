@@ -4,7 +4,7 @@
 <div>
 <h3>SETTINGS</h3>
 <hr></hr>
-<div class="well span8 offset2">
+<div class="well span8">
 <form:form action = "/admin/settings" method = "POST" modelAttribute = "setting">
 	<form:hidden path="id"/>
 	<label>Stock Process:</label><form:select items="${stock}" path="stockProcess"/>

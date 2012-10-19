@@ -7,5 +7,9 @@
 <definition name="admin.viewtransactions.index" extends="default">
     <put-attribute name="body" value="/WEB-INF/views/admin/viewtransactions/index.jsp" />
 </definition>
+
+<definition name="admin.viewtransactionsuser.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/viewtransactions/viewtransactionsuser.jsp" />
+</definition>
    
  </tiles-definitions> 

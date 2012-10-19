@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.altostratus.bionicwheels.model.InventoryTransaction;
+import com.altostratus.core.model.User;
 
 public interface InventoryTransactionService {
 	public InventoryTransaction saveInventoryTransaction(
@@ -17,4 +18,7 @@ public interface InventoryTransactionService {
 
 	public List<InventoryTransaction> getAllInventoryTransactionsWithinDate(
 			Date startDate, Date endDate);
+
+	public List<InventoryTransaction> getAllInventoryTransactionsWithinDateByUser(
+			User user, Date startDate, Date endDate);
 }

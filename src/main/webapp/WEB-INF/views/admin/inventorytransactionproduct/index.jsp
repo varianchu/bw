@@ -117,7 +117,7 @@ $('#ButtonCreationDemoButton').click(
     	      } );
 
 // $('#myModal').modal('hide');
-
+//change by select box change the style of color of product info label
 $('#transactionOption').change(function(){
   if($(this).val() == 'INVENTORY_OUT'){
 	  var inputSale = document.getElementById('showProductSale');

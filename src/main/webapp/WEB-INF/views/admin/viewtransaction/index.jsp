@@ -6,7 +6,6 @@
 <h4>Date: ${transaction.dateCreated}</h4>
 <h4>Transaction Type: ${transaction.transactionType}</h4>
 <hr></hr>
-
 	<table class="table table-striped table-bordered table-condensed">
   		<thead>
   			<tr>
@@ -24,26 +23,5 @@
   			</tr>
   			</c:forEach>
   		</tbody>
-  	</table>
-	
+  	</table>	
 </div>
-
-<script type="text/javascript">
-
-$('#ButtonCreationDemoButton1').click(
-    	      function(e) {
-    	        $('#ButtonCreationDemoInput1').AnyTime_noPicker().AnyTime_picker({format: "%Y-%m-%d %H:%i"}).focus();
-    	        e.preventDefault();
-    	      } );
-    	      
-$('#ButtonCreationDemoButton2').click(
-	      function(e) {
-	        $('#ButtonCreationDemoInput2').AnyTime_noPicker().AnyTime_picker({format: "%Y-%m-%d %H:%i"}).focus();
-	        e.preventDefault();
-	      } );
-$('table.data_grid').dataTable({
-	"bJQueryUI": true,
-	"sPaginationType": "full_numbers"
-});
-
-</script>

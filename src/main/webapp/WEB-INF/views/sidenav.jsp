@@ -30,6 +30,7 @@
 		<li class="">
 			<a href="/admin/stocktransaction">Stock In/Out</a>
 			<a href="/admin/view_transactions">View Transactions</a>
+			<a href="/admin/view_transactions_user">View Transactions by User</a>
 		</li>
 		<li class="nav-header">
 			Customer Management
