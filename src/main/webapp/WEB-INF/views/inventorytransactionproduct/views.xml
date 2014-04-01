@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+<definition name="admin.inventorytransactionproduct.out" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/inventorytransactionproduct/out.jsp" />
+</definition>
+
+<definition name="admin.inventorytransactionproduct.in" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/inventorytransactionproduct/in.jsp" />
+</definition>
+
+<definition name="admin.inventorytransactionproduct.refund" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/inventorytransactionproduct/refund.jsp" />
+</definition>
+   
+</tiles-definitions> 

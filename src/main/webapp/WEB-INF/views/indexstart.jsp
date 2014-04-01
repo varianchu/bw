@@ -5,7 +5,7 @@
 <hr />
 <h3>Welcome to Bionic Wheels System! </h3><br />
 
-<div class="well span6">
+<div class="well span12">
 Kindly fill up the necessary fields in the settings menu found on the upper-right. Fill up the inventory database with
 Category Information, Supplier Information, Brand Information and Lastly Product Information to generate the bargraphs 
 in this dashcode page. If you have any questions regarding the process of the system, feel free to contact Varian Chu at

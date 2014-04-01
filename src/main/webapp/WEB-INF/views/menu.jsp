@@ -52,7 +52,7 @@
 		<div class="container">
 			<a class="brand" href="${home}">Bionic Wheels System</a>
 			<div class="pull-right" style="padding-top: 10px;">
-					<p class="pull-right" style="color: white;">Logged in as <span id="core_username"><sec:authentication property="principal.username" /></span> |
+					<p class="pull-right" style="color: white;">Logged in as <span id="core_username"><sec:authentication property="principal.firstname" /></span> |
 					<a class="" href="/j_spring_security_logout" style="color: white"><b>Log out</b></a>
 			</div>
 <!-- 			<div class="nav-collapse"> -->

@@ -1,10 +1,13 @@
 package com.altostratus.bionicwheels.controller;
 
+import java.security.Principal;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,6 +23,7 @@ import com.altostratus.bionicwheels.validator.BrandValidator;
 
 @Controller("brandController")
 @RequestMapping(value = "/admin")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER','TIRE_MAGS_PERSON')")
 public class BrandController {
 
 	@Autowired
@@ -31,29 +35,27 @@ public class BrandController {
 	@Autowired
 	BrandValidator brandValidator;
 
-	private String successMessage = null;
-	private String errorMessage = null;
-
 	private Logger logger = LoggerFactory.getLogger(BrandController.class);
 
-	@RequestMapping(value = "/brand", method = RequestMethod.GET)
-	public ModelAndView brandIndex(HttpServletRequest request) {
-		logger.info("entering brand index");
+	@RequestMapping(value = "/brand/{message}", method = RequestMethod.GET)
+	public ModelAndView brandIndex(HttpServletRequest request,
+			@PathVariable("message") String message, Principal principal) {
+		logger.info(principal.getName() + " is entering brand index.");
 		ModelAndView mnv = new ModelAndView("admin.brand.index");
 		mnv.addObject("brand", new Brand());
 		mnv.addObject("suppliers", supplierService.getAllSuppliers());
 		mnv.addObject("brands", brandService.getAllBrands());
-		mnv.addObject("SUCCESS_MESSAGE", successMessage);
-		mnv.addObject("ERROR_MESSAGE", errorMessage);
-		successMessage = null;
-		errorMessage = null;
+		if (message.equalsIgnoreCase("SUCCESS")) {
+			mnv.addObject("SUCCESS_MESSAGE", "Successfully saved Brand");
+		}
 		return mnv;
 	}
 
 	@RequestMapping(value = "/brand/edit/{id}", method = RequestMethod.GET)
 	public ModelAndView editBrand(@PathVariable("id") Long brandId,
-			HttpServletRequest request) {
-		logger.info("Editing brand id: " + brandId.toString());
+			HttpServletRequest request, Principal principal) {
+		logger.info(principal.getName() + " is trying to edit brand id: "
+				+ brandId.toString());
 		ModelAndView mnv = new ModelAndView("admin.brand.index");
 		mnv.addObject("brand", brandService.getBrand(brandId));
 		mnv.addObject("suppliers", supplierService.getAllSuppliers());
@@ -62,40 +64,63 @@ public class BrandController {
 	}
 
 	@RequestMapping(value = "/brand/remove/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ModelAndView removeBrand(@PathVariable("id") Long brandId,
-			HttpServletRequest request) {
-		logger.info("Removing brand id: " + brandId.toString());
-		brandService.removeBrand(brandId);
-		ModelAndView mnv = new ModelAndView("redirect:/admin/brand");
-		return mnv;
+			HttpServletRequest request, Principal principal) {
+
+		logger.info(principal.getName() + " tries to remove brand id: "
+				+ brandId.toString());
+		ModelAndView mnv = new ModelAndView("admin.brand.index");
+		try {
+			brandService.removeBrand(brandId);
+			mnv.addObject("brand", new Brand());
+			mnv.addObject("suppliers", supplierService.getAllSuppliers());
+			mnv.addObject("brands", brandService.getAllBrands());
+			mnv.addObject("SUCCESS_MESSAGE", "Successfully removed Brand");
+			logger.info(principal.getName()
+					+ " has successfully removed the brand.");
+			return mnv;
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.info(e.getMessage());
+			logger.info("remove unsuccessful (Brand) by " + principal.getName());
+
+			mnv.addObject("brand", new Brand());
+			mnv.addObject("suppliers", supplierService.getAllSuppliers());
+			mnv.addObject("brands", brandService.getAllBrands());
+			mnv.addObject("ERROR_MESSAGE", "Unsuccessfully removed Brand");
+			return mnv;
+		}
 	}
 
 	@RequestMapping(value = "/brand", method = RequestMethod.POST)
 	public ModelAndView saveBrand(HttpServletRequest request,
-			@ModelAttribute("brand") Brand brand, BindingResult result) {
+			@ModelAttribute("brand") Brand brand, BindingResult result,
+			Principal principal) {
 
-		logger.info("Saving Brand");
+		logger.info(principal.getName() + " tries to save Brand.");
 
 		brandValidator.validate(brand, result);
 
 		if (result.hasErrors()) {
-			logger.info("Failed to save brand.");
+			logger.info("Failed to save brand by " + principal.getName());
 			ModelAndView mnv = new ModelAndView("admin.brand.index");
 			mnv.addObject("brand", new Brand());
 			mnv.addObject("suppliers", supplierService.getAllSuppliers());
 			mnv.addObject("brands", brandService.getAllBrands());
 			mnv.addObject("ERROR_MESSAGE",
 					"Brand not saved. Kindly check inputted fields.");
-			successMessage = null;
 			return mnv;
 		}
 
 		// logger.info("Failed to save category");
 		brand.setSupplier(supplierService.getSupplier(brand.getSupplierId()));
+		brand.setBrandName(brand.getBrandName().toUpperCase());
 		brandService.saveBrand(brand);
-		successMessage = "Successfully saved brand.";
-		errorMessage = null;
-		ModelAndView mnv = new ModelAndView("redirect:/admin/brand");
+
+		logger.info("Successfully saved brand by " + principal.getName());
+
+		ModelAndView mnv = new ModelAndView("redirect:/admin/brand/SUCCESS");
 		return mnv;
 	}
 

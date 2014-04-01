@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
-<div class="span9">
+<div class="span12">
 <h2 class="title">Dashboard</h2>
 <!-- <div id="divForGraph" class="well span12"> -->
 <!-- </div> -->

@@ -31,13 +31,13 @@ public class ProductTireValidator implements Validator {
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "crossSectionWidth",
 				"field.required",
 				"Please specify the Cross Section Width of the tire.");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "profile",
-				"field.required", "Please specify the Profile of the tire.");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "diameter",
+//		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "profile",
+//				"field.required", "Please specify the Profile of the tire.");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "diameter", 
 				"field.required", "Please specify the Diameter of the tire.");
 
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "productName",
-				"field.required", "Product name is required.");
+//		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "productName",
+//				"field.required", "Product name is required.");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "code",
 				"field.required", "Product code is required.");
 		if (dummyProduct.getSupplierId() == null) {
@@ -66,12 +66,12 @@ public class ProductTireValidator implements Validator {
 							"Product code should be unique.");
 					break;
 				}
-				if (dummyProduct.getProductName().equalsIgnoreCase(
-						p.getProductName())) {
-					errors.rejectValue("productName", "field.required",
-							"Product Name is already in the database.");
-					break;
-				}
+//				if (dummyProduct.getProductName().equalsIgnoreCase(
+//						p.getProductName())) {
+//					errors.rejectValue("productName", "field.required",
+//							"Product Name is already in the database.");
+//					break;
+//				}
 				// ValidationUtils.rejectIfEmptyOrWhitespace(errors, "",
 				// errorCode,
 				// errorArgs)

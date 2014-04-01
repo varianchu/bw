@@ -25,6 +25,8 @@ public class DummyProduct {
 	private Integer profile;
 	private String construction;
 	private String diameter;
+	private String dataUri;
+	private String convertCode;
 
 	private Long magsId;
 	private String style;
@@ -256,6 +258,22 @@ public class DummyProduct {
 
 	public void setSrpString(String srpString) {
 		this.srpString = srpString;
+	}
+
+	public String getDataUri() {
+		return dataUri;
+	}
+
+	public void setDataUri(String dataUri) {
+		this.dataUri = dataUri;
+	}
+
+	public String getConvertCode() {
+		return convertCode;
+	}
+
+	public void setConvertCode(String convertCode) {
+		this.convertCode = convertCode;
 	}
 
 }

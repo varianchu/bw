@@ -28,5 +28,9 @@
   <definition name="uncaughtException" extends="plain">
     <put-attribute name="body" value="/WEB-INF/views/uncaughtException.jsp" />
   </definition>
+  
+   <definition name="accessDenied" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/accessDenied.jsp" />
+   </definition>
 
 </tiles-definitions>

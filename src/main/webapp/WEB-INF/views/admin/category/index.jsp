@@ -9,7 +9,7 @@
 	<form:hidden path="id"/>
 	<label>Category Name:</label><form:input type="text" path="categoryName" placeholder="Category Name"/>
 	<form:errors path="categoryName" style="color:red;"/>
-	<label>Category Code:</label><form:input type="text" path="code" placeholder="Category Code" class="span2"/>
+	<label>Category Code:</label><form:input type="text" path="code" placeholder="Category Code" class=""/>
 	<form:errors path="code" style="color:red;"/>
 	<label>Description:</label><form:textarea type="text" class="input-xlarge" path="description"/>
 	<hr></hr>

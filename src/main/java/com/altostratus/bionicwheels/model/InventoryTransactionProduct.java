@@ -33,6 +33,9 @@ public class InventoryTransactionProduct {
 	@Column(name = "quantity")
 	private Double qty = 0.0;
 
+	@Column(name = "unit_of_measure")
+	private String uom;
+
 	@Column(name = "product_name", nullable = false)
 	private String productName;
 
@@ -41,6 +44,10 @@ public class InventoryTransactionProduct {
 
 	@Column(name = "product_sale", nullable = false)
 	private Double productSale;
+
+	@ManyToOne(cascade = { CascadeType.PERSIST })
+	@JoinColumn(name = "category_id", nullable = true)
+	private Category category;
 
 	public Long getId() {
 		return id;
@@ -97,6 +104,22 @@ public class InventoryTransactionProduct {
 
 	public void setProductSale(Double productSale) {
 		this.productSale = productSale;
+	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
+	public String getUom() {
+		return uom;
+	}
+
+	public void setUom(String uom) {
+		this.uom = uom;
 	}
 
 	public boolean equals(Object other) {

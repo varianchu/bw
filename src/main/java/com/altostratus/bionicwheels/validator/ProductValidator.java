@@ -9,7 +9,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.altostratus.bionicwheels.model.DummyProduct;
-import com.altostratus.bionicwheels.model.Product;
+import com.altostratus.bionicwheels.service.BrandService;
 import com.altostratus.bionicwheels.service.ProductService;
 
 @Component
@@ -17,6 +17,9 @@ public class ProductValidator implements Validator {
 
 	@Autowired
 	ProductService productService;
+
+	@Autowired
+	BrandService brandService;
 
 	private Logger logger = LoggerFactory.getLogger(ProductValidator.class);
 
@@ -49,8 +52,6 @@ public class ProductValidator implements Validator {
 					"Please select a Band.");
 		}
 
-		logger.info("SRP: " + dummyProduct.getSrp().toString());
-
 		if (dummyProduct.getSrp() < dummyProduct.getCost()) {
 			logger.info("SRP IS LESS THAN COST");
 			errors.rejectValue("srp", "field.required",
@@ -63,24 +64,27 @@ public class ProductValidator implements Validator {
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "srp",
 				"field.required", "Please specify SRP");
 
-		for (Product p : productService.getAllProducts()) {
-			if (dummyProduct.getId() != p.getId()) {
-				if (dummyProduct.getCode().equalsIgnoreCase(p.getCode())) {
-					errors.rejectValue("code", "field.required",
-							"Product code should be unique.");
-					break;
-				}
-
-				if (dummyProduct.getProductName().equalsIgnoreCase(
-						p.getProductName())) {
-					errors.rejectValue("productName", "field.required",
-							"Product Name is already in the database.");
-					break;
-				}
-				// ValidationUtils.rejectIfEmptyOrWhitespace(errors, "",
-				// errorCode,
-				// errorArgs)
-			}
+		Boolean checker = null;
+		if (dummyProduct.getId() == null) {
+			checker = true;
+		} else {
+			checker = false;
 		}
+
+		if (productService.getProductsByCode(dummyProduct.getCode()).size() > 0 && checker) {
+			errors.rejectValue("code", null, "Product code must be unique");
+		}
+
+		logger.info("SRP: " + dummyProduct.getSrp().toString());
+
+		// for (Product p : productService.getAllProducts()) {
+		// if (dummyProduct.getId() != p.getId()) {
+		// if (dummyProduct.getCode().equals(p.getCode())) {
+		// errors.rejectValue("code", "field.required",
+		// "Product code should be unique.");
+		// break;
+		// }
+		// }
+		// }
 	}
 }

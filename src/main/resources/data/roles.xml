@@ -3,4 +3,7 @@
 	<role id="1" name="ROLE_ADMIN" description="Administrator" />
 	<role id="2" name="SALES_PERSON" description="Sales Person" />
 	<role id="3" name="TIRE_MAGS_PERSON" description="Tire, Mags and Tint Manager" />
+	<role id="4" name="ROLE_SYSTEM_MANAGER" description="Add/Edit/Remove Products" />
+	<role id="5" name="CASHIER" description="Add Service Transactions/Sales Person/Add-Edit/Remove Products" />
+	<role id="6" name="SERVICE_MANAGER" description="Everything that entails to car services"/>
 </dataset>

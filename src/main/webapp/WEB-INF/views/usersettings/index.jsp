@@ -4,7 +4,7 @@
 <div>
 <h3>USER ACCOUNTS</h3>
 <hr></hr>
-<div class="well span8">
+<div class="well span11">
 	<table class="table table-striped table-bordered table-condensed alert-info">
   		<thead>
   			<tr>

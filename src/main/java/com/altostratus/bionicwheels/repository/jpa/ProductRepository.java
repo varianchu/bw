@@ -40,4 +40,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findBySupplierAndTotalQtyGreaterThan(Supplier supplier,
 			Double number);
+	
+	List<Product> findByProductName(String productName);
 }

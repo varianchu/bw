@@ -27,7 +27,7 @@ public class ProductMagWheels extends BaseObject implements Serializable {
 	@Column(name = "style")
 	private String style;
 
-	@Column(name = "size", nullable = false, length = 5)
+	@Column(name = "size", nullable = false, length = 12)
 	private String size;
 
 	@Column(name = "spokes")

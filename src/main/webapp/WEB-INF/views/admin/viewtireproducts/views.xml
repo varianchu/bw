@@ -7,5 +7,9 @@
 <definition name="admin.viewtireproducts.index" extends="default">
     <put-attribute name="body" value="/WEB-INF/views/admin/viewtireproducts/index.jsp" />
 </definition>
+
+<definition name="view.tirestoday" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/viewtireproducts/viewtoday.jsp" />
+</definition>
    
- </tiles-definitions> 
+</tiles-definitions> 

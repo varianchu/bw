@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+<definition name="admin.batchbarcode.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/barcode/index.jsp" />
+</definition>
+
+<definition name="admin.batchbarcode.category" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/barcode/categorybarcode.jsp" />
+</definition>
+
+<definition name="admin.batchbarcode.brand" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/barcode/brandbarcode.jsp" />
+</definition>
+   
+</tiles-definitions> 

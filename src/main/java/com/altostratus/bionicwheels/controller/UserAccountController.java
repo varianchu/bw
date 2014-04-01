@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -28,6 +29,9 @@ public class UserAccountController {
 
 	@Autowired
 	UserManagementService userManagementService;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	public ModelAndView viewUsers(HttpServletRequest request) {
@@ -83,7 +87,8 @@ public class UserAccountController {
 		logger.info("USER EMAIL: " + user.getEmail());
 		logger.info("USER FIRST NAME: " + user.getFirstName());
 		logger.info("USER LAST NAME: " + user.getLastName());
-		logger.info("USER PASSWORD: " + user.getPassword());
+//		logger.info("USER PASSWORD: "
+//				+ passwordEncoder.encodePassword(user.getPassword(), null));
 
 		ModelAndView mnv = new ModelAndView("usersettings.index",
 				"SUCCESS_MESSAGE", "Successfully saved User "

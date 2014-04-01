@@ -30,7 +30,7 @@ public class ProductTire extends BaseObject implements Serializable {
 	@Column(name = "cross_section_width", nullable = false, length = 4)
 	private String crossSectionWidth;
 
-	@Column(name = "profile", nullable = false, length = 2)
+	@Column(name = "profile", length = 2)
 	private Integer profile;
 
 	@Column(name = "construction")
@@ -38,6 +38,9 @@ public class ProductTire extends BaseObject implements Serializable {
 
 	@Column(name = "diameter", nullable = false, length = 4)
 	private String diameter;
+
+	@Column(name = "tread_name")
+	private String treadName;
 
 	@OneToOne(cascade = { CascadeType.PERSIST })
 	@JoinColumn(name = "product_id", nullable = false, unique = true)
@@ -89,6 +92,14 @@ public class ProductTire extends BaseObject implements Serializable {
 
 	public void setProduct(Product product) {
 		this.product = product;
+	}
+
+	public String getTreadName() {
+		return treadName;
+	}
+
+	public void setTreadName(String treadName) {
+		this.treadName = treadName;
 	}
 
 	public boolean equals(Object other) {

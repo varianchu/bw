@@ -9,8 +9,8 @@
 	<form:hidden path="id"/>
 	<label>Supplier Name:</label><form:input type="text" path="supplierName" placeholder="Supplier Name"/>
 	<form:errors path = "supplierName" style="color:red;"></form:errors>
-	<label>Supplier Address:</label><form:input type="text" path="address" class="span4" placeholder="Address"/>
-	<label>Contact Number:</label><form:input type="text" path="contactNumber" placeholder="Contact Number" class="span2"/>
+	<label>Supplier Address:</label><form:input type="text" path="address" class="span12" placeholder="Address"/>
+	<label>Contact Number:</label><form:input type="text" path="contactNumber" placeholder="Contact Number" class=""/>
 	<label>Notes:</label><form:textarea type="text" class="input-xlarge" path="notes"/>
 	<hr></hr>
 	<input type="submit" value="Save Supplier" class="btn btn-primary"/>

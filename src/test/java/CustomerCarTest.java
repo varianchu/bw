@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +18,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.altostratus.bionicwheels.model.AccountsReceivable;
 import com.altostratus.bionicwheels.model.Car;
 import com.altostratus.bionicwheels.model.Customer;
+import com.altostratus.bionicwheels.service.AccountsReceivableService;
 import com.altostratus.bionicwheels.service.CustomerCarService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -32,6 +35,9 @@ public class CustomerCarTest {
 
 	@Autowired
 	CustomerCarService customerCarService;
+
+	@Autowired
+	AccountsReceivableService accountsReceivableService;
 
 	@Before
 	public void preMethodSetup() {
@@ -141,6 +147,62 @@ public class CustomerCarTest {
 		landcruiser.setNextChangeOil(nextOil1);
 		landcruiser.setCustomer(lebron);
 		landcruiser = (Car) customerCarService.saveCar(landcruiser);
+
+		SimpleDateFormat sdf1 = new SimpleDateFormat("MM-dd-yyyy");
+		String date11 = "01-01-2012";
+		String date21 = "01-30-2012";
+		String date12 = "01-01-2013";
+		String date22 = "01-30-2013";
+		Date startDate = null;
+		Date endDate = null;
+		Date startDate1 = null;
+		Date endDate1 = null;
+		try {
+			startDate = sdf1.parse(date11);
+			endDate = sdf1.parse(date21);
+			startDate1 = sdf.parse(date12);
+			endDate1 = sdf.parse(date22);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		System.out.println(startDate);
+		System.out.println(startDate1);
+
+		AccountsReceivable account1 = new AccountsReceivable();
+		AccountsReceivable account2 = new AccountsReceivable();
+		AccountsReceivable account3 = new AccountsReceivable();
+
+		account1.setAmount(5000.0);
+		account1.setCustomer(kobe);
+		account1.setDateCreated(startDate);
+		account1.setExpectedDateReceivable(endDate);
+		account1.setReceiptNumber("12345");
+
+		account1 = (AccountsReceivable) accountsReceivableService
+				.saveAccountsReceivable(account1);
+
+		account2.setAmount(15000.0);
+		account2.setCustomer(lebron);
+		account2.setDateCreated(startDate1);
+		account2.setExpectedDateReceivable(endDate1);
+		account2.setReceiptNumber("55555");
+
+		account2 = (AccountsReceivable) accountsReceivableService
+				.saveAccountsReceivable(account2);
+	}
+
+	@Test
+	public void testSizeOfAccountsReceivable() {
+		logger.info("Checking the number of accounts receivable");
+		Date dateToday = new Date();
+		List<AccountsReceivable> accounts = accountsReceivableService
+				.getDueAccountsReceivable(dateToday);
+
+		logger.info("Accounts size: " + accounts.size());
+
+		assertTrue(accounts.size() == 2);
 	}
 
 	@Test

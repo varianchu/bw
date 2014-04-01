@@ -16,4 +16,7 @@ public interface InventoryTransactionRepository extends
 
 	List<InventoryTransaction> findByUserAndDateCreatedBetween(User user,
 			Date startDate, Date endDate);
+	
+	List<InventoryTransaction> findByTransactionTypeAndDateCreatedBetween(String transactionType, Date startDate, Date endDate);
+	
 }

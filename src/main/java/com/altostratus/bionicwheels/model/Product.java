@@ -25,7 +25,7 @@ import com.altostratus.core.model.BaseObject;
 public class Product extends BaseObject implements Serializable {
 
 	public static enum UNIT_OF_MEASURE {
-		BOX, PIECES, ROLL
+		PIECES, BOX, ROLL
 	}
 
 	@Id
@@ -35,7 +35,7 @@ public class Product extends BaseObject implements Serializable {
 	@Column(name = "code", nullable = false, unique = true)
 	private String code;
 
-	@Column(name = "product_name", nullable = false, length = 40, unique = true)
+	@Column(name = "product_name", nullable = false, length = 40)
 	private String productName;
 
 	@Column(name = "description", nullable = true, length = 50, columnDefinition = "TEXT")
@@ -64,6 +64,9 @@ public class Product extends BaseObject implements Serializable {
 
 	@Column(name = "inventory_id")
 	private Long inventoryId;
+
+	@Column(name = "data_uri", length = 8000)
+	private String dataUri;
 
 	@ManyToOne(cascade = { CascadeType.PERSIST })
 	@JoinColumn(name = "brand_id", nullable = false)
@@ -186,6 +189,14 @@ public class Product extends BaseObject implements Serializable {
 		this.inventoryId = inventoryId;
 	}
 
+	public String getDataUri() {
+		return dataUri;
+	}
+
+	public void setDataUri(String dataUri) {
+		this.dataUri = dataUri;
+	}
+
 	public Brand getBrand() {
 		return brand;
 	}
@@ -227,5 +238,12 @@ public class Product extends BaseObject implements Serializable {
 
 	public String toString() {
 		return productName + " (" + code + ")";
+	}
+
+	public boolean isNew() {
+		if (id == null)
+			return true;
+		else
+			return false;
 	}
 }

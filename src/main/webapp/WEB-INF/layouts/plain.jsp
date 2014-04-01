@@ -16,6 +16,19 @@
 		<script type="text/javascript" src="/js/bootstrap-scrollspy.js"></script>
 		<script type="text/javascript" src="/js/bootstrap-tabs.js"></script>
 		<script type="text/javascript" src="/js/bootstrap-twipsy.js"></script>
+		
+		<!-- 		JSPDF FILES -->
+		
+		<script type="text/javascript" src="/js/jspdf.js"></script>
+		<script type="text/javascript" src="/js/FileSaver.min.js"></script>
+		<script type="text/javascript" src="/js/BlobBuilder.js"></script>
+
+		<script type="text/javascript" src="/js/jspdf.plugin.addimage.js"></script>
+
+		<script type="text/javascript" src="/js/jspdf.plugin.standard_fonts_metrics.js"></script>
+		<script type="text/javascript" src="/js/jspdf.plugin.split_text_to_size.js"></script>
+		<script type="text/javascript" src="/js/jspdf.plugin.from_html.js"></script>
+		
 	</head>
 	<body>
 		<div class="container">

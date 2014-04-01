@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+<definition name="admin.reports.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/index.jsp" />
+</definition>
+
+<definition name="admin.report.category.purchases" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfilterpurchase.jsp" />
+</definition>
+
+<definition name="admin.report.category.inventory" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfilterinventory.jsp" />
+</definition>
+   
+<definition name="admin.report.category.summary" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfiltersummary.jsp" />
+</definition>
+
+<definition name="admin.report.category.rank" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfilterrank.jsp" />
+</definition>
+   
+<definition name="admin.report.category.user" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfilteruser.jsp" />
+</definition>
+   
+</tiles-definitions> 

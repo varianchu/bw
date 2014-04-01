@@ -7,5 +7,9 @@
 <definition name="admin.viewmagsproducts.index" extends="default">
     <put-attribute name="body" value="/WEB-INF/views/admin/viewmagsproducts/index.jsp" />
 </definition>
+
+<definition name="view.magwheelstoday" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/viewmagsproducts/viewtoday.jsp" />
+</definition>
    
  </tiles-definitions> 

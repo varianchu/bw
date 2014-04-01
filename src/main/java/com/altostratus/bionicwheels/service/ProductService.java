@@ -45,4 +45,6 @@ public interface ProductService {
 
 	public List<Product> getProductsBySupplierAboveNumber(Supplier supplier,
 			Double number);
+
+	public List<Product> getProductsByProductName(String productName);
 }

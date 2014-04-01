@@ -1,10 +1,13 @@
 package com.altostratus.bionicwheels.controller;
 
+import java.security.Principal;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -20,6 +23,7 @@ import com.altostratus.bionicwheels.service.SupplierService;
 
 @Controller("settingsController")
 @RequestMapping("admin")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class SettingsController {
 
 	@Autowired
@@ -37,9 +41,10 @@ public class SettingsController {
 	private Logger logger = LoggerFactory.getLogger(SettingsController.class);
 
 	@RequestMapping(value = "/settings", method = RequestMethod.GET)
-	public ModelAndView settingsIndex(HttpServletRequest request) {
+	public ModelAndView settingsIndex(HttpServletRequest request,
+			Principal principal) {
 
-		logger.info("entering settings index");
+		logger.info("entering settings index viewed by " + principal.getName());
 
 		ModelAndView mnv = new ModelAndView("admin.settings.index");
 		Long id = (long) 1;
@@ -64,9 +69,11 @@ public class SettingsController {
 
 	@RequestMapping(value = "/settings", method = RequestMethod.POST)
 	public ModelAndView saveSettings(HttpServletRequest request,
-			@ModelAttribute("setting") Settings setting, BindingResult result) {
+			@ModelAttribute("setting") Settings setting, BindingResult result,
+			Principal principal) {
+
 		setting = settingsService.saveSettings(setting);
-		logger.info("settings saved!");
+		logger.info("settings saved! by " + principal.getName());
 		ModelAndView mnv = new ModelAndView("redirect:/admin/settings");
 		return mnv;
 	}

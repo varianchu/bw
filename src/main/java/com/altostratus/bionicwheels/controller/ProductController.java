@@ -1,11 +1,12 @@
 package com.altostratus.bionicwheels.controller;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.xml.bind.DatatypeConverter;
 
 import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
@@ -20,6 +23,7 @@ import org.krysalis.barcode4j.tools.UnitConv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -27,12 +31,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.altostratus.bionicwheels.model.Brand;
 import com.altostratus.bionicwheels.model.DummyProduct;
-import com.altostratus.bionicwheels.model.ImageDirectoryModel;
 import com.altostratus.bionicwheels.model.Inventory;
 import com.altostratus.bionicwheels.model.Product;
 import com.altostratus.bionicwheels.model.ProductMagWheels;
@@ -48,6 +50,7 @@ import com.altostratus.bionicwheels.service.SupplierService;
 import com.altostratus.bionicwheels.validator.ProductMagWheelsValidator;
 import com.altostratus.bionicwheels.validator.ProductTireValidator;
 import com.altostratus.bionicwheels.validator.ProductValidator;
+import com.altostratus.core.util.ConvertCode;
 
 @Controller("productController")
 @RequestMapping("/admin")
@@ -82,20 +85,25 @@ public class ProductController {
 
 	@Autowired
 	ProductMagWheelsService productMagWheelsService;
+	
+	@Autowired
+	ConvertCode convertCode;
 
 	private Logger logger = LoggerFactory.getLogger(ProductController.class);
 
-	Boolean isTire = false;
-	Boolean isMags = false;
+	@RequestMapping(value = "/product/{message}", method = RequestMethod.GET)
+	public ModelAndView productIndex(HttpServletRequest request, HttpSession session, @PathVariable("message") String message, Principal principal) {
 
-	private List<Inventory> productInventories = null;
+		logger.info(principal.getName() + " is entering product index");
 
-	private String errorMessage = null;
-	private String successMessage = null;
+		String productType = "GENERIC";
 
-	@RequestMapping(value = "/product", method = RequestMethod.GET)
-	public ModelAndView productIndex(HttpServletRequest request) {
-		logger.info("entering product index");
+		session.setAttribute("productType", productType);
+
+		String sessionProductType = (String) session.getAttribute("productType");
+
+		logger.info(principal.getName() + " - (INIT) session attribute product type: " + sessionProductType);
+
 		ModelAndView mnv = new ModelAndView("admin.product.index");
 		mnv.addObject("product", new DummyProduct());
 		mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
@@ -103,39 +111,33 @@ public class ProductController {
 		List<Supplier> suppliers = supplierService.getAllSuppliers();
 		mnv.addObject("suppliers", suppliers);
 		mnv.addObject("tireconstruction", ProductTire.CONSTRUCTION.values());
-		// error here because of suppliers.get(0)
 		List<String> brandNames = new ArrayList<String>();
 		if (suppliers.size() == 0) {
 			brandNames.add("");
 		} else {
-			List<Brand> brands = brandService.getAllBrandSuppliers(suppliers
-					.get(0));
+			List<Brand> brands = brandService.getAllBrandSuppliers(suppliers.get(0));
 			for (Brand brand : brands) {
 				brandNames.add(brand.getBrandName());
 			}
 		}
+		List<Inventory> productInventories = null;
 		mnv.addObject("productInventories", productInventories);
 		mnv.addObject("brands", brandNames);
 		mnv.addObject("products", productService.getAllProducts());
-		mnv.addObject("SUCCESS_MESSAGE", successMessage);
-		mnv.addObject("ERROR_MESSAGE", errorMessage);
-		successMessage = null;
-		errorMessage = null;
+		if(message.equalsIgnoreCase("SUCCESS")){
+			mnv.addObject("SUCCESS_MESSAGE", "Successfully saved Product");
+		}
 		return mnv;
 	}
 
 	@RequestMapping(value = "/product/edit/{id}", method = RequestMethod.GET)
-	public ModelAndView editProduct(@PathVariable("id") Long productId,
-			HttpServletRequest request) {
-		logger.info("Editing product id: " + productId.toString());
+	public ModelAndView editProduct(@PathVariable("id") Long productId, HttpServletRequest request, HttpSession session, Principal principal) {
+		logger.info(principal.getName() + " tries to edit/view product id: " + productId.toString());
 
 		DummyProduct dummyProduct = new DummyProduct();
 		Product product = productService.getProduct(productId);
-		Inventory inventory = inventoryService.getInventory(product
-				.getInventoryId());
+		Inventory inventory = inventoryService.getInventory(product.getInventoryId());
 
-		// testing ok
-		logger.info("product tire is: " + product.getProductTire());
 		dummyProduct.setId(productId);
 		dummyProduct.setCode(product.getCode());
 		dummyProduct.setProductName(product.getProductName());
@@ -146,23 +148,23 @@ public class ProductController {
 		dummyProduct.setSupplierId(product.getSupplier().getId());
 		dummyProduct.setBrandName(product.getBrand().getBrandName());
 		dummyProduct.setInventoryId(product.getInventoryId());
-		logger.info("ok");
-
-		// logger.info("id is: " + product.getProductMagWheels().getId());
-		// // dummyProduct.setMagsId(product.getProductMagWheels().getId());
-		// logger.info("mags id is: " + dummyProduct.getMagsId());
+		dummyProduct.setConvertCode(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
+		dummyProduct.setDataUri(product.getDataUri());
+		
 		dummyProduct.setQty(inventory.getQty());
 		dummyProduct.setSrp(inventory.getSrp());
 		dummyProduct.setCost(inventory.getCost());
+		
+		
+		logger.info(principal.getName() + " dummy product setup ok.");
 
 		ModelAndView mnv = new ModelAndView("admin.product.index");
-		mnv.addObject("product", dummyProduct);
+		
 		mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
 		mnv.addObject("categories", categoryService.getAllCategories());
 		List<Supplier> suppliers = supplierService.getAllSuppliers();
 		mnv.addObject("suppliers", suppliers);
-		List<Brand> brands = brandService.getAllBrandSuppliers(product
-				.getSupplier());
+		List<Brand> brands = brandService.getAllBrandSuppliers(product.getSupplier());
 		List<String> brandNames = new ArrayList<String>();
 		for (Brand brand : brands) {
 			brandNames.add(brand.getBrandName());
@@ -171,20 +173,24 @@ public class ProductController {
 		// if edited do the necessary changes
 		if (product.getProductTire() != null) {
 			dummyProduct.setTireId(product.getProductTire().getId());
-			dummyProduct.setCrossSectionWidth(product.getProductTire()
-					.getCrossSectionWidth());
+			dummyProduct.setCrossSectionWidth(product.getProductTire().getCrossSectionWidth());
 			dummyProduct.setProfile(product.getProductTire().getProfile());
-			dummyProduct.setConstruction(product.getProductTire()
-					.getConstruction());
+			dummyProduct.setConstruction(product.getProductTire().getConstruction());
 			dummyProduct.setDiameter(product.getProductTire().getDiameter());
-			isTire = true;
-			isMags = false;
+			
+			String productType = "TIRE";
+
+			session.setAttribute("productType", productType);
+
+			String sessionProductType = (String) session.getAttribute("productType"); 
+			
+			logger.info(principal.getName() + " - (EDIT/VIEW) session attribute product type: " + sessionProductType);
 		}
 
 		// logger.info("product mag wheels id: "
 		// + product.getProductmagWheels().getId());
 
-		if (product.getProductMagWheels() != null) {
+		else if (product.getProductMagWheels() != null) {
 			dummyProduct.setMagsId(product.getProductMagWheels().getId());
 			dummyProduct.setStyle(product.getProductMagWheels().getStyle());
 			dummyProduct.setSize(product.getProductMagWheels().getSize());
@@ -192,12 +198,25 @@ public class ProductController {
 			dummyProduct.setPcd(product.getProductMagWheels().getPcd());
 			dummyProduct.setOffset(product.getProductMagWheels().getOffset());
 			dummyProduct.setFinish(product.getProductMagWheels().getFinish());
-			logger.info("all set for mags!");
-			isMags = true;
-			isTire = false;
+			
+			String productType = "MAGWHEEL";
+
+			session.setAttribute("productType", productType);
+
+			String sessionProductType = (String) session.getAttribute("productType"); 
+			
+			logger.info(principal.getName() + " - (EDIT/VIEW) session attribute product type: " + sessionProductType);
+		} else {
+			String productType = "GENERIC";
+
+			session.setAttribute("productType", productType);
+
+			String sessionProductType = (String) session.getAttribute("productType"); 
+			
+			logger.info(principal.getName() + " - (EDIT/VIEW) session attribute product type: " + sessionProductType);
 		}
 
-		productInventories = product.getInventories();
+		mnv.addObject("product", dummyProduct);
 		mnv.addObject("productInventories", product.getInventories());
 		mnv.addObject("brands", brandNames);
 		mnv.addObject("tireconstruction", ProductTire.CONSTRUCTION.values());
@@ -206,22 +225,80 @@ public class ProductController {
 	}
 
 	@RequestMapping(value = "/product/remove/{id}", method = RequestMethod.GET)
-	public ModelAndView removeProduct(@PathVariable("id") Long productId,
-			HttpServletRequest request) {
-		logger.info("Removing product id: " + productId.toString());
-		productService.removeProduct(productId);
-		ModelAndView mnv = new ModelAndView("redirect:/admin/product");
-		return mnv;
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ModelAndView removeProduct(@PathVariable("id") Long productId, HttpServletRequest request, Principal principal) {
+		
+		logger.info(principal.getName() + "tries to remove product id: " + productId.toString());
+		ModelAndView mnv = new ModelAndView("admin.product.index");
+		try {
+			productService.removeProduct(productId);
+			mnv.addObject("product", new DummyProduct());
+			mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
+			mnv.addObject("categories", categoryService.getAllCategories());
+			List<Supplier> suppliers = supplierService.getAllSuppliers();
+			mnv.addObject("suppliers", suppliers);
+			mnv.addObject("tireconstruction", ProductTire.CONSTRUCTION.values());
+			// error here because of suppliers.get(0)
+			List<String> brandNames = new ArrayList<String>();
+			if (suppliers.size() == 0) {
+				brandNames.add("");
+			} else {
+				List<Brand> brands = brandService.getAllBrandSuppliers(suppliers.get(0));
+				for (Brand brand : brands) {
+					brandNames.add(brand.getBrandName());
+				}
+			}
+			List<Inventory> productInventories = null;
+			mnv.addObject("productInventories", productInventories);
+			mnv.addObject("brands", brandNames);
+			mnv.addObject("products", productService.getAllProducts());
+			mnv.addObject("SUCCESS_MESSAGE", "Successfully removed Product");
+			
+			logger.info(principal.getName() + " has successfully removed product.");
+			
+			return mnv;
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.info(e.getMessage());
+			logger.info("remove unsuccessful (Product) by " + principal.getName());
+			
+			mnv.addObject("product", new DummyProduct());
+			mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
+			mnv.addObject("categories", categoryService.getAllCategories());
+			List<Supplier> suppliers = supplierService.getAllSuppliers();
+			mnv.addObject("suppliers", suppliers);
+			mnv.addObject("tireconstruction", ProductTire.CONSTRUCTION.values());
+			// error here because of suppliers.get(0)
+			List<String> brandNames = new ArrayList<String>();
+			if (suppliers.size() == 0) {
+				brandNames.add("");
+			} else {
+				List<Brand> brands = brandService.getAllBrandSuppliers(suppliers.get(0));
+				for (Brand brand : brands) {
+					brandNames.add(brand.getBrandName());
+				}
+			}
+			List<Inventory> productInventories = null;
+			mnv.addObject("productInventories", productInventories);
+			mnv.addObject("brands", brandNames);
+			mnv.addObject("products", productService.getAllProducts());
+			return mnv;
+		}
 	}
 
 	@RequestMapping(value = "/product", method = RequestMethod.POST)
-	public ModelAndView saveProduct(HttpServletRequest request,
-			@ModelAttribute("product") DummyProduct dummyProduct,
-			BindingResult result) {
-		logger.info("Saving product");
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER', 'TIRE_MAGS_PERSON')")
+	public ModelAndView saveProduct(HttpServletRequest request, @ModelAttribute("product") DummyProduct dummyProduct, BindingResult result, HttpSession session, Principal principal) {
+		logger.info(principal.getName() + " tries to save product.");
 
-		if (isMags == false && isTire == false) {
+		Product product = new Product();
 
+		String sessionProductType = (String) session.getAttribute("productType"); 
+		
+		logger.info(principal.getName() + " - (POST) session attribute product type: " + sessionProductType);
+
+		if (sessionProductType.equalsIgnoreCase("GENERIC")) {
+			logger.info(principal.getName() + " - saving generic product");
 			productValidator.validate(dummyProduct, result);
 
 			if (result.hasErrors()) {
@@ -231,25 +308,28 @@ public class ProductController {
 				mnv.addObject("categories", categoryService.getAllCategories());
 				mnv.addObject("suppliers", supplierService.getAllSuppliers());
 				mnv.addObject("products", productService.getAllProducts());
-				mnv.addObject("ERROR_MESSAGE",
-						"Product was not saved. Please Check the fields.");
+				mnv.addObject("ERROR_MESSAGE", "Product was not saved. Please Check the fields.");
 				List<Supplier> suppliers = supplierService.getAllSuppliers();
 				List<String> brandNames = new ArrayList<String>();
 				if (suppliers.size() == 0) {
 					brandNames.add("");
 				} else {
-					List<Brand> brands = brandService
-							.getAllBrandSuppliers(suppliers.get(0));
+					List<Brand> brands = brandService.getAllBrandSuppliers(suppliers.get(0));
 					for (Brand brand : brands) {
 						brandNames.add(brand.getBrandName());
 					}
 				}
 				mnv.addObject("brands", brandNames);
+				logger.info("Unsuccessfully saved product (GENERIC) by " + principal.getName());
 				return mnv;
 			}
-		}
-		if (isTire == true) {
 
+			product.setProductName(dummyProduct.getProductName().toUpperCase());
+			logger.info(dummyProduct.getProductName());
+
+		}
+		if (sessionProductType.equalsIgnoreCase("TIRE")) {
+			logger.info("saving tires.");
 			productTireValidator.validate(dummyProduct, result);
 			if (result.hasErrors()) {
 				ModelAndView mnv = new ModelAndView("admin.product.index");
@@ -259,28 +339,28 @@ public class ProductController {
 				List<Supplier> suppliers = supplierService.getAllSuppliers();
 				mnv.addObject("suppliers", suppliers);
 				mnv.addObject("products", productService.getAllProducts());
-				mnv.addObject("tireconstruction",
-						ProductTire.CONSTRUCTION.values());
+				mnv.addObject("tireconstruction", ProductTire.CONSTRUCTION.values());
 				List<String> brandNames = new ArrayList<String>();
 				if (suppliers.size() == 0) {
 					brandNames.add("");
 				} else {
-					List<Brand> brands = brandService
-							.getAllBrandSuppliers(suppliers.get(0));
+					List<Brand> brands = brandService.getAllBrandSuppliers(suppliers.get(0));
 					for (Brand brand : brands) {
 						brandNames.add(brand.getBrandName());
 					}
 				}
 				mnv.addObject("brands", brandNames);
-				mnv.addObject("ERROR_MESSAGE",
-						"Product was not saved. Please Check the fields of Tire and Product.");
+				mnv.addObject("ERROR_MESSAGE", "Product was not saved. Please Check the fields of Tire and Product.");
+				logger.info("Unsuccessfully saved product (TIRE) by " + principal.getName());
 				return mnv;
 			}
 
+			product.setProductName(dummyProduct.getCrossSectionWidth() + "/" + dummyProduct.getProfile() + dummyProduct.getConstruction() + "/" + dummyProduct.getDiameter());
+
 		}
 
-		if (isMags == true) {
-
+		if (sessionProductType.equalsIgnoreCase("MAGWHEEL")) {
+			logger.info("saving mags!");
 			productMagsValidator.validate(dummyProduct, result);
 			if (result.hasErrors()) {
 				ModelAndView mnv = new ModelAndView("admin.product.index");
@@ -290,158 +370,161 @@ public class ProductController {
 				List<Supplier> suppliers = supplierService.getAllSuppliers();
 				mnv.addObject("suppliers", suppliers);
 				mnv.addObject("products", productService.getAllProducts());
-				mnv.addObject("tireconstruction",
-						ProductTire.CONSTRUCTION.values());
+				mnv.addObject("tireconstruction", ProductTire.CONSTRUCTION.values());
 				List<String> brandNames = new ArrayList<String>();
 				if (suppliers.size() == 0) {
 					brandNames.add("");
 				} else {
-					List<Brand> brands = brandService
-							.getAllBrandSuppliers(suppliers.get(0));
+					List<Brand> brands = brandService.getAllBrandSuppliers(suppliers.get(0));
 					for (Brand brand : brands) {
 						brandNames.add(brand.getBrandName());
 					}
 				}
 				mnv.addObject("brands", brandNames);
-				mnv.addObject("ERROR_MESSAGE",
-						"Product was not saved. Please Check the fields of Mag Wheels and Product.");
+				mnv.addObject("ERROR_MESSAGE", "Product was not saved. Please Check the fields of Mag Wheels and Product.");
+				logger.info("Unsuccessfully saved product (MAGWHEEL) by " + principal.getName());
 				return mnv;
 			}
 
+			product.setProductName((dummyProduct.getProductName() + "-" + dummyProduct.getSize()).toUpperCase());
+			logger.info(dummyProduct.getProductName());
+
 		}
 
-		Product product = new Product();
+		logger.info(principal.getName() + " - brandName from dummy product is: " + dummyProduct.getBrandName().toString());
 
-		logger.info("brandName from dummy product is: "
-				+ dummyProduct.getBrandName().toString());
-
+		// check this part, this means that this overwrites the qty and other
+		// details?
 		if (dummyProduct.getId() != null) {
 			product.setId(dummyProduct.getId());
 			product.setInventoryId(dummyProduct.getInventoryId());
 		}
 
-		product.setCode(dummyProduct.getCode());
-		logger.info(dummyProduct.getCode());
-		product.setTotalQty(dummyProduct.getTotalQty());
-		logger.info(dummyProduct.getTotalQty().toString());
-		product.setProductName(dummyProduct.getProductName());
-		logger.info(dummyProduct.getProductName());
+		product.setCode(dummyProduct.getCode().toUpperCase());
+		product.setTotalQty(0.0);
 		product.setDescription(dummyProduct.getDescription());
-		logger.info("description: " + dummyProduct.getDescription());
 		product.setUnitOfMeasure(dummyProduct.getUnitOfMeasure());
-		logger.info(dummyProduct.getUnitOfMeasure());
-		product.setCategory(categoryService.getCategory(dummyProduct
-				.getCategoryId()));
-		logger.info("Category id: " + dummyProduct.getCategoryId());
-		product.setSupplier(supplierService.getSupplier(dummyProduct
-				.getSupplierId()));
-		logger.info("Supplier id: " + dummyProduct.getSupplierId());
-		Brand brand = brandService.getBrandByBrandName(dummyProduct
-				.getBrandName());
+		product.setCategory(categoryService.getCategory(dummyProduct.getCategoryId()));
+		product.setSupplier(supplierService.getSupplier(dummyProduct.getSupplierId()));
+		Brand brand = brandService.getBrandByBrandName(dummyProduct.getBrandName());
 		product.setBrand(brand);
-
-		logger.info("brand is " + brand.getBrandName());
+		product.setDataUri(dummyProduct.getDataUri());
+		
+		logger.info("Product set - CODE: " + product.getCode() + " CATEGORY: " + product.getCategory() + " SUPPLIER: " + product.getSupplier() + " BRAND: " + product.getBrand());
 
 		// product.setImageUrl(fileName);
 		// product.setThumbnailUrl(fileNameThumbnail);
+		
+//		if(dummyProduct.getId()!=null){
+//			product.setDataUri(product.getDataUri());
+//		}
 
 		product = (Product) productService.saveProduct(product);
-		logger.info("product saved! YEY!");
+		logger.info("Successfully saved product (INIT SETUP) by " + principal.getName());
 
+		String imageString = "";
+		
 		if (dummyProduct.getId() == null) {
 			try {
 				Code39Bean bean = new Code39Bean();
 				final int dpi = 150;
-				bean.setModuleWidth(UnitConv.in2mm(1.0f / dpi));
+				//this is 150 before dpi
+				bean.setModuleWidth(UnitConv.in2mm(2.0f / dpi));
+//				bean.setModuleWidth(dpi);
 				bean.setWideFactor(3);
 				bean.doQuietZone(false);
-				ServletContext context = request.getSession()
-						.getServletContext();
-				String barcodeFileName = context.getRealPath(request
-						.getContextPath());
-				File outputFile = new File(barcodeFileName
-						+ "/barcode-catalogue/barcode-" + product.getCode()
-						+ ".jpg");
+				bean.setBarHeight(5.0);
+				ServletContext context = request.getSession().getServletContext();
+				String barcodeFileName = context.getRealPath(request.getContextPath());
+				File outputFile = new File(barcodeFileName + "/barcode-catalogue/barcode-" + product.getId() + ".jpg");
 				OutputStream out = new FileOutputStream(outputFile);
 				logger.info("barcode is generated in " + outputFile);
 				try {
-					BitmapCanvasProvider canvas = new BitmapCanvasProvider(out,
-							"image/jpeg", dpi, BufferedImage.TYPE_BYTE_BINARY,
-							false, 0);
-					bean.generateBarcode(canvas, product.getCode());
+					BitmapCanvasProvider canvas = new BitmapCanvasProvider(out, "image/jpeg", dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+					bean.generateBarcode(canvas, product.getId().toString());
 					canvas.finish();
 				} finally {
 					out.close();
 				}
+				//added feb 24, 2014 - working!
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				BufferedImage image = null;
+				try{
+					image = ImageIO.read(outputFile);
+				}catch(IOException e){
+					logger.info("failed to convert to buffered image by " + principal.getName());
+				    e.printStackTrace();
+				}
+				try {
+				    ImageIO.write(image, "jpeg", baos);
+				} catch (IOException e) {
+					logger.info("failed to convert to uri - " + principal.getName());
+				    e.printStackTrace();
+				}
+				imageString = "data:image/jpeg;base64," + DatatypeConverter.printBase64Binary(baos.toByteArray());
+				logger.info("successfully converted barcode to datauri - " + principal.getName());
+				//end
 			} catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace();
+				logger.info("barcode conversion error - " + principal.getName());
 			}
 		}
 
 		// change after, product.getInventories... no need additional method in
 		// inventory service
-		List<Inventory> inventories = inventoryService
-				.getInventoryByProduct(product);
+		List<Inventory> inventories = inventoryService.getInventoryByProduct(product);
 
 		if (inventories.size() == 0) {
 			Inventory inventory = new Inventory();
 			inventory.setCost(dummyProduct.getCost());
 			inventory.setProduct(product);
-			inventory.setQty(dummyProduct.getQty());
+			// inventory.setQty(dummyProduct.getQty());
+			inventory.setQty(0.0);
 			inventory.setSrp(dummyProduct.getSrp());
 
 			inventory.setDate(new Date());
 			inventory = (Inventory) inventoryService.saveInventory(inventory);
 			product = productService.getProduct(product.getId());
 			product.setInventoryId(inventory.getId());
+			product.setDataUri(imageString);
 			product = productService.saveProduct(product);
-			logger.info("inventory is saved, new product --- new inventory");
-			logger.info("this product's inventory id link is: "
-					+ product.getInventoryId());
+			logger.info("inventory is saved, new product --- new inventory by " + principal.getName());
+			logger.info("this product's inventory id link is: " + product.getInventoryId() + " provided by " + principal.getName());
 		} else {
 			// do checkbox! error here!
-			logger.info("testing pls. help!" + inventories.size());
-			logger.info("get new price: " + dummyProduct.getNewPrice());
+			logger.info("get new price: " + dummyProduct.getNewPrice() + " by " + principal.getName());
 			if (dummyProduct.getNewPrice() == true) {
+				logger.info("NEW PRICE CLICKED BY " + principal.getName());
 				Inventory newInventory = new Inventory();
 				newInventory.setCost(dummyProduct.getCost());
 				newInventory.setProduct(product);
-				newInventory.setQty(dummyProduct.getQty());
+				// newInventory.setQty(dummyProduct.getQty());
+				newInventory.setQty(0.0);
 				newInventory.setSrp(dummyProduct.getSrp());
 				newInventory.setDate(new Date());
-				newInventory = (Inventory) inventoryService
-						.saveInventory(newInventory);
+				newInventory = (Inventory) inventoryService.saveInventory(newInventory);
 				product = productService.getProduct(product.getId());
 				product.setInventoryId(newInventory.getId());
+//				product.setDataUri(product.getDataUri());
 				product = productService.saveProduct(product);
 				// product.
-				logger.info("inventory is saved, old product --- new inventory");
-				logger.info("inventory id for new price for PRODUCT: "
-						+ product.getProductName() + " is "
-						+ product.getInventoryId());
+				logger.info("inventory is saved, old product --- new inventory by " + principal.getName());
+				logger.info("inventory id for new price for PRODUCT: " + product.getProductName() + " is " + product.getInventoryId() + " by " + principal.getName());
 			}
-			if (dummyProduct.getNewPrice() == null
-					|| dummyProduct.getNewPrice() == false) {
-				// logger.info("HELLO THERE!");
-				logger.info("product is: " + product + "product id is: "
-						+ product.getId());
-				logger.info("product inventory is: " + product.getInventoryId());
-				Inventory oldInventory = (Inventory) inventoryService
-						.getInventory(product.getInventoryId());
-				logger.info("HELLO THERE AGAIN!");
+			if (dummyProduct.getNewPrice() == null || dummyProduct.getNewPrice() == false) {
+				logger.info("product is: " + product + "product id is: " + product.getId() + " by " + principal.getName());
+				logger.info("product inventory is: " + product.getInventoryId() + " by " + principal.getName());
+				Inventory oldInventory = (Inventory) inventoryService.getInventory(product.getInventoryId());
 				oldInventory.setCost(dummyProduct.getCost());
-				oldInventory.setQty(dummyProduct.getQty());
 				oldInventory.setSrp(dummyProduct.getSrp());
-				oldInventory = (Inventory) inventoryService
-						.saveInventory(oldInventory);
-				logger.info("inventory is saved, old product --- old inventory");
+				oldInventory = (Inventory) inventoryService.saveInventory(oldInventory);
+				logger.info("inventory is saved, old product --- old inventory by " + principal.getName());
 			}
 		}
 
 		Double totalQty = 0.0;
-		List<Inventory> qtyInventories = inventoryService
-				.getInventoryByProduct(product);
+		List<Inventory> qtyInventories = inventoryService.getInventoryByProduct(product);
 		for (Inventory inventory : qtyInventories) {
 			logger.info("inventory id from inventories: " + inventory.getId());
 			totalQty += inventory.getQty();
@@ -452,22 +535,19 @@ public class ProductController {
 		// product = productService.saveProduct(product);
 
 		// add new productValidatorTire here additional fields :)
-		if (isTire == true) {
+		if (sessionProductType.equalsIgnoreCase("TIRE")) {
 
 			if (dummyProduct.getMagsId() != null) {
 				// Long id = product.getProductMagWheels().getId();
 				product.setProductMagWheels(null);
-				productMagWheelsService.removeMagWheels(dummyProduct
-						.getMagsId());
+				productMagWheelsService.removeMagWheels(dummyProduct.getMagsId());
 			}
 
 			ProductTire tire;
 			if (dummyProduct.getTireId() != null) {
-				tire = productTireService.getProductTire(dummyProduct
-						.getTireId());
+				tire = productTireService.getProductTire(dummyProduct.getTireId());
 				tire.setId(dummyProduct.getTireId());
-				logger.info("tire is not null and product id is: "
-						+ tire.getId());
+				logger.info("tire is not null and product id is: " + tire.getId() + " by " + principal.getName());
 			} else {
 				tire = new ProductTire();
 			}
@@ -478,27 +558,15 @@ public class ProductController {
 			tire.setProduct(product);
 			logger.info("Product Tire: " + product.getProductName());
 			tire = productTireService.saveProductTire(tire);
-			logger.info("Tire is saved!");
+			logger.info("Tire is saved! by " + principal.getName());
+
 		}
 
-		// add new productValidatorMags here additional fields :)
-		if (isMags == true) {
-			// error here not deleting the tire
-
-			// if (product.getProductTire() != null) {
-			// logger.info("product tire is not null");
-			// Long id = product.getProductTire().getId();
-			// logger.info("product tire's id is " + id);
-			// product.setProductTire(null);
-			// logger.info("product tire's id should be set to null and it is: "
-			// + product.getProductTire());
-			// productTireService.removeProductTire(id);
-			// }
+		if (sessionProductType.equalsIgnoreCase("MAGWHEEL")) {
 
 			if (dummyProduct.getTireId() != null) {
 				logger.info("product tire: " + product.getProductTire());
-				ProductTire tire = productTireService
-						.getProductTire(dummyProduct.getTireId());
+				ProductTire tire = productTireService.getProductTire(dummyProduct.getTireId());
 				logger.info("tire is " + tire);
 				product.setProductTire(null);
 				productTireService.removeProductTire(tire);
@@ -506,11 +574,9 @@ public class ProductController {
 
 			ProductMagWheels mags;
 			if (dummyProduct.getMagsId() != null) {
-				mags = productMagWheelsService.getMagWheels(dummyProduct
-						.getMagsId());
+				mags = productMagWheelsService.getMagWheels(dummyProduct.getMagsId());
 				mags.setId(dummyProduct.getMagsId());
-				logger.info("mags is not null and product id is: "
-						+ mags.getId());
+				logger.info("mags is not null and product id is: " + mags.getId() + " by " + principal.getName());
 			} else {
 				mags = new ProductMagWheels();
 			}
@@ -523,75 +589,21 @@ public class ProductController {
 			mags.setSpokes(dummyProduct.getSpokes());
 			mags.setStyle(dummyProduct.getStyle());
 
-			MultipartFile file = dummyProduct.getFileData();
+			// MultipartFile file = dummyProduct.getFileData();
 			String fileName = null;
 			String fileNameThumbnail = null;
-			InputStream inputStream = null;
-			OutputStream outputStream = null;
+			// InputStream inputStream = null;
+			// OutputStream outputStream = null;
 
-			logger.info("brandName from dummy product is: "
-					+ dummyProduct.getBrandName().toString());
+			logger.info("Brand Name from dummy product is: " + dummyProduct.getBrandName().toString());
 
-			try {
-
-				if (file.getSize() > 0) {
-					inputStream = file.getInputStream();
-					if (file.getSize() > 10000000) {
-						logger.info("Failed to upload image.");
-						ModelAndView mnv = new ModelAndView(
-								"admin.product.index");
-						mnv.addObject("product", new DummyProduct());
-						mnv.addObject("uoms", Product.UNIT_OF_MEASURE.values());
-						mnv.addObject("categories",
-								categoryService.getAllCategories());
-						mnv.addObject("suppliers",
-								supplierService.getAllSuppliers());
-						mnv.addObject("products",
-								productService.getAllProducts());
-						mnv.addObject("fail", "failed to upload image.");
-						mnv.addObject("tireconstruction",
-								ProductTire.CONSTRUCTION.values());
-						return mnv;
-					}
-
-					ServletContext context = request.getSession()
-							.getServletContext();
-					fileName = context.getRealPath(request.getContextPath());
-					fileNameThumbnail = fileName + "/product-catalogue/"
-							+ dummyProduct.getCode() + "_thumbnail.png";
-					fileName += "/product-catalogue/" + dummyProduct.getCode()
-							+ ".png";
-					outputStream = new FileOutputStream(fileName);
-					logger.info(fileName);
-
-					int readBytes = 0;
-					byte[] buffer = new byte[10000000];
-					while ((readBytes = inputStream.read(buffer, 0, 10000)) != -1) {
-						outputStream.write(buffer, 0, readBytes);
-					}
-					outputStream.close();
-					inputStream.close();
-
-					BufferedImage img = new BufferedImage(75, 75,
-							BufferedImage.TYPE_INT_RGB);
-					img.createGraphics().drawImage(
-							ImageIO.read(new File(fileName)).getScaledInstance(
-									75, 75, Image.SCALE_SMOOTH), 0, 0, null);
-					ImageIO.write(img, "png", new File(fileNameThumbnail));
-
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-				logger.info(e.getMessage());
-				e.printStackTrace();
-			}
 			mags.setImageUrl(fileName);
 			mags.setThumbnailUrl(fileNameThumbnail);
 			mags = productMagWheelsService.saveMagWheels(mags);
-			logger.info("Mags is saved!");
+			logger.info("Mags is saved! by " + principal.getName());
 		}
 
-		if (isTire == false && isMags == false) {
+		if (sessionProductType.equalsIgnoreCase("GENERIC")) {
 			logger.info("demoted to generic product");
 
 			try {
@@ -599,21 +611,16 @@ public class ProductController {
 				ProductTire tire;
 				ProductMagWheels mags;
 				if (dummyProduct.getTireId() != null) {
-					tire = productTireService.getProductTire(dummyProduct
-							.getTireId());
-					logger.info("tire is not null and product(tire) id is: "
-							+ tire.getId());
+					tire = productTireService.getProductTire(dummyProduct.getTireId());
+					logger.info("tire is not null and product(tire) id is: " + tire.getId() + " by " + principal.getName());
 					product.setProductTire(null);
 					productTireService.removeProductTire(tire);
 				}
 				if (dummyProduct.getMagsId() != null) {
-					mags = productMagWheelsService.getMagWheels(dummyProduct
-							.getMagsId());
-					logger.info("mags is not null and product(mags) id is: "
-							+ mags.getId());
+					mags = productMagWheelsService.getMagWheels(dummyProduct.getMagsId());
+					logger.info("mags is not null and product(mags) id is: " + mags.getId() + " by " + principal.getName());
 					product.setProductMagWheels(null);
-					productMagWheelsService.removeMagWheels(dummyProduct
-							.getMagsId());
+					productMagWheelsService.removeMagWheels(dummyProduct.getMagsId());
 				}
 
 			} catch (Exception e) {
@@ -622,21 +629,18 @@ public class ProductController {
 				logger.info("error");
 			}
 		}
+
 		product = productService.saveProduct(product);
-		ModelAndView mnv = new ModelAndView("redirect:/admin/product");
-		successMessage = "Successfully saved " + product.getProductName()
-				+ ". Kindly check the view products section for details.";
-		isTire = false;
-		isMags = false;
+		ModelAndView mnv = new ModelAndView("redirect:/admin/product/SUCCESS");
 		return mnv;
 	}
 
 	// change to magwheels only
-	@RequestMapping(value = "/view-products-gallery", method = RequestMethod.GET)
-	public ModelAndView viewProductsGallery(HttpServletRequest request) {
-		logger.info("entering view products index");
-		ModelAndView mnv = new ModelAndView("admin.viewproductsgallery.index");
-		ArrayList<ImageDirectoryModel> productURLs = new ArrayList<ImageDirectoryModel>();
+//	@RequestMapping(value = "/view-products-gallery", method = RequestMethod.GET)
+//	public ModelAndView viewProductsGallery(HttpServletRequest request) {
+//		logger.info("entering view products index");
+//		ModelAndView mnv = new ModelAndView("admin.viewproductsgallery.index");
+//		ArrayList<ImageDirectoryModel> productURLs = new ArrayList<ImageDirectoryModel>();
 		// for (Product p : productService.getAllProducts()) {
 		// ImageDirectoryModel imageDirectoryModel = new ImageDirectoryModel();
 		// if (p.getImageUrl() == null) {
@@ -656,11 +660,12 @@ public class ProductController {
 		// }
 		// }
 		// mnv.addObject("urls", productURLs);
-		return mnv;
-	}
+//		return mnv;
+//	}
 
 	@RequestMapping(value = "/view-products", method = RequestMethod.GET)
-	public ModelAndView viewAllProducts(HttpServletRequest request) {
+	public ModelAndView viewAllProducts(HttpServletRequest request, Principal principal) {
+		logger.info("viewing all products by " + principal.getName());
 		ModelAndView mnv = new ModelAndView("admin.viewproducts.index");
 		mnv.addObject("products", productService.getAllProducts());
 		return mnv;
@@ -689,43 +694,130 @@ public class ProductController {
 
 	// change in the future
 	@RequestMapping(value = "/enable-tire")
-	public @ResponseBody
-	void enableTire() {
-		logger.info("tire is enabled.");
-		this.isTire = true;
-		this.isMags = false;
-		logger.info("isTire: " + isTire);
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER', 'TIRE_MAGS_PERSON')")
+	public @ResponseBody void enableTire(HttpSession session, Principal principal) {
+		
+		String productType = "TIRE";
+
+		session.setAttribute("productType", productType);
+
+		String sessionProductType = (String) session.getAttribute("productType");
+
+		logger.info("session attribute product type: " + sessionProductType + " by " + principal.getName());
 
 	}
 
 	@RequestMapping(value = "/enable-mags")
-	public @ResponseBody
-	void enableMags() {
-		logger.info("mags is enabled.");
-		this.isMags = true;
-		this.isTire = false;
-		logger.info("isMags: " + isMags);
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER', 'TIRE_MAGS_PERSON')")
+	public @ResponseBody void enableMags(HttpSession session, Principal principal) {
+		
+		String productType = "MAGWHEEL";
+
+		session.setAttribute("productType", productType);
+
+		String sessionProductType = (String) session.getAttribute("productType"); 
+		
+		logger.info("session attribute product type: " + sessionProductType + " by " + principal.getName());
 
 	}
 
 	@RequestMapping(value = "/disable-all")
-	public @ResponseBody
-	void disableAll() {
-		logger.info("disabled all.");
-		this.isTire = false;
-		this.isMags = false;
-		logger.info("isTire: " + isTire);
-		logger.info("isMags: " + isMags);
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER', 'TIRE_MAGS_PERSON')")
+	public @ResponseBody void disableAll(HttpSession session, Principal principal) {
+		
+		String productType = "GENERIC";
+
+		session.setAttribute("productType", productType);
+
+		String sessionProductType = (String) session.getAttribute("productType"); 
+		
+		logger.info("session attribute product type: " + sessionProductType + " by " + principal.getName());
 
 	}
 
-	@RequestMapping(value = "/barcode/{barcodeName}", method = RequestMethod.GET)
-	public ModelAndView getBarcode(
-			@PathVariable("barcodeName") String barcodeName,
-			HttpServletRequest request) {
-		ModelAndView mnv = new ModelAndView("admin.barcode.index");
-		mnv.addObject("barcode", "/barcode-catalogue/barcode-" + barcodeName
-				+ ".jpg");
+	@RequestMapping(value = "/barcode/{id}", method = RequestMethod.GET)
+	public ModelAndView getBarcode(@PathVariable("id") Long id, HttpServletRequest request) {
+		ModelAndView mnv = new ModelAndView("admin.barcode");
+		
+		List<DummyProduct> dps = new ArrayList<DummyProduct>();
+		
+		DummyProduct dp = new DummyProduct();
+		
+		Product product = productService.getProduct(id);
+		
+		dp.setBrandName(product.getBrand().getBrandName());
+		dp.setProductName(product.getProductName());
+		dp.setDescription(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
+		dp.setCode(product.getCode());
+		dp.setSrp(inventoryService.getInventory(product.getInventoryId()).getSrp());
+		dp.setDataUri(product.getDataUri());
+		
+		dps.add(dp);
+		
+		mnv.addObject("products", dps);
+		mnv.addObject("product", product);
+		
+		return mnv;
+	}
+	
+	@RequestMapping(value = "/generate/batch-barcode", method = RequestMethod.GET)
+	public ModelAndView generateBatchBarcodeIndex(HttpServletRequest request){
+		ModelAndView mnv = new ModelAndView("admin.batchbarcode.index");
+		mnv.addObject("categories", categoryService.getAllCategories());
+		mnv.addObject("brands", brandService.getAllBrands());
+		return mnv;
+	}
+	
+	@RequestMapping(value = "/generate/batch-barcode-category/{id}", method = RequestMethod.GET)
+	public ModelAndView generateBatchBarcodeByCategory(HttpServletRequest request, @PathVariable("id") Long id){
+		ModelAndView mnv = new ModelAndView("admin.batchbarcode.category");
+		
+		List<DummyProduct> dps = new ArrayList<DummyProduct>();
+		
+		List<Product> bufferProducts = productService.getProductsByCategory(categoryService.getCategory(id));
+		
+		for(Product product : bufferProducts){
+			DummyProduct dp = new DummyProduct();
+			dp.setBrandName(product.getBrand().getBrandName());
+			dp.setProductName(product.getProductName());
+			dp.setDescription(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
+			dp.setCode(product.getCode());
+			dp.setSrp(inventoryService.getInventory(product.getInventoryId()).getSrp());
+			dp.setDataUri(product.getDataUri());
+			
+			dps.add(dp);
+		}
+		
+		mnv.addObject("products", dps);
+		mnv.addObject("category", categoryService.getCategory(id).getCategoryName());
+		
+		
+		return mnv;
+	}
+	
+	@RequestMapping(value = "/generate/batch-barcode-brand/{id}", method = RequestMethod.GET)
+	public ModelAndView generateBatchBarcodeByBrand(HttpServletRequest request, @PathVariable("id") Long id){
+		ModelAndView mnv = new ModelAndView("admin.batchbarcode.brand");
+		
+		List<DummyProduct> dps = new ArrayList<DummyProduct>();
+		
+		List<Product> bufferProducts = productService.getProductsByBrand(brandService.getBrand(id));
+		
+		for(Product product : bufferProducts){
+			DummyProduct dp = new DummyProduct();
+			dp.setBrandName(product.getBrand().getBrandName());
+			dp.setProductName(product.getProductName());
+			dp.setDescription(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
+			dp.setCode(product.getCode());
+			dp.setSrp(inventoryService.getInventory(product.getInventoryId()).getSrp());
+			dp.setDataUri(product.getDataUri());
+			
+			dps.add(dp);
+		}
+		
+		mnv.addObject("products", dps);
+		mnv.addObject("brand", brandService.getBrand(id).getBrandName());
+		
 		return mnv;
 	}
 }

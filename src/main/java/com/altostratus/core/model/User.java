@@ -28,6 +28,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.altostratus.bionicwheels.model.InventoryTransaction;
+import com.altostratus.bionicwheels.model.ServiceTransaction;
 
 @Entity
 @Table(name = "user")
@@ -55,6 +56,9 @@ public class User extends BaseObject implements UserDetails {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.PERSIST)
 	private List<InventoryTransaction> inventoryTransactions;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.PERSIST)
+	private List<ServiceTransaction> serviceTransactions;
 
 	@Transient
 	private Role role;
@@ -162,7 +166,7 @@ public class User extends BaseObject implements UserDetails {
 
 	@Override
 	public String toString() {
-		return username + " - " + firstName;
+		return firstName + " " + lastName;
 	}
 
 	@Override

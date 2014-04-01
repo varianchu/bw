@@ -52,6 +52,9 @@ public class Customer extends BaseObject implements Serializable {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = { CascadeType.REMOVE })
 	private List<Car> cars;
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", cascade = { CascadeType.REMOVE })
+	private List<AccountsReceivable> accountsReceivable;
+
 	public Long getId() {
 		return id;
 	}
@@ -130,6 +133,15 @@ public class Customer extends BaseObject implements Serializable {
 
 	public void setCars(List<Car> cars) {
 		this.cars = cars;
+	}
+
+	public List<AccountsReceivable> getAccountsReceivable() {
+		return accountsReceivable;
+	}
+
+	public void setAccountsReceivable(
+			List<AccountsReceivable> accountsReceivable) {
+		this.accountsReceivable = accountsReceivable;
 	}
 
 	public boolean equals(Object other) {

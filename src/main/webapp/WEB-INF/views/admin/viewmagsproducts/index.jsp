@@ -2,12 +2,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <div>
-<h3>SEARCH MAG WHEEL/S</h3>
+<h3>SEARCH MAG WHEEL/s</h3>
 <!-- testing -->
 <hr></hr>
 <div class="well span8">
-<form:form action = "/admin/search-mags" method = "POST" modelAttribute = "mags">
-	<label>Filter by:</label><form:select id = "filter" path="filterName" onchange="showFields()" class="span2">
+<form:form action = "/search-mags" method = "POST" modelAttribute = "mags">
+	<label>Filter by:</label><form:select id = "filter" path="filterName" onchange="showFields()" class="">
 	<form:option value="0" label="---CHOOSE FILTER---"/>
 		<c:forEach var = "filtervalue" items="${filters}">
 			<form:option value="${filtervalue}"></form:option>
@@ -57,7 +57,7 @@
 	<input type="submit" value="Search Mag Wheels" class="btn btn-primary"/>
 </form:form>
 </div>
-<div class="row span8 alert alert-info">
+<div class="row span12 alert alert-info">
 <table class="table table-striped table-bordered table-condensed data_grid">
   <thead>
   <tr>
@@ -80,7 +80,7 @@
     <td>
     <ul class="nav nav-pills" style="height:0px;">
     	<li>
-    		<a href="#">View Product</a>
+    		<a href="/admin/product/edit/${mags.product.id}">View Product</a>
 		</li>
 	</ul>
 	</td>

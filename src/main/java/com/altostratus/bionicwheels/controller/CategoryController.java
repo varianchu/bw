@@ -1,10 +1,13 @@
 package com.altostratus.bionicwheels.controller;
 
+import java.security.Principal;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,26 +32,23 @@ public class CategoryController {
 
 	private Logger logger = LoggerFactory.getLogger(CategoryController.class);
 
-	private String successMessage = null;
-	private String errorMessage = null;
-
-	@RequestMapping(value = "/category", method = RequestMethod.GET)
-	public ModelAndView categoryIndex(HttpServletRequest request) {
-		logger.info("entering category index");
+	@RequestMapping(value = "/category/{message}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER')")
+	public ModelAndView categoryIndex(HttpServletRequest request, @PathVariable("message") String message, Principal principal) {
+		logger.info(principal.getName() + " is entering category index");
 		ModelAndView mnv = new ModelAndView("admin.category.index");
 		mnv.addObject("category", new Category());
 		mnv.addObject("categories", categoryService.getAllCategories());
-		mnv.addObject("SUCCESS_MESSAGE", successMessage);
-		mnv.addObject("ERROR_MESSAGE", errorMessage);
-		successMessage = null;
-		errorMessage = null;
+		if(message.equalsIgnoreCase("SUCCESS")){
+			mnv.addObject("SUCCESS_MESSAGE", "Successfully saved Category");
+		}
 		return mnv;
 	}
 
 	@RequestMapping(value = "/category/edit/{id}", method = RequestMethod.GET)
-	public ModelAndView editCategory(@PathVariable("id") Long categoryId,
-			HttpServletRequest request) {
-		logger.info("Editing category id: " + categoryId.toString());
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER')")
+	public ModelAndView editCategory(@PathVariable("id") Long categoryId, HttpServletRequest request, Principal principal) {
+		logger.info(principal.getName() + " is editing category id: " + categoryId.toString());
 		ModelAndView mnv = new ModelAndView("admin.category.index");
 		mnv.addObject("category", categoryService.getCategory(categoryId));
 		mnv.addObject("categories", categoryService.getAllCategories());
@@ -56,50 +56,54 @@ public class CategoryController {
 	}
 
 	@RequestMapping(value = "/category/remove/{id}", method = RequestMethod.GET)
-	public ModelAndView removeCategory(@PathVariable("id") Long categoryId,
-			HttpServletRequest request) {
-		logger.info("Removing category id: " + categoryId.toString());
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public ModelAndView removeCategory(@PathVariable("id") Long categoryId, HttpServletRequest request, Principal principal) {
+		logger.info(principal.getName() + " tries o remove category id: " + categoryId.toString());
+		ModelAndView mnv = new ModelAndView("admin.category.index");
 		try {
 			categoryService.removeCategory(categoryId);
-			successMessage = "Successfully deleted Category";
-			ModelAndView mnv = new ModelAndView("redirect:/admin/category");
+			logger.info("successfully removed category by " + principal.getName());
+			mnv.addObject("category", new Category());
+			mnv.addObject("categories", categoryService.getAllCategories());
+			mnv.addObject("SUCCESS_MESSAGE", "Successfully removed Category");
 			return mnv;
 		} catch (Exception e) {
 			// TODO: handle exception
 			logger.info(e.getMessage());
 			logger.info("remove unsuccessful (Category).");
-			errorMessage = "Delete Category Unsuccessful.";
-			ModelAndView mnv = new ModelAndView("redirect:/admin/category");
+			
+			mnv.addObject("category", new Category());
+			mnv.addObject("categories", categoryService.getAllCategories());
+			mnv.addObject("ERROR_MESSAGE", "Remove Unsuccessful.");
 			return mnv;
 		}
 	}
 
 	@RequestMapping(value = "/category", method = RequestMethod.POST)
-	public ModelAndView saveCategory(HttpServletRequest request,
-			@ModelAttribute("category") Category category, BindingResult result) {
-		logger.info("Saving Category");
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','CASHIER','ROLE_SYSTEM_MANAGER')")
+	public ModelAndView saveCategory(HttpServletRequest request, @ModelAttribute("category") Category category, BindingResult result, Principal principal) {
+		
+		logger.info(principal.getName() + " is trying to save a category");
 
 		categoryValidator.validate(category, result);
 
 		if (result.hasErrors()) {
 			logger.info(result.toString());
-			// mnv.addObject("category", new Category());
-			// mnv.addObject("categories", categoryService.getAllCategories());
-			logger.info("Failed to save category");
+			logger.info(principal.getName() + " failed to save category");
 			ModelAndView mnv = new ModelAndView("admin.category.index");
 			mnv.addObject("category", new Category());
 			mnv.addObject("categories", categoryService.getAllCategories());
-			mnv.addObject("ERROR_MESSAGE",
-					"Category not saved. Kindly check inputted fields.");
-			successMessage = null;
+			mnv.addObject("ERROR_MESSAGE", "Category not saved. Kindly check inputted fields.");
 			return mnv;
 		}
 		// add success message
+		category.setCategoryName(category.getCategoryName().toUpperCase());
+		category.setCode(category.getCode().toUpperCase());
 		categoryService.saveCategory(category);
-
-		successMessage = "Successfully saved category.";
-		errorMessage = null;
-		ModelAndView mnv = new ModelAndView("redirect:/admin/category");
+		
+		logger.info("Successfully saved category by " + principal.getName());
+		
+		ModelAndView mnv = new ModelAndView("redirect:/admin/category/SUCCESS");
 		return mnv;
 	}
 }

@@ -37,7 +37,7 @@ public class Supplier extends BaseObject implements Serializable {
 	@Column(name = "notes", nullable = true, columnDefinition = "TEXT")
 	private String notes;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "supplier", cascade = CascadeType.REMOVE)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "supplier", cascade = CascadeType.PERSIST)
 	private List<Product> products;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "supplier", cascade = CascadeType.PERSIST)
@@ -116,6 +116,13 @@ public class Supplier extends BaseObject implements Serializable {
 
 	public String toString() {
 		return supplierName;
+	}
+
+	public boolean isNew() {
+		if (id == null)
+			return true;
+		else
+			return false;
 	}
 
 }

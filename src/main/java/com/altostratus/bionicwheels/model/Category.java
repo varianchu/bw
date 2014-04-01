@@ -33,7 +33,7 @@ public class Category extends BaseObject implements Serializable {
 	@Column(name = "category_name", nullable = false, unique = true, length = 30)
 	private String categoryName;
 	// with cascade type remove original
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.REMOVE)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category", cascade = CascadeType.PERSIST)
 	private List<Product> products;
 
 	public List<Product> getProducts() {
@@ -93,5 +93,12 @@ public class Category extends BaseObject implements Serializable {
 
 	public String toString() {
 		return categoryName;
+	}
+
+	public boolean isNew() {
+		if (id == null)
+			return true;
+		else
+			return false;
 	}
 }

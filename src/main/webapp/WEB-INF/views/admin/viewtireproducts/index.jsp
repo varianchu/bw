@@ -6,10 +6,10 @@
 <!-- testing -->
 <hr></hr>
 <div class="well span8">
-<form:form action = "/admin/search-tires" method = "POST" modelAttribute = "tire">
+<form:form action = "/search-tires" method = "POST" modelAttribute = "tire">
 <%-- 	<form:hidden path="id"/> --%>
 <%-- 	<label>Supplier:</label><form:select id = "filter" items="${filters}" path="filterName" onchange="showFields()"/> --%>
-	<label>Filter by:</label><form:select id = "filter" path="filterName" onchange="showFields()" class="span3">
+	<label>Filter by:</label><form:select id = "filter" path="filterName" onchange="showFields()" class="">
 	<form:option value="0" label="---CHOOSE FILTER---"/>
 		<c:forEach var = "filtervalue" items="${filters}">
 			<form:option value="${filtervalue}"></form:option>
@@ -83,7 +83,7 @@
 	<input type="submit" value="Search Tire" class="btn btn-primary"/>
 </form:form>
 </div>
-<div class="row span8 alert alert-info">
+<div class="row span12 alert alert-info">
 <table class="table table-striped table-bordered table-condensed data_grid">
   <thead>
   <tr>
@@ -104,7 +104,7 @@
     <td>
     <ul class="nav nav-pills" style="height:0px;">
     	<li>
-    		<a href="#">View Product</a>
+    		<a href="/admin/product/edit/${tire.product.id}">View Product</a>
 		</li>
 	</ul>
 	</td>

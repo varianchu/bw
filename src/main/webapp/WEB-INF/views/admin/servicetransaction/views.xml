@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+
+<tiles-definitions>
+
+<definition name="service.transaction.form" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/servicetransaction/form.jsp" />
+</definition>
+
+<definition name="admin.viewservicetransactions.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/servicetransaction/viewservicetransactions.jsp" />
+</definition>
+
+<definition name="admin.viewservicetransactionsuser.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/servicetransaction/viewservicetransactionsuser.jsp" />
+</definition>
+   
+<definition name="admin.viewservicetransactionsworker.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/servicetransaction/viewservicetransactionsworker.jsp" />
+</definition>
+
+<definition name="admin.viewservicetransactionitem.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/servicetransaction/viewservicetransactionitem.jsp" />
+</definition>
+
+</tiles-definitions> 

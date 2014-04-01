@@ -67,6 +67,8 @@
 		<script type="text/javascript" src="/js/grid.js"></script>
 <!-- 		<script type="text/javascript" src="/js/jquery.galleriffic.js"></script> -->
 		<script type="text/javascript" src="/js/jquery.history.js"></script>
+		
+		
 <!-- 		<script type="text/javascript" src="/js/jquery.opacityrollover.js"></script> -->
 <!-- 		<script type="text/javascript" src="/js/jquery.DT_bootstrap.js"></script> -->
 <!-- 		<script type="text/javascript" src="/js/jquery.ui.datetime.min.js"></script> -->
@@ -79,21 +81,21 @@
 <!-- 		<script type="text/javascript" src="/js/DateTimePicker.js"></script> -->
 <!-- 		<script type="text/javascript" src="/js/jquery-ui-1.8.16.custom.min.js"></script> -->
 
-		<link rel="shortcut icon" href="../assets/ico/favicon.ico">
+		<link rel="shortcut icon" href="/assets/ico/favicon.ico">
 		
 <!-- 		<script src="../assets/js/jquery.js"></script> -->
-    	<script src="../assets/js/bootstrap-transition.js"></script>
-    	<script src="../assets/js/bootstrap-alert.js"></script>
-    	<script src="../assets/js/bootstrap-modal.js"></script>
-    	<script src="../assets/js/bootstrap-dropdown.js"></script>
-    	<script src="../assets/js/bootstrap-scrollspy.js"></script>
-    	<script src="../assets/js/bootstrap-tab.js"></script>
-    	<script src="../assets/js/bootstrap-tooltip.js"></script>
-    	<script src="../assets/js/bootstrap-popover.js"></script>
-    	<script src="../assets/js/bootstrap-button.js"></script>
-    	<script src="../assets/js/bootstrap-collapse.js"></script>
-    	<script src="../assets/js/bootstrap-carousel.js"></script>
-    	<script src="../assets/js/bootstrap-typeahead.js"></script>
+    	<script src="/assets/js/bootstrap-transition.js"></script>
+    	<script src="/assets/js/bootstrap-alert.js"></script>
+    	<script src="/assets/js/bootstrap-modal.js"></script>
+    	<script src="/assets/js/bootstrap-dropdown.js"></script>
+    	<script src="/assets/js/bootstrap-scrollspy.js"></script>
+    	<script src="/assets/js/bootstrap-tab.js"></script>
+    	<script src="/assets/js/bootstrap-tooltip.js"></script>
+    	<script src="/assets/js/bootstrap-popover.js"></script>
+    	<script src="/assets/js/bootstrap-button.js"></script>
+    	<script src="/assets/js/bootstrap-collapse.js"></script>
+    	<script src="/assets/js/bootstrap-carousel.js"></script>
+    	<script src="/assets/js/bootstrap-typeahead.js"></script>
     	
     	<script type="text/javascript">
 
@@ -105,7 +107,7 @@
     	
 	</head>
 
-	<body style="background-color:#3681eb;">
+	<body background="/images/retina_wood.png">
  	<div class="navbar navbar-fixed-top">
  		<div class="navbar-inner">
         	<div class="container">
@@ -115,36 +117,36 @@
             	<span class="icon-bar"></span>
           		</a>
           		<a class="brand" href="/"><img src="/images/BIONIC_blue-yellow.png" width="40" height="20" style="margin-top:-10;">Bionic Wheels System</a>
-          		<div class="nav-collapse collapse">
-            		<ul class="nav">
-              			<li><a href="/">Home</a></li>
+<!--           		<div class="nav-collapse collapse"> -->
+<!--             		<ul class="nav"> -->
+<!--               			<li><a href="/">Home</a></li> -->
 <!--               			<li><a href="#about">Reports</a></li> -->
-              			<li class="dropdown">
-                			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
-                				<ul class="dropdown-menu">
-                  					<li><a href="/inventory-report">Download All Inventory Count</a></li>
-                  					<li><a href="#">Generate Report By Filter</a></li>
-                				</ul>
-              			</li>
-              			<li><a href="/admin/view-products-gallery">View MagWheels Gallery</a></li>
-              			<li class="dropdown">
-                			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a>
-                				<ul class="dropdown-menu">
-                  					<li><a href="/admin/settings">Stock Settings</a></li>
-                  					<li class="divider"></li>
-                  					<li class="nav-header">User Management</li>
-                  					<li><a href="/admin/user/create">Create User Account</a></li>
-                  					<li><a href="/admin/users">Accounts Management</a></li>
-                				</ul>
-              			</li>
-            		</ul>
-           <p class="pull-right" >Logged in as <span id="core_username"><sec:authentication property="principal.username" /></span> |
+<!--               			<li class="dropdown"> -->
+<!--                 			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a> -->
+<!--                 				<ul class="dropdown-menu"> -->
+<!--                   					<li><a href="/inventory-report">Download All Inventory Count</a></li> -->
+<!--                   					<li><a href="/admin/reports">Generate Report By Filter</a></li> -->
+<!--                 				</ul> -->
+<!--               			</li> -->
+<!--               			<li><a href="/admin/view-products-gallery">View MagWheels Gallery</a></li> -->
+<!--               			<li class="dropdown"> -->
+<!--                 			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Settings <b class="caret"></b></a> -->
+<!--                 				<ul class="dropdown-menu"> -->
+<!--                   					<li><a href="/admin/settings">Stock Settings</a></li> -->
+<!--                   					<li class="divider"></li> -->
+<!--                   					<li class="nav-header">User Management</li> -->
+<!--                   					<li><a href="/admin/user/create">Create User Account</a></li> -->
+<!--                   					<li><a href="/admin/users">Accounts Management</a></li> -->
+<!--                 				</ul> -->
+<!--               			</li> -->
+<!--             		</ul> -->
+           <p class="pull-right" >Logged in as <span id="core_username"><sec:authentication property="principal.firstName" /> <sec:authentication property="principal.lastName" /></span> |
 					<a class="" href="/j_spring_security_logout" ><b>Log out</b></a>
 			</p>
           </div><!--/.nav-collapse -->
         </div>
       </div>
-    </div>
+<!--     </div> -->
 	
 	<div class="container">
 		<div></div>
@@ -154,17 +156,17 @@
 		<c:if test="${ERROR_MESSAGE != null}">
 			<div class="alert alert-error">${ERROR_MESSAGE}</div>
 		</c:if>
-		<div class="row">
-			<div class="span2">
+		<div class="row-fluid">
+			<div class="span3" style="margin-left:-90px;">
 			   	<tiles:insertAttribute name="sidenav"/>
 			</div>
-			<div class="offset1 span9">
+			<div class="span10" style="margin-left: 15px;">
 				<tiles:insertAttribute name="body"/>
 			</div>
 		</div>
 		<hr>
 		<footer>
-        	<p>&copy; Bionic Wheels 2012</p>
+        	<p>&copy; Bionic Wheels 2014</p>
       	</footer>
 	</div>      
 </body>

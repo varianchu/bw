@@ -168,7 +168,7 @@ public class UserManagementServiceImpl implements UserManagementService,
 			throws UsernameNotFoundException, DataAccessException {
 		UserDetails user = getUserByUsername(username);
 		logger.info("USER LOGGING IN: " + user.getUsername());
-		logger.info("PASSWORD: " + user.getPassword());
+		// logger.info("PASSWORD: " + user.getPassword());
 		for (GrantedAuthority g : user.getAuthorities()) {
 			logger.info("ROLE: " + g.getAuthority());
 		}

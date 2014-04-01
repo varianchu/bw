@@ -34,7 +34,7 @@ xsi:schemaLocation="
 	<mvc:view-controller path="/uncaughtException" view-name="uncaughtException"/>
 	<mvc:view-controller path="/resourceNotFound" view-name="resourceNotFound"/>
 	<mvc:view-controller path="/dataAccessFailure" view-name="dataAccessFailure"/>
-
+	<mvc:view-controller path="/accessDenied" view-name="accessDenied"/>
 	<!-- Turns on support for mapping requests to Spring MVC @Controller methods
      	Also registers default Formatters and Validators for use across all @Controllers -->
     <mvc:annotation-driven/>
@@ -53,6 +53,7 @@ xsi:schemaLocation="
 				<prop key=".NoSuchRequestHandlingMethodException">resourceNotFound</prop>
 				<prop key=".TypeMismatchException">resourceNotFound</prop>
 				<prop key=".MissingServletRequestParameterException">resourceNotFound</prop>
+				<prop key=".AccessDeniedException">accessDenied</prop>
 			</props>
 		</property>
 	</bean>

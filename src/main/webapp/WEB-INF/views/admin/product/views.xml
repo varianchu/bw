@@ -12,7 +12,8 @@
     <put-attribute name="body" value="/WEB-INF/views/admin/product/viewproducts.jsp" />
 </definition>
 
-<definition name="admin.barcode.index" extends="blank">
+<definition name="admin.barcode" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/product/barcode.jsp" />
 </definition>
    
 </tiles-definitions> 

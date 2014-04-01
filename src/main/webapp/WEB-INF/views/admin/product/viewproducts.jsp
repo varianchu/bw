@@ -5,7 +5,7 @@
 <h3>VIEW PRODUCTS</h3>
 <!-- testing -->
 <hr></hr>
-<div class="well span8">
+<div class="well">
 <table class="table table-striped table-bordered table-condensed data_grid alert-info">
   <thead>
   <tr>
@@ -35,11 +35,11 @@
     		<a href="/admin/product/edit/${product.id}"><img alt="edit" src="/images/update.png">&nbsp; Edit/View </a>
     	</li>
     	<li class="dropdown" data-dropdown="dropdown">
-			<a href="#" class="dropdown-toggle"><img alt="delete" src="/images/delete.png">&nbsp; Remove</a>
-				<ul class="dropdown-menu">
-					<li><a href="/admin/product/remove/${product.id}">Delete it!</a></li>
-					<li><a href="#">Cancel</a></li>
-				</ul>
+			<a onclick="removeFunction(${product.id})" style="cursor:pointer;"><img alt="delete" src="/images/delete.png">&nbsp; Remove</a>
+<!-- 				<ul class="dropdown-menu"> -->
+<%-- 					<li><a href="/admin/product/remove/${product.id}">Delete it!</a></li> --%>
+<!-- 					<li><a href="#">Cancel</a></li> -->
+<!-- 				</ul> -->
 		</li>
 	</ul>
 	</td>
@@ -55,6 +55,17 @@ $('table.data_grid').dataTable({
 	"bJQueryUI": true,
 	"sPaginationType": "full_numbers"
 });
-
-$('.dropdown-toggle').dropdown();
+function removeFunction(id)
+{
+	var x;
+	var r=confirm("Are you sure you want to delete the product?");
+	if (r==true)
+  	{
+		window.location.replace('/admin/product/remove/' + id);
+  	}
+	else
+  	{
+  		
+  	}
+}
 </script>

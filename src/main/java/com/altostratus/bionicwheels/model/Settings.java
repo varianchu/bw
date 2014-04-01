@@ -49,6 +49,9 @@ public class Settings extends BaseObject implements Serializable {
 	@Column(name = "floorValue", nullable = false)
 	private Double floorValue;
 
+	@Column(name = "transaction_number")
+	private Integer transactionNumber = 1;
+
 	public Long getId() {
 		return id;
 	}
@@ -111,6 +114,14 @@ public class Settings extends BaseObject implements Serializable {
 
 	public void setSupplierChoice(String supplierChoice) {
 		this.supplierChoice = supplierChoice;
+	}
+
+	public Integer getTransactionNumber() {
+		return transactionNumber;
+	}
+
+	public void setTransactionNumber(Integer transactionNumber) {
+		this.transactionNumber = transactionNumber;
 	}
 
 	public boolean equals(Object other) {

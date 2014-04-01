@@ -133,4 +133,10 @@ public class ProductServiceImpl implements ProductService {
 		return productRepository.findBySupplierAndTotalQtyLessThan(supplier,
 				number);
 	}
+
+	@Override
+	public List<Product> getProductsByProductName(String productName) {
+		// TODO Auto-generated method stub
+		return productRepository.findByProductName(productName);
+	}
 }

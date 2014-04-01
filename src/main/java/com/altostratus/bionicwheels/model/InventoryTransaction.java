@@ -27,7 +27,7 @@ import com.altostratus.core.model.User;
 public class InventoryTransaction extends BaseObject implements Serializable {
 
 	public static enum TRANSACTION_TYPE {
-		INVENTORY_IN, INVENTORY_OUT
+		INVENTORY_IN, INVENTORY_OUT, REFUND
 	}
 
 	@Id

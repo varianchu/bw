@@ -30,10 +30,11 @@ public class Brand extends BaseObject implements Serializable {
 	private String brandName;
 
 	@ManyToOne(cascade = { CascadeType.PERSIST })
-	@JoinColumn(name = "supplier_id")
+	@JoinColumn(name = "supplier_id", nullable = false)
 	private Supplier supplier;
 
-	// remember to check the delete of brands for cascading in products
+	// remember to check the delete of brands for cascading in products - must
+	// persist 3/14/14
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "brand", cascade = CascadeType.PERSIST)
 	private List<Product> products;
 
@@ -108,6 +109,13 @@ public class Brand extends BaseObject implements Serializable {
 
 	public String toString() {
 		return brandName;
+	}
+
+	public boolean isNew() {
+		if (id == null)
+			return true;
+		else
+			return false;
 	}
 
 }

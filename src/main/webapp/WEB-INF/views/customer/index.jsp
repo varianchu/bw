@@ -4,8 +4,8 @@
 <div>
 <h3>CUSTOMER INFORMATION</h3>
 <hr></hr>
-<div class="well span8">
-<form:form action = "/new-customer" method = "POST" modelAttribute = "customer">
+<div class="well">
+<form:form action = "/customer" method = "POST" modelAttribute = "customer">
 	<form:hidden path="id"/>
 	<label>Customer Name:</label><form:input type="text" path="customerName" placeholder="Customer Name"/>
 	<form:errors path="customerName" style="color:red;"/>
@@ -27,4 +27,34 @@
 	<input type="submit" value="Save Customer" class="btn btn-primary"/>
 </form:form>
 </div>
+<div class="row-fluid well">
+<table class="table table-striped table-bordered table-condensed data_grid">
+  		<thead>
+  			<tr>
+  				<td>Customer Name</td>
+   				<td>Contact Number</td>
+   				<td>Company</td>
+   				<td>Action</td>
+   			 </tr>
+  		</thead>
+  		<tbody>
+  		<c:forEach var = "customer" items="${customers}">
+  			<tr>
+    			<td>${customer.customerName}</td>
+    			<td>${customer.contactNumber}</td>
+    			<td>${customer.company}</td>
+    			<td><a href="/customer/edit/${customer.id}">EDIT</a></td>
+  			</tr>
+  		</c:forEach>
+  		</tbody>
+  	</table>
 </div>
+</div>
+
+<script type="text/javascript">
+
+$('table.data_grid').dataTable({
+	"bJQueryUI": true,
+	"sPaginationType": "full_numbers"
+});
+</script>

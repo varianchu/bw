@@ -5,25 +5,43 @@
 <h3 id="transactionTitle">VIEW TRANSACTIONS BY USER</h3>
 <hr></hr>
 
-<div class="well span5 offset1">
-	<form:form action = "/admin/view_transactions_user" method = "POST" modelAttribute = "transactionDatesUser">
-		<label>Transaction Start Date:</label><form:input type="text" id="ButtonCreationDemoInput1" path="date1"/><button id="ButtonCreationDemoButton1" type="button">
-    		<img src="/images/calendar.png" alt="[calendar icon]"/>
-  		</button>
-		<label>Transaction End Date:</label><form:input type="text" id="ButtonCreationDemoInput2" path="date2"/><button id="ButtonCreationDemoButton2" type="button">
-    		<img src="/images/calendar.png" alt="[calendar icon]"/>
-  		</button>
-  		<br />
-  		<br />
-  		<form:select path="userId" itemValue="id" items="${users}" id="selectUser"></form:select>
-  		<br />
-  		<br />
-  		<input type="submit" value="Get Transactions" class="btn btn-primary"/>
-	</form:form>
-  	
+<div class="row well span12">
+
+	<div class="span4">
+		<form:form action = "/view-transactions-user" method = "POST" modelAttribute = "transactionDatesUser">
+			<label>Transaction Start Date:</label><form:input type="text" id="ButtonCreationDemoInput1" path="date1"/><button id="ButtonCreationDemoButton1" type="button">
+	    		<img src="/images/calendar.png" alt="[calendar icon]"/>
+	  		</button>
+			<label>Transaction End Date:</label><form:input type="text" id="ButtonCreationDemoInput2" path="date2"/><button id="ButtonCreationDemoButton2" type="button">
+	    		<img src="/images/calendar.png" alt="[calendar icon]"/>
+	  		</button>
+	  		<br />
+	  		<br />
+	  		<form:select path="userId" itemValue="id" items="${users}" id="selectUser"></form:select>
+	  		<br />
+	  		<br />
+	  		<input type="submit" value="Get Transactions" class="btn btn-primary"/>
+		</form:form>
+  </div>
+  <div class="span8">
+  	<table class="table table-striped table-bordered table-condensed">
+  		<tr>
+  			<td>Total Cost of Goods Sold: </td>
+  			<td><b style="font-size:30px;">Php ${totalCost}</b></td>
+  		</tr>
+  		<tr>
+  			<td>Total Sales: </td>
+			<td><b style="font-size:30px;">Php ${totalSRP}</b></td>
+  		</tr>
+  		<tr>
+  			<td>Total Profit: </td>
+  			<td><b style="font-size:30px;">Php ${totalProfit}</b></td>
+  		</tr>
+  	</table>
+  </div>	
 </div>
 	
-<div class="row alert alert-info span8">
+<div class="row alert alert-info span12">
 	<table class="table table-striped table-bordered table-condensed data_grid">
   		<thead>
   			<tr>
@@ -36,15 +54,15 @@
   		</thead>
   		<tbody>
   		<c:forEach var = "transaction" items="${transactions}">
-  		<c:if test="${(transaction.totalTransactionCost != 0.0) && (transaction.totalTransactionSale != 0.0)}">
+<%--   		<c:if test="${(transaction.totalTransactionCost != 0.0) && (transaction.totalTransactionSale != 0.0)}"> --%>
   			<tr>
-  				<td><a href = "/admin/view_transaction/${transaction.id}">${transaction.referenceNumber}</a></td>
+  				<td><a href = "/view-transaction/${transaction.id}">${transaction.referenceNumber}</a></td>
     			<td>${transaction.dateCreated}</td>
     			<td>${transaction.transactionType}</td>
     			<td>&#8369; ${transaction.totalTransactionCost}</td>
     			<td>&#8369; ${transaction.totalTransactionSale}</td>
   			</tr>
-  		</c:if>
+<%--   		</c:if> --%>
   		</c:forEach>
   		</tbody>
   	</table>
