@@ -776,16 +776,52 @@ public class ProductController {
 		
 		List<Product> bufferProducts = productService.getProductsByCategory(categoryService.getCategory(id));
 		
-		for(Product product : bufferProducts){
-			DummyProduct dp = new DummyProduct();
-			dp.setBrandName(product.getBrand().getBrandName());
-			dp.setProductName(product.getProductName());
-			dp.setDescription(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
-			dp.setCode(product.getCode());
-			dp.setSrp(inventoryService.getInventory(product.getInventoryId()).getSrp());
-			dp.setDataUri(product.getDataUri());
-			
-			dps.add(dp);
+		//new June 25, 2014
+		if(bufferProducts.get(0).getProductMagWheels() !=null){
+			logger.info("FIRST");
+			for(Product product : bufferProducts){
+				DummyProduct dp = new DummyProduct();
+				dp.setBrandName(product.getBrand().getBrandName());
+				dp.setProductName(product.getProductName());
+				dp.setDescription(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
+				dp.setCode(product.getCode());
+				dp.setSrp(inventoryService.getInventory(product.getInventoryId()).getSrp());
+				dp.setDataUri(product.getDataUri());
+				dp.setPcd(product.getProductMagWheels().getPcd());
+				
+				dps.add(dp);
+			}
+		}
+		else if(bufferProducts.get(0).getProductTire() != null){
+			logger.info("SECOND");
+			for(Product product : bufferProducts){
+				DummyProduct dp = new DummyProduct();
+				dp.setBrandName(product.getBrand().getBrandName());
+				dp.setProductName(product.getProductName());
+				dp.setDescription(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
+				dp.setCode(product.getCode());
+				dp.setSrp(inventoryService.getInventory(product.getInventoryId()).getSrp());
+				dp.setDataUri(product.getDataUri());
+				dp.setTreadName(product.getCode());
+				
+				dps.add(dp);
+			}
+		}
+		else{
+		//end
+			logger.info("TEST PLS");
+			for(Product product : bufferProducts){
+				DummyProduct dp = new DummyProduct();
+				dp.setBrandName(product.getBrand().getBrandName());
+				dp.setProductName(product.getProductName());
+				dp.setDescription(convertCode.getCostCode(inventoryService.getInventory(product.getInventoryId()).getCost()));
+				dp.setCode(product.getCode());
+				dp.setSrp(inventoryService.getInventory(product.getInventoryId()).getSrp());
+				dp.setDataUri(product.getDataUri());
+				dp.setPcd(null);
+				
+				dps.add(dp);
+			}
 		}
 		
 		mnv.addObject("products", dps);

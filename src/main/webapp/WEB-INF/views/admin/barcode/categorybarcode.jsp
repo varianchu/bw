@@ -33,32 +33,106 @@ $(document).ready(function() {
 		if(checkPage!=0){
 			
 			if(column==0){
-				doc.addImage('${product.dataUri}','JPEG',2,i + 3,20,15);
-				doc.text(25,i + 4, 'BRAND: ${product.brandName}');
-				doc.text(25, i + 9, 'PRODUCT NAME: ${product.productName}');
-				doc.setFontSize(15);
-				doc.text(25, i + 14, 'CODE: ${product.description}');
-				doc.text(25, i + 19, 'SRP: Php ${product.srp} ');
-				doc.setFontSize(8);
+				<c:if test="${product.pcd != null}">
+					doc.addImage('${product.dataUri}','JPEG',2,i + 3,20,15);
+					doc.text(25,i + 4, 'BRAND: ${product.brandName}');
+// 					doc.text(25, i + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.setFontSize(10);
+					doc.text(25, i + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.text(25, i + 14, 'HOLES/PCD: ${product.pcd}');
+					doc.setFontSize(15);
+					doc.text(25, i + 19, 'CODE: ${product.description}');
+					doc.setFontSize(8);
+				</c:if>
+				<c:if test="${product.treadName != null}">
+					doc.addImage('${product.dataUri}','JPEG',2,i + 3,20,15);
+					doc.text(25,i + 4, 'BRAND: ${product.brandName}');
+	//					doc.text(25, i + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.setFontSize(10);
+					doc.text(25, i + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.text(25, i + 14, 'TREAD NAME: ${product.treadName}');
+					doc.setFontSize(15);
+					doc.text(25, i + 19, 'CODE: ${product.description}');
+					doc.setFontSize(8);
+				</c:if>
+				<c:if test="${product.pcd == null && product.treadName == null}">
+					doc.addImage('${product.dataUri}','JPEG',2,i + 3,20,15);
+					doc.text(25,i + 4, 'BRAND: ${product.brandName}');
+// 					doc.text(25, i + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.setFontSize(8);
+					doc.text(25, i + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.setFontSize(15);
+					doc.text(25, i + 14, 'CODE: ${product.description}');
+					doc.setFontSize(8);
+				</c:if>
 			}
 			else{
+				<c:if test="${product.pcd != null}">
+					doc.addImage('${product.dataUri}','JPEG',102,j + 3,20,15);
+					doc.text(125,j + 4, 'BRAND: ${product.brandName}');
+					doc.setFontSize(10);
+					doc.text(125, j + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.text(125, j + 14, 'HOLES/PCD: ${product.pcd}');
+					doc.setFontSize(15);
+					doc.text(125, j + 19, 'CODE: ${product.description}');
+					doc.setFontSize(8);
+				</c:if>
+				<c:if test="${product.treadName != null}">
+					doc.addImage('${product.dataUri}','JPEG',102,j + 3,20,15);
+					doc.text(125,j + 4, 'BRAND: ${product.brandName}');
+					doc.setFontSize(10);
+					doc.text(125, j + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.text(125, j + 14, 'TREAD NAME: ${product.treadName}');
+					doc.setFontSize(15);
+					doc.text(125, j + 19, 'CODE: ${product.description}');
+					doc.setFontSize(8);
+				</c:if>
+				<c:if test="${product.pcd == null && product.treadName == null}">
+					doc.addImage('${product.dataUri}','JPEG',102,j + 3,20,15);
+					doc.text(125,j + 4, 'BRAND: ${product.brandName}');
+					doc.setFontSize(8);
+					doc.text(125,j + 9, 'PRODUCT NAME: ${product.productName}');
+					doc.setFontSize(15);
+					doc.text(125,j + 14, 'CODE: ${product.description}');
+	//					doc.text(125,j + 19, 'SRP: Php ${product.srp}');
+					doc.setFontSize(8);
+				</c:if>
+			}
+		}else{
+			<c:if test="${product.pcd != null}">
 				doc.addImage('${product.dataUri}','JPEG',102,j + 3,20,15);
 				doc.text(125,j + 4, 'BRAND: ${product.brandName}');
+				doc.setFontSize(10);
+				doc.text(125, j + 9, 'PRODUCT NAME: ${product.productName}');
+				doc.text(125, j + 14, 'HOLES/PCD: ${product.pcd}');
+				doc.setFontSize(15);
+				doc.text(125, j + 19, 'CODE: ${product.description}');
+				doc.setFontSize(8);
+				doc.addPage();
+			</c:if>
+			<c:if test="${product.treadName != null}">
+				doc.addImage('${product.dataUri}','JPEG',102,j + 3,20,15);
+				doc.text(125,j + 4, 'BRAND: ${product.brandName}');
+				doc.setFontSize(10);
+				doc.text(125, j + 9, 'PRODUCT NAME: ${product.productName}');
+				doc.text(125, j + 14, 'TREAD NAME: ${product.treadName}');
+				doc.setFontSize(15);
+				doc.text(125, j + 19, 'CODE: ${product.description}');
+				doc.setFontSize(8);
+				doc.addPage();
+			</c:if>
+			<c:if test="${product.pcd == null && product.treadName == null}">
+				doc.addImage('${product.dataUri}','JPEG',102,j + 3,20,15);
+				doc.text(125,j + 4, 'BRAND: ${product.brandName}');
+				doc.setFontSize(8);
 				doc.text(125,j + 9, 'PRODUCT NAME: ${product.productName}');
 				doc.setFontSize(15);
 				doc.text(125,j + 14, 'CODE: ${product.description}');
-				doc.text(125,j + 19, 'SRP: Php ${product.srp}');
+	// 			doc.text(125,j + 19, 'SRP: Php ${product.srp}');
 				doc.setFontSize(8);
-			}
-		}else{
-			doc.addImage('${product.dataUri}','JPEG',102,j + 3,20,15);
-			doc.text(125,j + 4, 'BRAND: ${product.brandName}');
-			doc.text(125,j + 9, 'PRODUCT NAME: ${product.productName}');
-			doc.setFontSize(15);
-			doc.text(125,j + 14, 'CODE: ${product.description}');
-			doc.text(125,j + 19, 'SRP: Php ${product.srp}');
-			doc.setFontSize(8);
-			doc.addPage();
+				doc.addPage();
+			</c:if>
+			
 		}
 		
 	</c:forEach>

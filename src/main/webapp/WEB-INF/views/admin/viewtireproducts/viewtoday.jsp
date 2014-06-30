@@ -9,6 +9,8 @@
   		<thead>
   			<tr>
    				<td>Product Name</td>
+   				<td>Product Code</td>
+   				<td>Brand</td>
    				<td>Quantity</td>
 <!--    				<td>Cost</td> -->
    				<td>SRP</td>
@@ -19,6 +21,8 @@
   			<c:forEach var="transactionProduct" items="${itps}">
   			<tr>
   				<td>${transactionProduct.productName}</td>
+  				<td><c:if test="${transactionProduct.product==null}"> Product is already Deleted</c:if><c:if test="${transactionProduct.product!=null}"> ${transactionProduct.product.code}</c:if></td>
+  				<td><c:if test="${transactionProduct.product==null}"> Product is already Deleted</c:if><c:if test="${transactionProduct.product!=null}"> ${transactionProduct.product.brand.brandName}</c:if></td>
   				<td>${transactionProduct.qty}</td>
 <%--   				<td>${transactionProduct.productCost}</td> --%>
   				<td>${transactionProduct.productSale}</td>

@@ -14,6 +14,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.web.util.RedirectUrlBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -30,6 +32,8 @@ import com.altostratus.bionicwheels.model.InventoryTransaction;
 import com.altostratus.bionicwheels.model.InventoryTransactionProduct;
 import com.altostratus.bionicwheels.model.Product;
 import com.altostratus.bionicwheels.model.Settings;
+import com.altostratus.bionicwheels.service.BrandService;
+import com.altostratus.bionicwheels.service.CategoryService;
 import com.altostratus.bionicwheels.service.InventoryService;
 import com.altostratus.bionicwheels.service.InventoryTransactionProductService;
 import com.altostratus.bionicwheels.service.InventoryTransactionService;
@@ -69,6 +73,9 @@ public class InventoryTransactionProductController {
 
 	@Autowired
 	ConvertCode convertCode;
+	
+	@Autowired
+	CategoryService categoryService;
 
 	private Logger logger = LoggerFactory.getLogger(InventoryTransactionProductController.class);
 
@@ -126,32 +133,32 @@ public class InventoryTransactionProductController {
 		return mnv;
 	}
 
-	@RequestMapping(value = "/stocktransaction-refund")
-	public ModelAndView stockTransactionRefund(HttpServletRequest request, HttpSession session, Principal principal) {
-
-		logger.info("Entering stock transaction index - refund by " + principal.getName());
-		
-		List<DummyProductQty> transactionItems = new ArrayList<DummyProductQty>();
-		
-		session.setAttribute("transactionItems", transactionItems);
-		session.setAttribute("qtyOutChecker", "false");
-		
-		@SuppressWarnings("unchecked")
-		List<DummyProductQty> checkTransactionItems = (ArrayList<DummyProductQty>) session.getAttribute("transactionItems");
-		
-		logger.info("get transaction items size: " + checkTransactionItems.size());
-		logger.info("quantity out checker is: " + session.getAttribute("qtyOutChecker"));
-		
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		String s = df.format(new Date());
-		ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.refund");
-		mnv.addObject("transaction", new InventoryTransaction());
-
-		mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
-		mnv.addObject("getDate", s);
-
-		return mnv;
-	}
+//	@RequestMapping(value = "/stocktransaction-refund")
+//	public ModelAndView stockTransactionRefund(HttpServletRequest request, HttpSession session, Principal principal) {
+//
+//		logger.info("Entering stock transaction index - refund by " + principal.getName());
+//		
+//		List<DummyProductQty> transactionItems = new ArrayList<DummyProductQty>();
+//		
+//		session.setAttribute("transactionItems", transactionItems);
+//		session.setAttribute("qtyOutChecker", "false");
+//		
+//		@SuppressWarnings("unchecked")
+//		List<DummyProductQty> checkTransactionItems = (ArrayList<DummyProductQty>) session.getAttribute("transactionItems");
+//		
+//		logger.info("get transaction items size: " + checkTransactionItems.size());
+//		logger.info("quantity out checker is: " + session.getAttribute("qtyOutChecker"));
+//		
+//		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//		String s = df.format(new Date());
+//		ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.refund");
+//		mnv.addObject("transaction", new InventoryTransaction());
+//
+//		mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
+//		mnv.addObject("getDate", s);
+//
+//		return mnv;
+//	}
 
 	@RequestMapping(value = "/getproductintransaction/{id}")
 	public @ResponseBody
@@ -409,7 +416,7 @@ public class InventoryTransactionProductController {
 
 		for (DummyProductQty dpq : transactionItems) {
 			
-			if (dpq.getId() == id) {
+			if (dpq.getId().equals(id)) {
 				logger.info("DUMMY PRODUCT ID IS: " + dpq.getId() + " DUMMY PRODUCT QTY IS: " + dpq.getQty() + " DUMMY PRODUCT PRICE IS: " + dpq.getPrice());
 
 				removeList.add(dpq);
@@ -575,151 +582,153 @@ public class InventoryTransactionProductController {
 
 	// edit the delete check @Transactional
 	// @Transactional(rollbackFor = InsufficientStockException.class)
-	@RequestMapping(value = "/stocktransaction-refund", method = RequestMethod.POST)
-	public ModelAndView saveInventoryTransactionRefoundProduct(HttpSession session, HttpServletRequest request, @ModelAttribute("transaction") InventoryTransaction inventoryTransaction, BindingResult result, Principal principal) {
-
-		@SuppressWarnings("unchecked")
-		List<DummyProductQty> transactionItems = (ArrayList<DummyProductQty>) session.getAttribute("transactionItems");
-		
-		logger.info("[IN SAVE ITP] transactionItems size is: " + transactionItems.size() + " by " + principal.getName());
-		ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.refund");
-		ArrayList<String> headsUpMsgs = new ArrayList<String>();
-
-		Long inventoryTransactionId = null;
-		Double totalCost = 0.0;
-		Double totalSale = 0.0;
-
-		logger.info("Inventory Transaction is: " + InventoryTransaction.TRANSACTION_TYPE.REFUND.toString());
-
-		try {
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-			Date dateCreated = df.parse(inventoryTransaction.getDateCreatedValue());
-			inventoryTransaction.setDateCreated(dateCreated);
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-			return new ModelAndView("redirect:/admin/stocktransaction-refund");
-		}
-
-		inventoryTransactionValidator.validate(inventoryTransaction, result);
-
-		if (result.hasErrors()) {
-			logger.info(result.toString());
-			mnv.addObject("transaction", new InventoryTransaction());
-			mnv.addObject("headsup", headsUpMsgs);
-			mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-			String s = df.format(new Date());
-			mnv.addObject("getDate", s);
-			logger.info("FAIL, Entering Index Again (REFUND)");
-			return mnv;
-		}
-
-		if (transactionItems.size() != 0) {
-
-			InventoryTransaction it = new InventoryTransaction();
-			it.setTransactionType(InventoryTransaction.TRANSACTION_TYPE.REFUND.toString());
-			it.setReferenceNumber(inventoryTransaction.getReferenceNumber());
-			User user = userManagementService.getUserByUsername(request.getUserPrincipal().getName());
-			it.setUser(user);
-			it.setPointPersonName(user.getUsername() + " - " + user.getFirstName());
-
-			try {
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-				Date dateCreated = df.parse(inventoryTransaction.getDateCreatedValue());
-				it.setDateCreated(dateCreated);
-			} catch (Exception e) {
-				e.printStackTrace();
-				logger.error(e.getMessage());
-				return new ModelAndView("redirect:/admin/stocktransaction-refund");
-			}
-			it = (InventoryTransaction) inventoryTransactionService.saveInventoryTransaction(it);
-
-			inventoryTransactionId = it.getId();
-
-			logger.info("transaction date is " + it.getDateCreated());
-
-			// if (it.getTransactionType().equalsIgnoreCase("INVENTORY_IN")) {
-			// logger.info("[INVENTORY IN]");
-			for (DummyProductQty dpq : transactionItems) {
-				logger.info("SAVE DPQ TO ITP");
-				InventoryTransactionProduct itp = new InventoryTransactionProduct();
-				itp.setInventoryTransaction(it);
-				itp.setProduct(productService.getProduct(dpq.getId()));
-				itp.setProductName(productService.getProduct(dpq.getId()).getProductName());
-				itp.setQty(dpq.getQty());
-				// i think no need to get the product cost and srp if
-				// inventory in - but overall this would work
-				itp.setProductCost(-1 * inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getCost());
-				itp.setProductSale(-1 * inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getSrp());
-				itp.setCategory(productService.getProduct(dpq.getId()).getCategory());
-				itp.setUom(productService.getProduct(dpq.getId()).getUnitOfMeasure());
-
-				logger.info("Inventory transaction id: " + it.getId());
-				logger.info("Inventory transaction product is: " + itp.getProduct().getProductName());
-				logger.info("Inventory transaction qty is: " + itp.getQty());
-
-				itp = (InventoryTransactionProduct) inventoryTransactionProductService.saveInventoryTransactionProduct(itp);
-
-				totalCost = totalCost + (dpq.getQty() * inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getCost());
-
-				totalSale = totalSale + (dpq.getQty() * dpq.getPrice());
-
-				Product product = (Product) productService.getProduct(dpq.getId());
-				product.setTotalQty(product.getTotalQty() + dpq.getQty());
-				product = productService.saveProduct(product);
-				Inventory inventory = (Inventory) inventoryService.getInventory(product.getInventoryId());
-				inventory.setQty(inventory.getQty() + dpq.getQty());
-				inventory = inventoryService.saveInventory(inventory);
-				headsUpMsgs.add("Successfully added quantity of Product: " + product.getProductName() + " - its quantity is now: " + product.getTotalQty());
-			}
-		}
-
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		String s = df.format(new Date());
-
-		if (transactionItems.size() == 0) {
-			logger.info("No Product to process!");
-			headsUpMsgs.add("No Product for Transaction to be processed! Please add products for transaction");
-			mnv.addObject("transaction", new InventoryTransaction());
-			// mnv.addObject("transactionType",
-			// InventoryTransaction.TRANSACTION_TYPE.values());
-			mnv.addObject("headsup", headsUpMsgs);
-			mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
-			mnv.addObject("getDate", s);
-			logger.info("ERROR!, Entering Index Again");
-
-			transactionItems.clear();
-			
-			session.setAttribute("transactionItems", transactionItems);
-
-			return mnv;
-
-		}
-
-		InventoryTransaction transaction = inventoryTransactionService.getInventoryTransaction(inventoryTransactionId);
-
-		transaction.setTotalTransactionCost(totalCost *= -1);
-		transaction.setTotalTransactionSale(totalSale *= -1);
-
-		transaction = (InventoryTransaction) inventoryTransactionService.saveInventoryTransaction(transaction);
-
-		Settings settings = settingsService.getSettings((long) 1);
-		settings.setTransactionNumber(settings.getTransactionNumber() + 1);
-		settings = settingsService.saveSettings(settings);
-		
-		mnv.addObject("transaction", new InventoryTransaction());
-		mnv.addObject("headsup", headsUpMsgs);
-		mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
-		mnv.addObject("getDate", s);
-		logger.info("Saved Transaction (REFUND), Entering Index Again" + " by " + principal.getName());
-
-		transactionItems.clear();
-		
-		session.setAttribute("transactionItems", transactionItems);
-
-		return mnv;
-	}
+//	@RequestMapping(value = "/stocktransaction-refund", method = RequestMethod.POST)
+//	public ModelAndView saveInventoryTransactionRefoundProduct(HttpSession session, HttpServletRequest request, @ModelAttribute("transaction") InventoryTransaction inventoryTransaction, BindingResult result, Principal principal) {
+//
+//		@SuppressWarnings("unchecked")
+//		List<DummyProductQty> transactionItems = (ArrayList<DummyProductQty>) session.getAttribute("transactionItems");
+//		
+//		logger.info("[IN SAVE ITP] transactionItems size is: " + transactionItems.size() + " by " + principal.getName());
+//		ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.refund");
+//		ArrayList<String> headsUpMsgs = new ArrayList<String>();
+//
+//		Long inventoryTransactionId = null;
+//		Double totalCost = 0.0;
+//		Double totalSale = 0.0;
+//
+//		logger.info("Inventory Transaction is: " + InventoryTransaction.TRANSACTION_TYPE.REFUND.toString());
+//
+//		try {
+//			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//			Date dateCreated = df.parse(inventoryTransaction.getDateCreatedValue());
+//			inventoryTransaction.setDateCreated(dateCreated);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			logger.error(e.getMessage());
+//			return new ModelAndView("redirect:/admin/stocktransaction-refund");
+//		}
+//
+//		inventoryTransactionValidator.validate(inventoryTransaction, result);
+//
+//		if (result.hasErrors()) {
+//			logger.info(result.toString());
+//			mnv.addObject("transaction", new InventoryTransaction());
+//			mnv.addObject("headsup", headsUpMsgs);
+//			mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
+//			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//			String s = df.format(new Date());
+//			mnv.addObject("getDate", s);
+//			logger.info("FAIL, Entering Index Again (REFUND)");
+//			return mnv;
+//		}
+//
+//		if (transactionItems.size() != 0) {
+//
+//			InventoryTransaction it = new InventoryTransaction();
+//			it.setTransactionType(InventoryTransaction.TRANSACTION_TYPE.REFUND.toString());
+//			it.setReferenceNumber(inventoryTransaction.getReferenceNumber());
+//			User user = userManagementService.getUserByUsername(request.getUserPrincipal().getName());
+//			it.setUser(user);
+//			it.setPointPersonName(user.getUsername() + " - " + user.getFirstName());
+//
+//			try {
+//				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//				Date dateCreated = df.parse(inventoryTransaction.getDateCreatedValue());
+//				it.setDateCreated(dateCreated);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				logger.error(e.getMessage());
+//				return new ModelAndView("redirect:/admin/stocktransaction-refund");
+//			}
+//			it = (InventoryTransaction) inventoryTransactionService.saveInventoryTransaction(it);
+//
+//			inventoryTransactionId = it.getId();
+//
+//			logger.info("transaction date is " + it.getDateCreated());
+//
+//			// if (it.getTransactionType().equalsIgnoreCase("INVENTORY_IN")) {
+//			// logger.info("[INVENTORY IN]");
+//			for (DummyProductQty dpq : transactionItems) {
+//				logger.info("SAVE DPQ TO ITP");
+//				InventoryTransactionProduct itp = new InventoryTransactionProduct();
+//				itp.setInventoryTransaction(it);
+//				itp.setProduct(productService.getProduct(dpq.getId()));
+//				itp.setProductName(productService.getProduct(dpq.getId()).getProductName());
+//				itp.setQty(dpq.getQty());
+//				// i think no need to get the product cost and srp if
+//				// inventory in - but overall this would work
+//				// check if the setproductsale should be coming from inventory and not from dynamic input
+//				itp.setProductCost(-1 * inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getCost());
+////				itp.setProductSale(-1 * inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getSrp());
+//				itp.setProductSale(-1 * dpq.getPrice());
+//				itp.setCategory(productService.getProduct(dpq.getId()).getCategory());
+//				itp.setUom(productService.getProduct(dpq.getId()).getUnitOfMeasure());
+//
+//				logger.info("Inventory transaction id: " + it.getId());
+//				logger.info("Inventory transaction product is: " + itp.getProduct().getProductName());
+//				logger.info("Inventory transaction qty is: " + itp.getQty());
+//
+//				itp = (InventoryTransactionProduct) inventoryTransactionProductService.saveInventoryTransactionProduct(itp);
+//
+//				totalCost = totalCost + (dpq.getQty() * inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getCost());
+//
+//				totalSale = totalSale + (dpq.getQty() * dpq.getPrice());
+//
+//				Product product = (Product) productService.getProduct(dpq.getId());
+//				product.setTotalQty(product.getTotalQty() + dpq.getQty());
+//				product = productService.saveProduct(product);
+//				Inventory inventory = (Inventory) inventoryService.getInventory(product.getInventoryId());
+//				inventory.setQty(inventory.getQty() + dpq.getQty());
+//				inventory = inventoryService.saveInventory(inventory);
+//				headsUpMsgs.add("Successfully added quantity of Product: " + product.getProductName() + " - its quantity is now: " + product.getTotalQty());
+//			}
+//		}
+//
+//		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//		String s = df.format(new Date());
+//
+//		if (transactionItems.size() == 0) {
+//			logger.info("No Product to process!");
+//			headsUpMsgs.add("No Product for Transaction to be processed! Please add products for transaction");
+//			mnv.addObject("transaction", new InventoryTransaction());
+//			// mnv.addObject("transactionType",
+//			// InventoryTransaction.TRANSACTION_TYPE.values());
+//			mnv.addObject("headsup", headsUpMsgs);
+//			mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
+//			mnv.addObject("getDate", s);
+//			logger.info("ERROR!, Entering Index Again");
+//
+//			transactionItems.clear();
+//			
+//			session.setAttribute("transactionItems", transactionItems);
+//
+//			return mnv;
+//
+//		}
+//
+//		InventoryTransaction transaction = inventoryTransactionService.getInventoryTransaction(inventoryTransactionId);
+//
+//		transaction.setTotalTransactionCost(totalCost *= -1);
+//		transaction.setTotalTransactionSale(totalSale *= -1);
+//
+//		transaction = (InventoryTransaction) inventoryTransactionService.saveInventoryTransaction(transaction);
+//
+//		Settings settings = settingsService.getSettings((long) 1);
+//		settings.setTransactionNumber(settings.getTransactionNumber() + 1);
+//		settings = settingsService.saveSettings(settings);
+//		
+//		mnv.addObject("transaction", new InventoryTransaction());
+//		mnv.addObject("headsup", headsUpMsgs);
+//		mnv.addObject("referenceNumber", settingsService.getSettings((long) 1).getTransactionNumber());
+//		mnv.addObject("getDate", s);
+//		logger.info("Saved Transaction (REFUND), Entering Index Again" + " by " + principal.getName());
+//
+//		transactionItems.clear();
+//		
+//		session.setAttribute("transactionItems", transactionItems);
+//
+//		return mnv;
+//	}
 
 	// edit the delete check @Transactional
 	@Transactional(rollbackFor = InsufficientStockException.class)
@@ -793,8 +802,9 @@ public class InventoryTransactionProductController {
 				itp.setProduct(productService.getProduct(dpq.getId()));
 				itp.setProductName(productService.getProduct(dpq.getId()).getProductName());
 				itp.setQty(dpq.getQty());
-				itp.setProductCost(inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getCost());
-				itp.setProductSale(inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getSrp());
+				
+//				itp.setProductSale(inventoryService.getInventory(productService.getProduct(dpq.getId()).getInventoryId()).getSrp());
+				itp.setProductSale(dpq.getPrice());
 				itp.setCategory(productService.getProduct(dpq.getId()).getCategory());
 				itp.setUom(productService.getProduct(dpq.getId()).getUnitOfMeasure());
 
@@ -830,6 +840,7 @@ public class InventoryTransactionProductController {
 									realInventory = inventoryService.saveInventory(realInventory);
 									// place new sale price here same in
 									// LIFO and else statement below.
+									itp.setProductCost(realInventory.getCost());
 									logger.info(totalCost.toString());
 
 								} else {
@@ -838,6 +849,7 @@ public class InventoryTransactionProductController {
 									totalCost = totalCost + (realInventory.getCost() * lastInventoryQty);
 									realInventory.setQty(tempQty);
 									realInventory = inventoryService.saveInventory(realInventory);
+									itp.setProductCost(realInventory.getCost());
 									break;
 								}
 							}
@@ -855,19 +867,22 @@ public class InventoryTransactionProductController {
 									totalCost = totalCost + (realInventory.getCost() * realInventory.getQty());
 									realInventory.setQty((double) 0);
 									realInventory = inventoryService.saveInventory(realInventory);
+									itp.setProductCost(realInventory.getCost());
 								} else {
 									Inventory realInventory = inventoryService.getInventory(inventory.getId());
 									Double lastInventoryQty = realInventory.getQty() - tempQty;
 									totalCost = totalCost + (realInventory.getCost() * lastInventoryQty);
 									realInventory.setQty(tempQty);
 									realInventory = inventoryService.saveInventory(realInventory);
+									itp.setProductCost(realInventory.getCost());
 									break;
 								}
 							}
 						}
 
 						totalSale = totalSale + (dpq.getQty() * dpq.getPrice());
-
+						System.out.println("TOTAL SALE IS: " + totalSale);
+						
 						itp = (InventoryTransactionProduct) inventoryTransactionProductService.saveInventoryTransactionProduct(itp);
 						headsUpMsgs.add("Successfully pulled-out the qty of Product: " + product.getProductName() + " - its quantity is now: " + product.getTotalQty());
 					}
@@ -960,5 +975,215 @@ public class InventoryTransactionProductController {
 		session.setAttribute("transactionItems", transactionItems);
 
 		return mnv;
+	}
+	
+	@RequestMapping(value = "/edit/inventory-transaction-product/{id}")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView editInventoryTransactionProduct(HttpServletRequest request, Principal principal, @PathVariable("id") Long id) {
+		
+		logger.info("Editing inventory transaction product id:" + id + " by " + principal.getName());
+		
+		ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.view");
+		
+		InventoryTransactionProduct itp = inventoryTransactionProductService.getInventoryTransactionProduct(id);
+		InventoryTransaction it = inventoryTransactionService.getInventoryTransaction(inventoryTransactionProductService.getInventoryTransactionProduct(id).getInventoryTransaction().getId());
+		itp.setCategoryId(inventoryTransactionProductService.getInventoryTransactionProduct(id).getCategory().getId());
+		itp.setInventoryTransactionId(inventoryTransactionProductService.getInventoryTransactionProduct(id).getInventoryTransaction().getId());
+		itp.setId(inventoryTransactionProductService.getInventoryTransactionProduct(id).getId());
+		itp.setProductId(inventoryTransactionProductService.getInventoryTransactionProduct(id).getProduct().getId());
+		itp.setProductName(inventoryTransactionProductService.getInventoryTransactionProduct(id).getProductName());
+		itp.setUom(inventoryTransactionProductService.getInventoryTransactionProduct(id).getUom());
+		itp.setQty(inventoryTransactionProductService.getInventoryTransactionProduct(id).getQty());
+		
+		if(it.getTransactionType().toString().equalsIgnoreCase("REFUND")){
+			itp.setProductCost(inventoryTransactionProductService.getInventoryTransactionProduct(id).getProductCost()*-1);
+			itp.setProductSale(inventoryTransactionProductService.getInventoryTransactionProduct(id).getProductSale()*-1);
+		}
+		else{
+			itp.setProductCost(inventoryTransactionProductService.getInventoryTransactionProduct(id).getProductCost());
+			itp.setProductSale(inventoryTransactionProductService.getInventoryTransactionProduct(id).getProductSale());
+		}
+		mnv.addObject("inventoryTransactionProduct", itp);
+		return mnv;
+		
+	}
+	
+	@RequestMapping(value = "/post/inventory-transaction-product", method=RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView postInventoryTransactionProduct(HttpServletRequest request, Principal principal, @ModelAttribute("inventoryTransactionProduct") InventoryTransactionProduct itp, BindingResult result) {
+		
+		logger.info("Posting inventory transaction product id:" + itp.getId() + " by " + principal.getName() + " with product cost: " + itp.getProductCost());
+		logger.info("PRODUCT COST IS: " + itp.getProductCost());
+		InventoryTransaction it = inventoryTransactionService.getInventoryTransaction(itp.getInventoryTransactionId());
+		
+		InventoryTransactionProduct itpBuffer = inventoryTransactionProductService.getInventoryTransactionProduct(itp.getId());
+		//before the update or transaction
+		Double preQty = itpBuffer.getQty();
+		Double preProductCost = itpBuffer.getProductCost();
+		Double preProductSale = itpBuffer.getProductSale();
+		//transaction cost and sale before the line item
+		Double bufferTotalTransactionCost = it.getTotalTransactionCost() - (preProductCost*preQty);
+		Double bufferTotalTransactionSale = it.getTotalTransactionSale() - (preProductSale*preQty);
+		
+		//setup inventoryTransactionProduct object for revision.
+		InventoryTransactionProduct inventoryTransactionProduct = itp;
+		
+		inventoryTransactionProduct.setCategory(categoryService.getCategory(itp.getCategoryId()));
+		inventoryTransactionProduct.setProduct(productService.getProduct(itp.getProductId()));
+		inventoryTransactionProduct.setInventoryTransaction(it);
+		
+		Product product = productService.getProduct(itp.getProductId());
+		
+		//place code here if product is null.
+		
+		if(it.getTransactionType().equalsIgnoreCase(InventoryTransaction.TRANSACTION_TYPE.INVENTORY_IN.toString())){
+			
+			Double totalQtyBeforeTransaction = product.getTotalQty() - preQty;
+			Double totalQtyAfterRevision = totalQtyBeforeTransaction + inventoryTransactionProduct.getQty();
+			product.setTotalQty(totalQtyAfterRevision);
+			
+			List<Inventory> inventories = inventoryService.getInventoryByProduct(product);
+			for(Inventory bufferInventory : inventories){
+				if(bufferInventory.getCost().toString().equalsIgnoreCase(inventoryTransactionProduct.getProductCost().toString())){
+					Double inventoryQtyBeforeTransaction = bufferInventory.getQty() - preQty;
+					
+					Double inventoryQtyAfterRevision = inventoryQtyBeforeTransaction + inventoryTransactionProduct.getQty();
+					bufferInventory.setQty(inventoryQtyAfterRevision);
+					
+					bufferInventory = inventoryService.saveInventory(bufferInventory);
+					break;
+				}
+			}
+			
+			product = productService.saveProduct(product);
+			
+			it.setTotalTransactionCost(bufferTotalTransactionCost + (inventoryTransactionProduct.getQty() * inventoryTransactionProduct.getProductCost()));
+			it.setTotalTransactionSale(0.0);
+			
+			logger.info("Inventory Transaction ID: " + it.getId());
+			
+		}
+		else if(it.getTransactionType().equalsIgnoreCase(InventoryTransaction.TRANSACTION_TYPE.INVENTORY_OUT.toString())){
+			
+			//start editing this for revision of itp - may 23, 2014
+			//error here!
+			List<Inventory> inventoriesOfProduct = inventoryService.getInventoryByProduct(product);
+			
+			Double totalQtyBeforeTransaction = product.getTotalQty() + preQty;
+			Double totalCost = 0.0;
+			
+			if((totalQtyBeforeTransaction-inventoryTransactionProduct.getQty())<0 || preQty<=inventoryTransactionProduct.getQty()){
+				
+				ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.view");
+				mnv.addObject("ERROR_MESSAGE", "Unsuccessful revision of quantity out. check total qty or the revised quantity is greater than the initial quantity. The revised quantity should be less");
+				mnv.addObject("inventoryTransactionProduct", inventoryTransactionProduct);
+				return mnv;
+	
+			}
+			else{
+				
+				product.setTotalQty(totalQtyBeforeTransaction);
+	
+				product = productService.saveProduct(product);
+				
+				Double qtyAns = product.getTotalQty() - inventoryTransactionProduct.getQty();
+				Double tempQty = inventoryTransactionProduct.getQty();
+//				Long id = (long) 1;
+				
+				product.setTotalQty(qtyAns);
+				
+				for(Inventory inventory : inventoriesOfProduct){
+					if(inventory.getCost().toString().equalsIgnoreCase(preProductCost.toString())){
+						Double inventoryQtyBeforeTransaction = inventory.getQty() + preQty;
+						inventory.setQty(inventoryQtyBeforeTransaction - tempQty);
+						inventory = inventoryService.saveInventory(inventory);
+						logger.info("Inventory Qty after revision is: " + inventory.getQty());
+						totalCost = totalCost + (inventory.getCost()*tempQty);
+						logger.info("TOTAL COST IN IF STATEMENT: " + totalCost);
+						break;
+					}
+				}
+
+				product = productService.saveProduct(product);
+				Double ans = bufferTotalTransactionCost + totalCost;
+				it.setTotalTransactionCost(ans);
+				logger.info("bufferTotalTransactionCost + totalCost = " + ans);
+				it.setTotalTransactionSale(bufferTotalTransactionSale + (inventoryTransactionProduct.getQty() * inventoryTransactionProduct.getProductSale()));
+				
+			}
+		}
+		else{
+			
+			List<Inventory> inventoriesOfProduct = inventoryService.getInventoryByProduct(product);
+			
+			Double totalQtyBeforeTransaction = product.getTotalQty() + preQty;
+			Double totalCost = 0.0;
+			Double totalSRP = 0.0;
+			
+			if(preQty<inventoryTransactionProduct.getQty() && !(inventoryTransactionProduct.getProductSale().equals(itpBuffer.getProductSale()))){
+				
+				ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.view");
+				mnv.addObject("ERROR_MESSAGE", "Unsuccessful revision of refund. check total qty or the revised quantity is greater than the initial quantity. The revised quantity should be less");
+				mnv.addObject("inventoryTransactionProduct", inventoryTransactionProduct);
+				return mnv;
+	
+			}
+			else{
+				
+				product.setTotalQty(totalQtyBeforeTransaction);
+	
+				product = productService.saveProduct(product);
+				
+				Double qtyAns = product.getTotalQty() - inventoryTransactionProduct.getQty();
+				Double tempQty = inventoryTransactionProduct.getQty();
+//				Long id = (long) 1;
+				
+				product.setTotalQty(qtyAns);
+				
+				for(Inventory inventory : inventoriesOfProduct){
+					if(inventory.getCost().toString().equalsIgnoreCase(itp.getProductCost().toString())){
+						
+						Inventory wrongInventory = inventoryService.getInventory(product.getInventoryId());
+						wrongInventory.setQty(wrongInventory.getQty() - inventoryTransactionProduct.getQty());
+						wrongInventory = inventoryService.saveInventory(wrongInventory);
+						
+						Double inventoryQtyBeforeTransaction = inventory.getQty() + preQty;
+						inventory.setQty(inventoryQtyBeforeTransaction + tempQty);
+						inventory = inventoryService.saveInventory(inventory);
+						logger.info("Inventory Qty after revision is: " + inventory.getQty());
+						totalCost = totalCost + ((inventoryTransactionProduct.getProductCost()*tempQty)*-1);
+						totalSRP = totalSRP + ((inventoryTransactionProduct.getProductSale()*tempQty)*-1);
+						logger.info("TOTAL COST IN IF STATEMENT: " + totalCost);
+						break;
+					}
+					else{
+						ModelAndView mnv = new ModelAndView("admin.inventorytransactionproduct.view");
+						mnv.addObject("ERROR_MESSAGE", "Unsuccessful revision of refund. the product cost you entered is invalid.");
+						mnv.addObject("inventoryTransactionProduct", inventoryTransactionProduct);
+						return mnv;
+					}
+				}
+
+				product = productService.saveProduct(product);
+				Double ans = bufferTotalTransactionCost + totalCost;
+				Double ans2 = bufferTotalTransactionSale + totalSRP;
+				it.setTotalTransactionCost(ans);
+				it.setTotalTransactionSale(ans2);
+				logger.info("bufferTotalTransactionCost + totalCost = " + ans);
+				it.setTotalTransactionSale(bufferTotalTransactionSale + (inventoryTransactionProduct.getQty() * inventoryTransactionProduct.getProductSale()));
+				
+			}
+		}
+		
+		it = inventoryTransactionService.saveInventoryTransaction(it);
+		
+		logger.info("Transaction Cost: " + it.getTotalTransactionCost() + " Transaction Sale: " + it.getTotalTransactionSale());
+		
+		inventoryTransactionProduct = inventoryTransactionProductService.saveInventoryTransactionProduct(inventoryTransactionProduct);
+		
+		logger.info("Inventory Transaction Product Revised Qty: " + inventoryTransactionProduct.getQty() + " and revised price: " + inventoryTransactionProduct.getProductSale());
+		
+		return new ModelAndView("redirect:/view-transaction/" + itp.getInventoryTransactionId());
+		
 	}
 }

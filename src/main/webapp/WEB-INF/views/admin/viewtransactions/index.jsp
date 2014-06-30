@@ -23,24 +23,24 @@
   	<table class="table table-striped table-bordered table-condensed">
   		<tr>
   			<td>Total Cost of Goods Sold: </td>
-  			<td><b style="font-size:30px;">Php ${totalCost}</b></td>
+  			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalCost}" /></b></td>
   		</tr>
   		<tr>
   			<td>Total Sales: </td>
-			<td><b style="font-size:30px;">Php ${totalSRP}</b></td>
+			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalSRP}" /></b></td>
   		</tr>
   		<tr>
   			<td>Total Profit: </td>
-  			<td><b style="font-size:30px;">Php ${totalProfit}</b></td>
+  			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalProfit}" /></b></td>
   		</tr>
   		<tr>
   			<td>Total Purchases Cost: </td>
-  			<td><b style="font-size:30px;">Php ${totalPurchases}</b></td>
+  			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalPurchases}" /></b></td>
   		</tr>
   		<tr>
   			<td>Net Profit: </td>
-  			<td><c:if test = "${(totalProfit-totalPurchases)>0}"><b style="color: green; font-size:35px;">Php ${netProfit}</b></c:if>
-  				<c:if test = "${(totalProfit-totalPurchases)<=0}"><b style="color: red; font-size:35px;">Php ${netProfit}</b></c:if>
+  			<td><c:if test = "${(totalProfit-totalPurchases)>0}"><b style="color: green; font-size:35px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${netProfit}" /></b></c:if>
+  				<c:if test = "${(totalProfit-totalPurchases)<=0}"><b style="color: red; font-size:35px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${netProfit}" /></b></c:if>
   			</td>
   		</tr>
   	</table>
@@ -66,8 +66,8 @@
   				<td><a href = "/view-transaction/${transaction.id}">${transaction.referenceNumber}</a></td>
     			<td>${transaction.dateCreated}</td>
     			<td>${transaction.transactionType}</td>
-    			<td>${transaction.totalTransactionCost}</td>
-    			<td>${transaction.totalTransactionSale}</td>
+    			<td>&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${transaction.totalTransactionCost}" /></td>
+    			<td>&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${transaction.totalTransactionSale}" /></td>
     			<td>${transaction.user.firstName} ${transaction.user.lastName}</td>
   			</tr>
   		</c:forEach>

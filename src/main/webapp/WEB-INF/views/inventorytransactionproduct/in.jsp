@@ -17,7 +17,7 @@
 <table>
 <tr>
 	<td><label>Product ID:</label></td>
-	<td>&nbsp;&nbsp;<input id="productId" onkeypress="return isNumberKey(event)" onchange="getProductInfo()" class="span10"/ autofocus></td>
+	<td>&nbsp;&nbsp;<input id="productId" onkeypress="return isNumberKey(event)" onchange="getProductInfo()" class="span10" autofocus/></td>
 </tr>
 <tr>
 	<td><label>Quantity to Add:</label></td>

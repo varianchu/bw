@@ -7,5 +7,14 @@
 <definition name="admin.viewtransaction.index" extends="default">
     <put-attribute name="body" value="/WEB-INF/views/admin/viewtransaction/index.jsp" />
 </definition>
-   
- </tiles-definitions> 
+
+<definition name="admin.inventorytransactionproduct.view" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/viewtransaction/tp.jsp" />
+</definition>
+
+<definition name="admin.viewproducthistory.index" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/viewtransaction/itphistory.jsp" />
+</definition>   
+  
+
+</tiles-definitions> 

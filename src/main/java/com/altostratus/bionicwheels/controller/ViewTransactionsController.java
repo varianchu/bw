@@ -21,11 +21,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.altostratus.bionicwheels.model.DummyProductQty;
 import com.altostratus.bionicwheels.model.InventoryTransaction;
+import com.altostratus.bionicwheels.model.InventoryTransactionProduct;
+import com.altostratus.bionicwheels.model.Product;
 import com.altostratus.bionicwheels.model.TransactionsWithinDate;
 import com.altostratus.bionicwheels.model.TransactionsWithinDateUser;
 import com.altostratus.bionicwheels.service.InventoryTransactionProductService;
 import com.altostratus.bionicwheels.service.InventoryTransactionService;
+import com.altostratus.bionicwheels.service.ProductService;
 import com.altostratus.core.model.User;
 import com.altostratus.core.service.UserManagementService;
 
@@ -42,6 +46,9 @@ public class ViewTransactionsController {
 
 	@Autowired
 	UserManagementService userManagementService;
+	
+	@Autowired
+	ProductService productService;
 
 	@RequestMapping(value = "/admin/view-transactions", method = RequestMethod.GET)
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -198,4 +205,64 @@ public class ViewTransactionsController {
 		mnv.addObject("transactionProducts", inventoryTransactionProductService.getAllProductsWithTransactionInventoryId(id));
 		return mnv;
 	}
+	
+	//new feature product history
+	@RequestMapping(value = "/admin/view-product-transaction-history", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView productCheckHistoryInventoryTransactionProduct(HttpServletRequest request, Principal principal) {
+		
+		logger.info("Trying to view product transaction history by  " + principal.getName());
+		
+		ModelAndView mnv = new ModelAndView("admin.viewproducthistory.index");
+		mnv.addObject("transactionDates", new TransactionsWithinDate());
+		
+		return mnv;
+	}
+	
+	@RequestMapping(value = "/admin/view-product-transaction-history", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView productCheckHistoryInventoryTransactionProductView(HttpServletRequest request, Principal principal, @ModelAttribute("transactionDates") TransactionsWithinDate transactionsWithinDate, BindingResult result) {
+		
+		logger.info("product transaction history presented by  " + principal.getName());
+		ModelAndView mnv = new ModelAndView("admin.viewproducthistory.index");
+		
+		String date1 = transactionsWithinDate.getDate1();
+		String date2 = transactionsWithinDate.getDate2();
+
+		try {
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			Date startDate = df.parse(date1);
+			Date endDate = df.parse(date2);
+
+			List<InventoryTransaction> inventoryTransactions = inventoryTransactionService.getAllInventoryTransactionsWithinDate(startDate, endDate);
+			Product product = productService.getProduct(transactionsWithinDate.getProductId());
+			List<InventoryTransactionProduct> inventoryTransactionProducts = new ArrayList<InventoryTransactionProduct>();
+			
+			if(product==null){
+				throw new Exception();
+			}
+			
+			for(InventoryTransaction inventoryTransaction : inventoryTransactions){
+				List<InventoryTransactionProduct> itps = inventoryTransaction.getInventoryTransactionProducts();
+				for(InventoryTransactionProduct itp : itps){
+					if(itp.getProduct()!=null && itp.getProduct().equals(product)){
+						inventoryTransactionProducts.add(itp);
+					}
+				}
+			}
+			
+			mnv.addObject("transactionProducts", inventoryTransactionProducts);
+			
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			mnv.addObject("ERROR_MESSAGE", "PRODUCT NOT FOUND! OR DATE FORMAT ERROR!");
+			return mnv;
+		}
+
+		return mnv;
+	}
+	
 }

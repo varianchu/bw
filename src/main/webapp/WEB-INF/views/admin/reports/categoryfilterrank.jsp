@@ -19,7 +19,7 @@ $(document).ready(function() {
 	doc.addImage(imageData, 'JPEG', 5, 1, 20, 15);
 	doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Total Sale Inventory Rank (As of ${date1} to ${date2})');
 	doc.text(5, 18, 'Product Name');
-	doc.text(95, 18, 'Qty Out');
+	doc.text(115, 18, 'Qty Out');
 	doc.line(5, 20, 205, 20); 
 	doc.setFont("courier");
 	doc.setFontType("normal");
@@ -30,8 +30,8 @@ $(document).ready(function() {
 	
 	if(checkPage!=0){
 		i = (checkPage*3) + 20;
-		doc.text(5,i, '${lip.product.productName} - ${lip.product.brand.brandName}');
-		doc.text(95,i, '${lip.qtyOut}');
+		doc.text(5,i, '${lip.product.productName} - ${lip.product.brand.brandName} - ${lip.product.code}');
+		doc.text(115,i, '${lip.qtyOut}');
 //			doc.line(5, 20, 205, 20);
 	}
 	else{
@@ -40,13 +40,13 @@ $(document).ready(function() {
 		doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Total Inventory Report (As of ${date})');
 		doc.line(5, 16, 205, 16);
 		doc.text(5, 15, 'Product Name');
-		doc.text(95, 15, 'Qty Out');
+		doc.text(115, 15, 'Qty Out');
 		 
 		doc.setFont("courier");
 		doc.setFontType("normal");
 		i = (checkPage*3) + 20;
-		doc.text(5,i, '${lip.product.productName} - ${lip.product.brand.brandName}');
-		doc.text(95,i, '${lip.qtyOut}');
+		doc.text(5,i, '${lip.product.productName} - ${lip.product.brand.brandName} - ${lip.product.code}');
+		doc.text(115,i, '${lip.qtyOut}');
 
 	}
 	

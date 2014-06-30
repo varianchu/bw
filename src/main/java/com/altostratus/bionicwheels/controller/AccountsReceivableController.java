@@ -48,7 +48,8 @@ public class AccountsReceivableController {
 	public ModelAndView accountsReceivableIndex(HttpServletRequest request, Principal principal) {
 
 		logger.info("entering accounts receivable form by " + principal.getName());
-
+		System.out.println("entering accounts receivable form by " + principal.getName());
+		
 		List<String> terms = new ArrayList<String>();
 
 		terms.add("30 days");
@@ -72,7 +73,8 @@ public class AccountsReceivableController {
 	public ModelAndView accountsReceivableEdit(HttpServletRequest request, @PathVariable("id") Long id, Principal principal) {
 
 		logger.info("entering accounts receivable form by " + principal.getName());
-
+		System.out.println("entering accounts receivable form by " + principal.getName());
+		
 		List<String> terms = new ArrayList<String>();
 
 		terms.add("30 days");
@@ -97,7 +99,8 @@ public class AccountsReceivableController {
 	public ModelAndView viewDueAccountsReceivableIndex(HttpServletRequest request, Principal principal) {
 
 		logger.info("entering accounts receivable viewer by " + principal.getName());
-
+		System.out.println("entering accounts receivable viewer by " + principal.getName());
+		
 		Date dateToday = new Date();
 
 		List<AccountsReceivable> accountsReceivables = accountsReceivableService.getDueAccountsReceivable(dateToday);
@@ -121,7 +124,8 @@ public class AccountsReceivableController {
 	public ModelAndView viewAllAccountsReceivableIndex(HttpServletRequest request, Principal principal) {
 
 		logger.info("entering accounts receivable viewer by " + principal.getName());
-
+		System.out.println("entering accounts receivable viewer by " + principal.getName());
+		
 		List<AccountsReceivable> accountsReceivables = accountsReceivableService.getAllAccountsReceivable();
 
 		Double totalAmount = 0.0;
@@ -143,7 +147,8 @@ public class AccountsReceivableController {
 	public ModelAndView viewDueAccountsReceivableIndexByReceiptNumber(HttpServletRequest request,@PathVariable("receiptNumber") String receiptNumber, Principal principal) {
 
 		logger.info("entering accounts receivable viewer - by receipt number - by " + principal.getName());
-
+		System.out.println("entering accounts receivable viewer - by receipt number - by " + principal.getName());
+		
 		AccountsReceivable accountsReceivable = accountsReceivableService.getAccountsReceivableByReceiptNumber(receiptNumber);
 
 		if (accountsReceivable == null) {
@@ -179,7 +184,8 @@ public class AccountsReceivableController {
 	public ModelAndView viewDueAccountsReceivableIndexByReceiptNumber(HttpServletRequest request, @PathVariable("customerId") Long customerId, Principal principal) {
 
 		logger.info("entering accounts receivable viewer - by customer - by " + principal.getName());
-
+		System.out.println("entering accounts receivable viewer - by customer - by " + principal.getName());
+		
 		Customer customer = customerCarService.getCustomerById(customerId);
 
 		List<AccountsReceivable> accountsReceivables = accountsReceivableService.getAccountsReceivableByCustomer(customer);
@@ -204,7 +210,8 @@ public class AccountsReceivableController {
 	public ModelAndView accountsReceivableSave(HttpServletRequest request, @ModelAttribute("accountsReceivable") AccountsReceivable accountsReceivable, BindingResult bindingResult, Principal principal) {
 
 		logger.info("trying to save accounts receivable by " + principal.getName());
-
+		System.out.println("trying to save accounts receivable by " + principal.getName());
+		
 		List<String> terms = new ArrayList<String>();
 
 		terms.add("30 days");
@@ -279,6 +286,7 @@ public class AccountsReceivableController {
 	public ModelAndView paidAccountsReceivable(@PathVariable("id") Long accountsReceivableId, HttpServletRequest request, Principal principal) {
 		
 		logger.info("Removing accounts receivable id: " + accountsReceivableId.toString() + "(PAID ALREADY) viewed by " + principal.getName());
+		System.out.println("Removing accounts receivable id: " + accountsReceivableId.toString() + "(PAID ALREADY) viewed by " + principal.getName());
 		String receiptNumber = accountsReceivableService.getAccountsReceivable(accountsReceivableId).getReceiptNumber();
 
 		Date dateToday = new Date();

@@ -11,6 +11,7 @@
   <tr>
    <td>Product Name</td>
    <td>Product Code</td>
+   <td>Brand</td>
    <td>Category</td>
    <td>Supplier</td>
 <!--    <td>Description</td> -->
@@ -24,6 +25,7 @@
   <tr>
     <td>${product.productName}</td>
     <td>${product.code}</td>
+    <td>${product.brand.brandName}</td>
     <td>${product.category}</td>
     <td>${product.supplier}</td>
 <%--     <td>${product.description}</td> --%>

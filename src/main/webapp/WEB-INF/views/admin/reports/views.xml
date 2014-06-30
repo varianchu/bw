@@ -15,6 +15,10 @@
 <definition name="admin.report.category.inventory" extends="plain">
     <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfilterinventory.jsp" />
 </definition>
+
+<definition name="admin.report.brand.inventory" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/brandfilterinventory.jsp" />
+</definition>
    
 <definition name="admin.report.category.summary" extends="plain">
     <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfiltersummary.jsp" />

@@ -27,11 +27,11 @@
   	<table class="table table-striped table-bordered table-condensed">
   		<tr>
   			<td>Total Sales: </td>
-			<td><b style="font-size:30px;">Php ${totalSRP}</b></td>
+			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalSRP}" /></b></td>
   		</tr>
   		<tr>
   			<td>Total Profit: </td>
-  			<td><b style="font-size:30px;">Php ${totalProfit}</b></td>
+  			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalProfit}" /></b></td>
   		</tr>
   		<tr>
   			<td>Sales Representative</td>
@@ -61,8 +61,8 @@
     			<td>${transaction.serviceDate}</td>
     			<td>${transaction.customerName} - ${transaction.car}</td>
     			<td>${transaction.user.username}</td>
-    			<td>&#8369; ${transaction.totalServiceTransactionSale}</td>
-    			<td>&#8369; ${transaction.totalServiceTransactionProfit}</td>
+    			<td>&#8369;<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${transaction.totalServiceTransactionSale}" /></td>
+    			<td>&#8369;<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${transaction.totalServiceTransactionProfit}" /></td>
   			</tr>
 <%--   		</c:if> --%>
   		</c:forEach>

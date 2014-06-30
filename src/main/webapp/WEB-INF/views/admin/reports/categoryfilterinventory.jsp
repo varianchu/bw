@@ -19,9 +19,9 @@ $(document).ready(function() {
 	doc.addImage(imageData, 'JPEG', 5, 1, 20, 15);
 	doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Total Inventory Report (As of ${date})');
 	doc.text(5, 18, 'Product Name');
-	doc.text(95, 18, 'Qty');
-	doc.text(110, 18, 'Unit of Measure');
-	doc.text(135, 18, 'Cost of Good');
+	doc.text(115, 18, 'Qty');
+	doc.text(130, 18, 'Unit of Measure');
+	doc.text(155, 18, 'Cost of Good');
 	doc.line(5, 20, 205, 20); 
 	doc.setFont("courier");
 	doc.setFontType("normal");
@@ -32,10 +32,10 @@ $(document).ready(function() {
 			
 			if(checkPage!=0){
 				i = (checkPage*3) + 20;
-				doc.text(5,i, '${lip.product.productName} - ${lip.product.brand.brandName}');
-				doc.text(95,i, '${lip.qty}');
-				doc.text(110,i, '${lip.product.unitOfMeasure}');
-				doc.text(135,i, 'Php ${lip.costOfGood}');
+				doc.text(5,i, '${lip.product.productName} - ${lip.product.brand.brandName} - ${lip.product.code}');
+				doc.text(115,i, '${lip.qty}');
+				doc.text(130,i, '${lip.product.unitOfMeasure}');
+				doc.text(155,i, 'Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.costOfGood}" />');
 // 				doc.line(5, 20, 205, 20);
 			}
 			else{
@@ -44,17 +44,17 @@ $(document).ready(function() {
 				doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Total Inventory Report (As of ${date})');
 				doc.line(5, 16, 205, 16);
 				doc.text(5, 15, 'Product Name');
-				doc.text(95, 15, 'Qty');
-				doc.text(110, 15, 'Unit of Measure');
-				doc.text(135, 15, 'Cost of Good');
+				doc.text(115, 15, 'Qty');
+				doc.text(130, 15, 'Unit of Measure');
+				doc.text(155, 15, 'Cost of Good');
 				 
 				doc.setFont("courier");
 				doc.setFontType("normal");
 				i = (checkPage*3) + 20;
-				doc.text(5,i, '${lip.product.productName} - lip.product.brand.brandName');
-				doc.text(95,i, '${lip.qty}');
-				doc.text(110,i, '${lip.product.unitOfMeasure}');
-				doc.text(135,i, 'Php ${lip.costOfGood}');
+				doc.text(5,i, '${lip.product.productName} - ${lip.product.brand.brandName} - ${lip.product.code}');
+				doc.text(115,i, '${lip.qty}');
+				doc.text(130,i, '${lip.product.unitOfMeasure}');
+				doc.text(155,i, 'Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.costOfGood}" />');
 
 			}
 			
@@ -64,8 +64,8 @@ $(document).ready(function() {
 // 	doc.addImage(imageData, 'JPEG', 15, 15, 15, 15);
 	doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Total Inventory Report (As of ${date})');
 	doc.text(20, 20, 'Summary for Category: ${category}');
-	doc.text(20, 30, 'Total Inventory In-Stock Qty: ${totalQty}');
-	doc.text(20, 35, 'Total Cost of Goods In-Stock: ${totalCostOfGoodsInStock}');
+	doc.text(20, 30, 'Total Inventory In-Stock Qty: <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalQty}" />');
+	doc.text(20, 35, 'Total Cost of Goods In-Stock: Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalCostOfGoodsInStock}" />');
 	
 	var string = doc.output('datauristring');
 

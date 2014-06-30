@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.altostratus.bionicwheels.model.Brand;
 import com.altostratus.bionicwheels.model.Category;
 import com.altostratus.bionicwheels.model.Inventory;
 import com.altostratus.bionicwheels.model.InventoryTransaction;
@@ -30,6 +31,7 @@ import com.altostratus.bionicwheels.model.LineItemProductReport;
 import com.altostratus.bionicwheels.model.Product;
 import com.altostratus.bionicwheels.model.TransactionsWithinDateCategory;
 import com.altostratus.bionicwheels.model.TransactionsWithinDateUser;
+import com.altostratus.bionicwheels.service.BrandService;
 import com.altostratus.bionicwheels.service.CategoryService;
 import com.altostratus.bionicwheels.service.InventoryService;
 import com.altostratus.bionicwheels.service.InventoryTransactionService;
@@ -54,6 +56,9 @@ public class ReportsController {
 
 	@Autowired
 	CategoryService categoryService;
+	
+	@Autowired
+	BrandService brandService;
 
 	@Autowired
 	SettingsService settingsService;
@@ -70,15 +75,14 @@ public class ReportsController {
 
 		ModelAndView mnv = new ModelAndView("admin.reports.index");
 		mnv.addObject("dateToday", new Date());
-		mnv.addObject("transactionDatesCategoryIn",
-				new TransactionsWithinDateCategory());
+		mnv.addObject("transactionDatesCategoryIn", new TransactionsWithinDateCategory());
 		mnv.addObject("inventoryCount", new TransactionsWithinDateCategory());
-		mnv.addObject("transactionDatesSummaryCategory",
-				new TransactionsWithinDateCategory());
-		mnv.addObject("transactionDatesRankingInventoryCategory",
-				new TransactionsWithinDateCategory());
+		mnv.addObject("inventoryCountBrand", new TransactionsWithinDateCategory());
+		mnv.addObject("transactionDatesSummaryCategory", new TransactionsWithinDateCategory());
+		mnv.addObject("transactionDatesRankingInventoryCategory", new TransactionsWithinDateCategory());
 		mnv.addObject("transactionDatesUser", new TransactionsWithinDateUser());
 		mnv.addObject("categories", categoryService.getAllCategories());
+		mnv.addObject("brands", brandService.getAllBrands());
 		mnv.addObject("users", userManagementService.getBasicUsers());
 		return mnv;
 	}
@@ -237,6 +241,66 @@ public class ReportsController {
 			mnv.addObject("totalQty", totalQty);
 			mnv.addObject("totalCostOfGoodsInStock", totalCostOfGoodsInStock);
 			mnv.addObject("category", categoryService.getCategory(id));
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			mnv.addObject("users", userManagementService.getBasicUsers());
+			mnv.addObject("ERROR_MESSAGE", "Something went wrong.");
+			return mnv;
+		}
+		return mnv;
+	}
+	
+//	new June 25, 2014
+	@RequestMapping(value = "/report-brand-inventory", method = RequestMethod.POST)
+	public ModelAndView viewTotalInventoryCountByBrandReport(HttpServletRequest request, @ModelAttribute("inventoryCountBrand") TransactionsWithinDateCategory transactionsWithinDateCategory, BindingResult result, Principal principal) {
+
+		logger.info("report accessed by " + principal.getName());
+
+		ModelAndView mnv = new ModelAndView("admin.report.brand.inventory");
+
+		Long id = transactionsWithinDateCategory.getBrandId();
+		Brand brand = brandService.getBrand(id);
+		Double totalQty = 0.0;
+		Double totalCostOfGoodsInStock = 0.0;
+
+		List<LineItemProductReport> lipr = new ArrayList<LineItemProductReport>();
+
+		try {
+			List<Product> products = productService
+					.getProductsByBrand(brand);
+
+			for (Product product : products) {
+				totalQty = totalQty + product.getTotalQty();
+				for (Inventory inventory : product.getInventories()) {
+
+					int retval = Double.compare(inventory.getQty(), 0.0);
+
+					if (retval != 0) {
+						totalCostOfGoodsInStock = totalCostOfGoodsInStock
+								+ (inventory.getQty() * inventory.getCost());
+
+						LineItemProductReport lineItemProductReport = new LineItemProductReport();
+						lineItemProductReport.setProduct(product);
+						lineItemProductReport
+								.setCostOfGood(inventory.getCost());
+						lineItemProductReport.setQty(inventory.getQty());
+
+						lipr.add(lineItemProductReport);
+						break;
+					}
+				}
+			}
+
+			DateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+
+			mnv.addObject("lineItemProducts", lipr);
+			mnv.addObject("date", sdf.format(new Date()));
+			logger.info(sdf.format(new Date()));
+			mnv.addObject("totalQty", totalQty);
+			mnv.addObject("totalCostOfGoodsInStock", totalCostOfGoodsInStock);
+			mnv.addObject("brand", brandService.getBrand(id));
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -483,10 +547,7 @@ public class ReportsController {
 	}
 
 	@RequestMapping(value = "/report-category-user-transactions", method = RequestMethod.POST)
-	public ModelAndView viewTransactionsByCategoryUserReport(
-			HttpServletRequest request,
-			@ModelAttribute("transactionDatesUser") TransactionsWithinDateUser transactionsWithinDateUser,
-			BindingResult result, Principal principal) {
+	public ModelAndView viewTransactionsByCategoryUserReport(HttpServletRequest request, @ModelAttribute("transactionDatesUser") TransactionsWithinDateUser transactionsWithinDateUser, BindingResult result, Principal principal) {
 
 		logger.info("report accessed by " + principal.getName());
 
@@ -494,11 +555,11 @@ public class ReportsController {
 
 		String date1 = transactionsWithinDateUser.getDate1();
 		String date2 = transactionsWithinDateUser.getDate2();
-		User user = userManagementService.getUser(transactionsWithinDateUser
-				.getUserId());
+		User user = userManagementService.getUser(transactionsWithinDateUser.getUserId());
 
 		Double totalCost = 0.0;
 		Double totalSRP = 0.0;
+		Double totalPurchases = 0.0;
 
 		try {
 
@@ -506,28 +567,44 @@ public class ReportsController {
 			Date startDate = df.parse(date1);
 			Date endDate = df.parse(date2);
 
-			List<InventoryTransaction> inventoryTransactions = inventoryTransactionService
-					.getAllInventoryTransactionsWithinDateByUser(user,
-							startDate, endDate);
+			List<InventoryTransaction> inventoryTransactions = inventoryTransactionService.getAllInventoryTransactionsWithinDateByUser(user, startDate, endDate);
+			List<InventoryTransactionProduct> inventoryTransactionProductsPurchases = new ArrayList<InventoryTransactionProduct>();
 			List<InventoryTransactionProduct> inventoryTransactionProducts = new ArrayList<InventoryTransactionProduct>();
 			List<LineItemProductReport> liprs = new ArrayList<LineItemProductReport>();
 
 			for (InventoryTransaction inventoryTransaction : inventoryTransactions) {
-				inventoryTransactionProducts.addAll(inventoryTransaction
-						.getInventoryTransactionProducts());
+				if(inventoryTransaction.getTransactionType().equalsIgnoreCase(InventoryTransaction.TRANSACTION_TYPE.INVENTORY_IN.toString())){
+					inventoryTransactionProductsPurchases.addAll(inventoryTransaction.getInventoryTransactionProducts());
+				}
+				else{
+					inventoryTransactionProducts.addAll(inventoryTransaction.getInventoryTransactionProducts());
+				}
 			}
 
-			for (InventoryTransactionProduct inventoryTransactionProduct : inventoryTransactionProducts) {
-
-				totalCost += inventoryTransactionProduct.getProductCost();
-				totalSRP += inventoryTransactionProduct.getProductSale();
+			for(InventoryTransactionProduct inventoryTransactionProduct : inventoryTransactionProductsPurchases) {
 
 				LineItemProductReport lipr = new LineItemProductReport();
 				lipr.setProduct(inventoryTransactionProduct.getProduct());
-				Double totalCOGS = inventoryTransactionProduct.getProductCost()
-						* inventoryTransactionProduct.getQty();
-				Double totalSale = inventoryTransactionProduct.getProductSale()
-						* inventoryTransactionProduct.getQty();
+				Double totalCOGS = inventoryTransactionProduct.getProductCost() * inventoryTransactionProduct.getQty();
+				lipr.setTotalCostOfGoodSold(totalCOGS);
+				lipr.setTotalSRP(0.0);
+				lipr.setTotalProfit(0.0);
+				lipr.setQty(inventoryTransactionProduct.getQty());
+
+				liprs.add(lipr);
+				
+				totalPurchases += totalCOGS;
+			}
+			
+			for (InventoryTransactionProduct inventoryTransactionProduct : inventoryTransactionProducts) {
+
+				totalCost += inventoryTransactionProduct.getProductCost() * inventoryTransactionProduct.getQty();
+				totalSRP += inventoryTransactionProduct.getProductSale() * inventoryTransactionProduct.getQty();
+
+				LineItemProductReport lipr = new LineItemProductReport();
+				lipr.setProduct(inventoryTransactionProduct.getProduct());
+				Double totalCOGS = inventoryTransactionProduct.getProductCost() * inventoryTransactionProduct.getQty();
+				Double totalSale = inventoryTransactionProduct.getProductSale() * inventoryTransactionProduct.getQty();
 				lipr.setTotalCostOfGoodSold(totalCOGS);
 				lipr.setTotalSRP(totalSale);
 				lipr.setTotalProfit(totalSale - totalCOGS);
@@ -536,8 +613,7 @@ public class ReportsController {
 				liprs.add(lipr);
 			}
 
-			logger.info("USER REPORT FILTER SUCCESS! - ITP size: "
-					+ inventoryTransactionProducts.size());
+			logger.info("USER REPORT FILTER SUCCESS! - ITP size: " + inventoryTransactionProducts.size());
 
 			DateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
 
@@ -547,6 +623,7 @@ public class ReportsController {
 			mnv.addObject("totalCost", totalCost);
 			mnv.addObject("totalSRP", totalSRP);
 			mnv.addObject("totalProfit", totalSRP - totalCost);
+			mnv.addObject("totalPurchases", totalPurchases);
 			mnv.addObject("user", user);
 
 		} catch (Exception e) {

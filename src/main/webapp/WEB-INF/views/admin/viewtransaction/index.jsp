@@ -11,6 +11,7 @@
 	<table class="table table-striped table-bordered table-condensed">
   		<thead>
   			<tr>
+  				<td>Transaction Product ID</td>
    				<td>Product Name</td>
    				<td>Quantity</td>
    				<td>Cost</td>
@@ -21,6 +22,7 @@
   		<tbody>
   			<c:forEach var="transactionProduct" items="${transactionProducts}">
   			<tr>
+  				<td><a href="/edit/inventory-transaction-product/${transactionProduct.id}">${transactionProduct.id}</a></td>
   				<td>${transactionProduct.productName}</td>
   				<td>${transactionProduct.qty}</td>
   				<td>${transactionProduct.productCost}</td>

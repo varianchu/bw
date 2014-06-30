@@ -4,8 +4,8 @@
 <div>
 <h3>VIEW SERVICE TRANSACTION FOR ID: ${serviceTransaction.id}</h3>
 <h4>Date: ${serviceTransaction.serviceDate}</h4>
-<h4>Service Transaction Total Sale: Php ${serviceTransaction.totalServiceTransactionSale}</h4>
-<h4>Service Transaction Total Profit: Php ${serviceTransaction.totalServiceTransactionProfit}</h4>
+<h4>Service Transaction Total Sale: &#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${serviceTransaction.totalServiceTransactionSale}" /></h4>
+<h4>Service Transaction Total Profit: &#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${serviceTransaction.totalServiceTransactionProfit}" /></h4>
 <h4>Customer/Car: ${serviceTransaction.customerName} - ${serviceTransaction.car}</h4>
 <h4>Worker: ${serviceTransaction.mechanicTireMan}</h4>
 <hr></hr>
@@ -21,8 +21,8 @@
   			<c:forEach var="item" items="${serviceTransactionItems}">
   			<tr>
   				<td>${item.serviceMadePart}</td>
-  				<td>${item.servicePrice}</td>
-  				<td>${item.serviceProfit}</td>
+  				<td>&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${item.servicePrice}" /></td>
+  				<td>&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${item.serviceProfit}" /></td>
   			</tr>
   			</c:forEach>
   		</tbody>

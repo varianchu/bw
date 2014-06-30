@@ -27,6 +27,7 @@ public class DummyProduct {
 	private String diameter;
 	private String dataUri;
 	private String convertCode;
+	private String treadName;
 
 	private Long magsId;
 	private String style;
@@ -274,6 +275,14 @@ public class DummyProduct {
 
 	public void setConvertCode(String convertCode) {
 		this.convertCode = convertCode;
+	}
+
+	public String getTreadName() {
+		return treadName;
+	}
+
+	public void setTreadName(String treadName) {
+		this.treadName = treadName;
 	}
 
 }

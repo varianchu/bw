@@ -19,8 +19,8 @@ $(document).ready(function() {
 	doc.addImage(imageData, 'JPEG', 5, 1, 20, 15);
 	doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Summary Report (As of ${date1} - ${date2})');
 	doc.text(1, 18, 'Product Name');
-	doc.text(55, 18, 'Qty In/Out');
-	doc.text(75, 18, 'COGS');
+	doc.text(53, 18, 'Qty In/Out');
+	doc.text(73, 18, 'COGS');
 	doc.text(95, 18, 'COOI');
 	doc.text(120, 18, 'Total SRP');
 	doc.text(150, 18, 'Total Profit');
@@ -35,13 +35,13 @@ $(document).ready(function() {
 			
 			if(checkPage!=0){
 				i = (checkPage*3) + 20;
-				doc.text(1,i, '${lip.product.productName} - ${lip.product.brand.brandName}');
-				doc.text(55,i, '${lip.qtyIn}/${lip.qtyOut}');
-				doc.text(75,i, 'P${lip.totalCostOfGoodSold}');
-				doc.text(95,i, 'P${lip.totalPurchaseCost}');
-				doc.text(120,i, 'P${lip.totalSRP}');
-				doc.text(150,i, 'P${lip.totalProfit}');
-				doc.text(180,i, 'P${lip.netProfit}');
+				doc.text(1,i, '${lip.product.productName}-${lip.product.brand.brandName}');
+				doc.text(53,i, '${lip.qtyIn}/${lip.qtyOut}');
+				doc.text(73,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalCostOfGoodSold}" />');
+				doc.text(95,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalPurchaseCost}" />');
+				doc.text(120,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalSRP}" />');
+				doc.text(150,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalProfit}" />');
+				doc.text(180,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.netProfit}" />');
 // 				doc.line(5, 20, 205, 20);
 			}
 			else{
@@ -49,24 +49,24 @@ $(document).ready(function() {
 				doc.setFont("times");
 				doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Summary Report (As of ${date1} - ${date2})');
 				doc.line(1, 16, 205, 16);
-				doc.text(1, 18, 'Product Name');
-				doc.text(55, 18, 'Qty In/Out');
-				doc.text(75, 18, 'COGS');
-				doc.text(95, 18, 'COOI');
-				doc.text(120, 18, 'Total SRP');
-				doc.text(150, 18, 'Total Profit');
-				doc.text(180, 18, 'Total Net Profit');
+				doc.text(1, 15, 'Product Name');
+				doc.text(53, 15, 'Qty In/Out');
+				doc.text(73, 15, 'COGS');
+				doc.text(95, 15, 'COOI');
+				doc.text(120, 15, 'Total SRP');
+				doc.text(150, 15, 'Total Profit');
+				doc.text(180, 15, 'Total Net Profit');
 				 
 				doc.setFont("courier");
 				doc.setFontType("normal");
 				i = (checkPage*3) + 20;
-				doc.text(1,i, '${lip.product.productName} - ${lip.product.brand.brandName}');
-				doc.text(55,i, '${lip.qtyIn}/${lip.qtyOut}');
-				doc.text(75,i, 'P${lip.totalCostOfGoodSold}');
-				doc.text(95,i, 'P${lip.totalPurchaseCost}');
-				doc.text(120,i, 'P${lip.totalSRP}');
-				doc.text(150,i, 'P${lip.totalProfit}');
-				doc.text(180,i, '${lip.netProfit}');
+				doc.text(1,i, '${lip.product.productName}-${lip.product.brand.brandName}');
+				doc.text(53,i, '${lip.qtyIn}/${lip.qtyOut}');
+				doc.text(73,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalCostOfGoodSold}" />');
+				doc.text(95,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalPurchaseCost}" />');
+				doc.text(120,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalSRP}" />');
+				doc.text(150,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.totalProfit}" />');
+				doc.text(180,i, 'P<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${lip.netProfit}" />');
 
 			}
 			
@@ -76,11 +76,11 @@ $(document).ready(function() {
 // 	doc.addImage(imageData, 'JPEG', 15, 40, 180, 180);
 	doc.text(20, 10, 'Bionic Wheels MDSG. INC. - Summary Report (As of ${date1} - ${date2})');
 	doc.text(20, 20, 'Summary for Category: ${category}');
-	doc.text(20, 25, 'Total Purchases Cost: Php ${summaryTotalPurchasesCost}');
-	doc.text(20, 30, 'Total Cost of Goods Sold: Php ${summaryTotalCOGS}');
-	doc.text(20, 35, 'Total Sales: Php ${summaryTotalSales}');
-	doc.text(20, 40, 'Total Profit: Php ${summaryTotalProfit}');
-	doc.text(20, 45, 'Net Profit: Php ${summaryNetProfit}');
+	doc.text(20, 25, 'Total Purchases Cost: Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${summaryTotalPurchasesCost}" />');
+	doc.text(20, 30, 'Total Cost of Goods Sold: Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${summaryTotalCOGS}" />');
+	doc.text(20, 35, 'Total Sales: Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${summaryTotalSales}" />');
+	doc.text(20, 40, 'Total Profit: Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${summaryTotalProfit}" />');
+	doc.text(20, 45, 'Net Profit: Php <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${summaryNetProfit}" />');
 	
 	var string = doc.output('datauristring');
 

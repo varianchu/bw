@@ -13,6 +13,7 @@ public class TransactionsWithinDate {
 	private String date1 = df.format(initDate);
 	private String date2 = df.format(initDate);
 	private Long categoryId;
+	private Long productId;
 
 	public String getDate1() {
 		return date1;
@@ -36,6 +37,14 @@ public class TransactionsWithinDate {
 
 	public void setCategoryId(Long categoryId) {
 		this.categoryId = categoryId;
+	}
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
 	}
 
 }

@@ -58,7 +58,7 @@
 	</div>
 </div>
 <hr></hr>
-<h4>Total Amount of Accounts Receivable: Php ${totalAmount}</h4>
+<h4>Total Amount of Accounts Receivable: &#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalAmount}" /></h4>
 <h4>Customer: ${customer}</h4>
 <div class="well span12">
 <table class="table table-striped table-bordered table-condensed data_grid alert-info">
@@ -81,7 +81,7 @@
     <td>${ar.receiptNumber}</td>
     <td>${ar.dateCreated}</td>
     <td>${ar.expectedDateReceivable}</td>
-    <td>Php ${ar.amount}</td>
+    <td>&#8369;<fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${ar.amount}" /></td>
     <td>
     <ul class="nav nav-pills" style="height:0px;">
     	<li class="dropdown" data-dropdown="dropdown">

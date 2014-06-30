@@ -10,6 +10,9 @@
 Choose Filter Option: <select id="filter" class="span7">
 					  	<option value="inCategory">Total purchases per category within dates</option>
 					  	<option value="inventoryCategory">Total inventory count per category</option>
+<!-- 					  	new start -->
+						<option value="inventoryBrand">Total inventory count per brand</option>
+<!-- 						new end -->
 					  	<option value="summaryCategory">Cumulative summary per category within dates</option>
 					  	<option value="rankInventoryCategory"> Rank most sale-able inventory per category within dates (descending)</option>
 					  	<option value="userTransaction">Transaction per user within dates</option>
@@ -46,6 +49,20 @@ Choose Filter Option: <select id="filter" class="span7">
 	<div class="span4">	
 		<form:form action = "/admin/reports/report-category-inventory" method = "POST" modelAttribute = "inventoryCount" target="_blank">
 	  		<label>Category: </label><form:select id="inputCategory" items="${categories}" path="categoryId" itemValue="id" class=""/>
+	  		<input style="margin-top:5px;" type="submit" value="Generate Inventory Count" class="btn btn-primary" />
+	  	</form:form>
+  	</div>
+  	
+</div>
+
+<!-- new june 25, 2014 -->
+<div class="well row hide span12" id = "inventoryBrand" >
+	
+	<h4>Total inventory count per brand for the date: ${dateToday}</h4>
+	
+	<div class="span4">	
+		<form:form action = "/admin/reports/report-brand-inventory" method = "POST" modelAttribute = "inventoryCountBrand" target="_blank">
+	  		<label>Category: </label><form:select id="inputCategory" items="${brands}" path="brandId" itemValue="id" class=""/>
 	  		<input style="margin-top:5px;" type="submit" value="Generate Inventory Count" class="btn btn-primary" />
 	  	</form:form>
   	</div>
@@ -173,30 +190,43 @@ $('#filterButton').click(function(){
         $('#inventoryCount').hide(); 
         $('#summary').hide(); 
         $('#rank').hide(); 
+        $('#inventoryBrand').hide(); 
         $('#userTransactions').hide(); 
     } else if($('#filter').val() == 'inventoryCategory'){
     	 $('#inventoryIn').hide(); 
          $('#inventoryCount').show(); 
          $('#summary').hide(); 
          $('#rank').hide(); 
+         $('#inventoryBrand').hide(); 
          $('#userTransactions').hide();
     } else if($('#filter').val() == 'summaryCategory'){
    	 	 $('#inventoryIn').hide(); 
       	 $('#inventoryCount').hide(); 
      	 $('#summary').show(); 
      	 $('#rank').hide(); 
+     	 $('#inventoryBrand').hide(); 
      	 $('#userTransactions').hide();
 	} else if($('#filter').val() == 'rankInventoryCategory'){
    	 	 $('#inventoryIn').hide(); 
       	 $('#inventoryCount').hide(); 
      	 $('#summary').hide(); 
      	 $('#rank').show(); 
+     	 $('#inventoryBrand').hide(); 
      	 $('#userTransactions').hide();
-	} else{
+	} else if($('#filter').val() == 'inventoryBrand'){
 		 $('#inventoryIn').hide(); 
      	 $('#inventoryCount').hide(); 
     	 $('#summary').hide(); 
     	 $('#rank').hide(); 
+    	 $('#inventoryBrand').show(); 
+    	 $('#userTransactions').hide();
+	}
+	else{
+		 $('#inventoryIn').hide(); 
+     	 $('#inventoryCount').hide(); 
+    	 $('#summary').hide(); 
+    	 $('#rank').hide(); 
+    	 $('#inventoryBrand').hide(); 
     	 $('#userTransactions').show();
 	}
 });

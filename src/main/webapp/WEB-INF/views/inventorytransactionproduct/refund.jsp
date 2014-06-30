@@ -20,7 +20,7 @@
 	<td>&nbsp;&nbsp;<input id="productId" onchange="getProductInfo()" onkeypress="return isNumberKey(event)" class="span10" autofocus/></td>
 </tr>
 <tr>
-	<td><label>Qty to Subtract:</label></td>
+	<td><label>Qty to Return:</label></td>
 	<td>&nbsp;&nbsp;<input id="productQty" onkeypress="return isNumberKeyDecimal(event)" class="span10"/></td>
 </tr>
 </table>

@@ -35,9 +35,10 @@
 		<li class="">
 			<a href="/stocktransaction-out">Stock/Inventory Out</a>
 			<a href="/stocktransaction-in">Stock/Inventory In</a>
-			<a href="/stocktransaction-refund">Refund Item (or Override)</a>
+<!-- 			<a href="/stocktransaction-refund">Refund Item (or Override)</a> -->
 			<a href="/admin/view-transactions">View Transactions</a>
 			<a href="/admin/view-transactions-user">View Transactions by User</a>
+			<a href="/admin/view-product-transaction-history">View Product Transaction History</a>
 		</li>
 		<li class="nav-header">
 			Reports
@@ -113,7 +114,7 @@
 		<li class="">
 			<a href="/stocktransaction-out">Stock/Inventory Out</a>
 			<a href="/stocktransaction-in">Stock/Inventory In</a>
-			<a href="/stocktransaction-refund">Refund Item (or Override)</a>
+<!-- 			<a href="/stocktransaction-refund">Refund Item (or Override)</a> -->
 			<a href="/view-transactions-user">View Transactions by User</a>
 		</li>
 	</ul>
@@ -152,7 +153,7 @@
 		<li class="">
 			<a href="/stocktransaction-out">Stock/Inventory Out</a>
 			<a href="/stocktransaction-in">Stock/Inventory In</a>
-			<a href="/stocktransaction-refund">Refund Item (or Override)</a>
+<!-- 			<a href="/stocktransaction-refund">Refund Item (or Override)</a> -->
 			<a href="/view-transactions-user">View Transactions by User</a>
 		</li>
 	</ul>
@@ -190,8 +191,9 @@
 		<li class="">
 			<a href="/stocktransaction-out">Stock/Inventory Out</a>
 			<a href="/stocktransaction-in">Stock/Inventory In</a>
-			<a href="/stocktransaction-refund">Refund Item (or Override)</a>
+<!-- 			<a href="/stocktransaction-refund">Refund Item (or Override)</a> -->
 			<a href="/view-transactions-user">View Transactions by User</a>
+			<a href="/admin/view-product-transaction-history">View Product Transaction History</a>
 		</li>
 		<li class="nav-header">
 			A/R Management
@@ -243,8 +245,9 @@
 		<li class="">
 			<a href="/stocktransaction-out">Stock/Inventory Out</a>
 			<a href="/stocktransaction-in">Stock/Inventory In</a>
-			<a href="/stocktransaction-refund">Refund Item (or Override)</a>
+<!-- 			<a href="/stocktransaction-refund">Refund Item (or Override)</a> -->
 			<a href="/view-transactions-user">View Transactions by User</a>
+			<a href="/admin/view-product-transaction-history">View Product Transaction History</a>
 		</li>
 		<li class="nav-header">
 			A/R Management

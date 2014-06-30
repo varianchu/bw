@@ -27,15 +27,15 @@
   	<table class="table table-striped table-bordered table-condensed">
   		<tr>
   			<td>Total Cost of Goods Sold: </td>
-  			<td><b style="font-size:30px;">Php ${totalCost}</b></td>
+  			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalCost}" /></b></td>
   		</tr>
   		<tr>
   			<td>Total Sales: </td>
-			<td><b style="font-size:30px;">Php ${totalSRP}</b></td>
+			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalSRP}" /></b></td>
   		</tr>
   		<tr>
   			<td>Total Profit: </td>
-  			<td><b style="font-size:30px;">Php ${totalProfit}</b></td>
+  			<td><b style="font-size:30px;">&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${totalProfit}" /></b></td>
   		</tr>
   	</table>
   </div>	
@@ -59,8 +59,8 @@
   				<td><a href = "/view-transaction/${transaction.id}">${transaction.referenceNumber}</a></td>
     			<td>${transaction.dateCreated}</td>
     			<td>${transaction.transactionType}</td>
-    			<td>&#8369; ${transaction.totalTransactionCost}</td>
-    			<td>&#8369; ${transaction.totalTransactionSale}</td>
+    			<td>&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${transaction.totalTransactionCost}" /></td>
+    			<td>&#8369; <fmt:formatNumber type="number" minFractionDigits="2" maxFractionDigits="2" value="${transaction.totalTransactionSale}" /></td>
   			</tr>
 <%--   		</c:if> --%>
   		</c:forEach>

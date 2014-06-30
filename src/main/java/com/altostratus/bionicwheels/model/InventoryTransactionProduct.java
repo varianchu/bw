@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 
@@ -48,6 +49,39 @@ public class InventoryTransactionProduct {
 	@ManyToOne(cascade = { CascadeType.PERSIST })
 	@JoinColumn(name = "category_id", nullable = true)
 	private Category category;
+
+	@Transient
+	private Long productId;
+
+	@Transient
+	private Long categoryId;
+
+	@Transient
+	private Long inventoryTransactionId;
+
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+
+	public Long getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(Long categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public Long getInventoryTransactionId() {
+		return inventoryTransactionId;
+	}
+
+	public void setInventoryTransactionId(Long inventoryTransactionId) {
+		this.inventoryTransactionId = inventoryTransactionId;
+	}
 
 	public Long getId() {
 		return id;

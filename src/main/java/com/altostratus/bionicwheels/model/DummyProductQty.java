@@ -6,6 +6,7 @@ public class DummyProductQty {
 	private Double price = 0.0;
 	private Double cost = 0.0;
 	private Double checkerQty = 0.0;
+	private Double refundCost = 0.0;
 
 	public Long getId() {
 		return id;
@@ -45,6 +46,14 @@ public class DummyProductQty {
 
 	public void setCheckerQty(Double checkerQty) {
 		this.checkerQty = checkerQty;
+	}
+
+	public Double getRefundCost() {
+		return refundCost;
+	}
+
+	public void setRefundCost(Double refundCost) {
+		this.refundCost = refundCost;
 	}
 
 }
