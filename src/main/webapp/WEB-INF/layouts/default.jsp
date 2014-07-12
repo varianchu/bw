@@ -81,8 +81,8 @@
 <!-- 		<script type="text/javascript" src="/js/DateTimePicker.js"></script> -->
 <!-- 		<script type="text/javascript" src="/js/jquery-ui-1.8.16.custom.min.js"></script> -->
 
-		<link rel="shortcut icon" href="/assets/ico/favicon.ico">
-		
+<!-- 		<link rel="shortcut icon" href="/assets/ico/favicon.ico"> -->
+		<link rel="shortcut icon" href="apple-touch-icon-72-precomposed.png">
 <!-- 		<script src="../assets/js/jquery.js"></script> -->
     	<script src="/assets/js/bootstrap-transition.js"></script>
     	<script src="/assets/js/bootstrap-alert.js"></script>
@@ -116,7 +116,7 @@
             	<span class="icon-bar"></span>
             	<span class="icon-bar"></span>
           		</a>
-          		<a class="brand" href="/"><img src="/images/BIONIC_blue-yellow.png" width="40" height="20" style="margin-top:-10;">Bionic Wheels System</a>
+          		<a class="brand" href="/"><!-- <img src="/images/BIONIC_blue-yellow.png" width="40" height="20" style="margin-top:-10;"> -->Bionic Wheels System</a>
 <!--           		<div class="nav-collapse collapse"> -->
 <!--             		<ul class="nav"> -->
 <!--               			<li><a href="/">Home</a></li> -->

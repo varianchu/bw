@@ -24,4 +24,8 @@
     <put-attribute name="body" value="/WEB-INF/views/admin/servicetransaction/viewservicetransactionitem.jsp" />
 </definition>
 
+<definition name="service.rendered.form" extends="default">
+    <put-attribute name="body" value="/WEB-INF/views/admin/servicetransaction/servicerendered.jsp" />
+</definition>
+
 </tiles-definitions> 

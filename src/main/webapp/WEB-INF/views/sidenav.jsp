@@ -60,6 +60,7 @@
 		</li>
 		<li class="divider"></li>
 		<li class="">
+			<a href="/admin/service-rendered/form">Service Rendered Form</a>
 			<a href="/admin/service-transaction/form">Service Transaction Form</a>
 			<a href="/admin/view-service-transactions">View Service Transactions</a>
 			<a href="/admin/view-service-transactions-user">View Service Transactions by Sales Representative</a>
@@ -270,10 +271,18 @@
 		</li>
 		<li class="divider"></li>
 		<li class="">
+			<a href="/admin/service-rendered/form">Service Rendered Form</a>
 			<a href="/admin/service-transaction/form">Service Transaction Form</a>
 			<a href="/admin/view-service-transactions">View Service Transactions</a>
 			<a href="/admin/view-service-transactions-user">View Service Transactions by Sales Representative</a>
 			<a href="/admin/view-service-transactions-worker">View Service Transactions by Specialist</a>
+		</li>
+		<li class="nav-header">
+			Settings
+		</li>
+		<li class="divider"></li>
+		<li class="">
+			<a href="/admin/mechanic-tireman/index">Mechanic/Tire Man Management</a>
 		</li>
 	</ul>
 </div>
@@ -287,6 +296,7 @@
 		</li>
 		<li class="divider"></li>
 		<li class="">
+			<a href="/admin/service-rendered/form">Service Rendered Form</a>
 			<a href="/service-transaction/form">Service Transaction Form</a>
 			<a href="/admin/view-service-transactions">View Service Transactions</a>
 			<a href="/view-service-transactions-user">View Service Transactions by Sales Representative</a>

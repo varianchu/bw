@@ -23,7 +23,7 @@ import com.altostratus.bionicwheels.validator.MechanicTireManValidator;
 
 @Controller
 @RequestMapping(value = "/admin")
-@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SYSTEM_MANAGER')")
+@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SYSTEM_MANAGER', 'CASHIER')")
 public class MechanicTireManController {
 
 	@Autowired

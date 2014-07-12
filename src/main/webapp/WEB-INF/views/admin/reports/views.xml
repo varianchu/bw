@@ -31,5 +31,9 @@
 <definition name="admin.report.category.user" extends="plain">
     <put-attribute name="body" value="/WEB-INF/views/admin/reports/categoryfilteruser.jsp" />
 </definition>
+
+<definition name="admin.report.service.transactions" extends="plain">
+    <put-attribute name="body" value="/WEB-INF/views/admin/reports/servicefiltertransaction.jsp" />
+</definition>
    
 </tiles-definitions> 

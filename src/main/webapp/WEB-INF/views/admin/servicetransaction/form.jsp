@@ -26,7 +26,16 @@
 	</div>
 	<div class="span6">
 		<form:form id="serviceTransactionItem" action="/admin/service-transaction-item" method="POST" modelAttribute = "serviceTransactionItem">
-			<label>Service Made or Part/s:</label><form:input id="serviceMade" path="serviceMadePart" placeholder="Service Made/Part(s)"/>
+<%-- 			<label>Service Made or Part/s:</label><form:input id="serviceMade" path="serviceMadePart" placeholder="Service Made/Part(s)"/> --%>
+			
+<!-- 			test -->
+
+			<label class="control-label" for="serviceMade" style="margin-top:20">Service Made/Part:</label>
+				<div class="controls" style="margin-top:5">
+					<form:select id="serviceMade" items="${servicesRendered}" path="serviceMadePart"/>
+					<form:errors path="serviceMadePart" style="color:red;"/>
+				</div>
+			
 			<label>Service Price:</label><form:input id="servicePrice" path="servicePrice" placeholder="Service Price"/>
 			<label>Service Profit:</label><form:input id="serviceProfit" path="serviceProfit" placeholder="Service Profit"/>
 			<br />

@@ -12,6 +12,7 @@ public class LineItemProductReport {
 	private Double qty = 0.0;
 	private Double qtyIn = 0.0;
 	private Double qtyOut = 0.0;
+	private String serviceMadePart = "";
 
 	public Double getTotalCostOfGoodSold() {
 		return totalCostOfGoodSold;
@@ -91,6 +92,14 @@ public class LineItemProductReport {
 
 	public void setNetProfit(Double netProfit) {
 		this.netProfit = netProfit;
+	}
+
+	public String getServiceMadePart() {
+		return serviceMadePart;
+	}
+
+	public void setServiceMadePart(String serviceMadePart) {
+		this.serviceMadePart = serviceMadePart;
 	}
 
 }

@@ -16,6 +16,7 @@ Choose Filter Option: <select id="filter" class="span7">
 					  	<option value="summaryCategory">Cumulative summary per category within dates</option>
 					  	<option value="rankInventoryCategory"> Rank most sale-able inventory per category within dates (descending)</option>
 					  	<option value="userTransaction">Transaction per user within dates</option>
+					  	<option value="services">Service Transactions within dates</option>
 					  </select>
 					  
 					  <input type="button" value="submit" id="filterButton">
@@ -134,6 +135,25 @@ Choose Filter Option: <select id="filter" class="span7">
   	
 </div>
 
+<div class="well row hide span12" id = "services" >
+	
+	<h4>Summary of services within dates</h4>
+	
+	<div class="">
+		<form:form action = "/admin/reports/report-service-transactions" method = "POST" modelAttribute = "transactionDatesService" target="_blank">
+			<label>Transaction Start Date:</label><form:input type="text" id="ButtonCreationDemoInput9" path="date1"/><button id="ButtonCreationDemoButton9" type="button">
+	    		<img src="/images/calendar.png" alt="[calendar icon]"/>
+	  		</button>
+			<label>Transaction End Date:</label><form:input type="text" id="ButtonCreationDemoInput10" path="date2"/><button id="ButtonCreationDemoButton10" type="button">
+	    		<img src="/images/calendar.png" alt="[calendar icon]"/>
+	  		</button>
+	  		
+	  		<input style="margin-top:5px;" type="submit" value="Get Service Transactions" class="btn btn-primary"/>
+		</form:form>
+  	</div>
+  	
+</div>
+
 <script type="text/javascript">
 
 $('#ButtonCreationDemoButton1').click(
@@ -183,6 +203,18 @@ $('#ButtonCreationDemoButton8').click(
       $('#ButtonCreationDemoInput8').AnyTime_noPicker().AnyTime_picker({format: "%Y-%m-%d %H:%i"}).focus();
       e.preventDefault();
     } );
+    
+$('#ButtonCreationDemoButton9').click(
+	      function(e) {
+	        $('#ButtonCreationDemoInput9').AnyTime_noPicker().AnyTime_picker({format: "%Y-%m-%d %H:%i"}).focus();
+	        e.preventDefault();
+	      } );
+	      
+$('#ButtonCreationDemoButton10').click(
+    function(e) {
+      $('#ButtonCreationDemoInput10').AnyTime_noPicker().AnyTime_picker({format: "%Y-%m-%d %H:%i"}).focus();
+      e.preventDefault();
+    } );
 
 $('#filterButton').click(function(){
     if($('#filter').val() == 'inCategory') {
@@ -192,6 +224,7 @@ $('#filterButton').click(function(){
         $('#rank').hide(); 
         $('#inventoryBrand').hide(); 
         $('#userTransactions').hide(); 
+        $('#services').hide(); 
     } else if($('#filter').val() == 'inventoryCategory'){
     	 $('#inventoryIn').hide(); 
          $('#inventoryCount').show(); 
@@ -199,6 +232,7 @@ $('#filterButton').click(function(){
          $('#rank').hide(); 
          $('#inventoryBrand').hide(); 
          $('#userTransactions').hide();
+         $('#services').hide(); 
     } else if($('#filter').val() == 'summaryCategory'){
    	 	 $('#inventoryIn').hide(); 
       	 $('#inventoryCount').hide(); 
@@ -206,6 +240,7 @@ $('#filterButton').click(function(){
      	 $('#rank').hide(); 
      	 $('#inventoryBrand').hide(); 
      	 $('#userTransactions').hide();
+     	$('#services').hide(); 
 	} else if($('#filter').val() == 'rankInventoryCategory'){
    	 	 $('#inventoryIn').hide(); 
       	 $('#inventoryCount').hide(); 
@@ -213,6 +248,7 @@ $('#filterButton').click(function(){
      	 $('#rank').show(); 
      	 $('#inventoryBrand').hide(); 
      	 $('#userTransactions').hide();
+     	$('#services').hide(); 
 	} else if($('#filter').val() == 'inventoryBrand'){
 		 $('#inventoryIn').hide(); 
      	 $('#inventoryCount').hide(); 
@@ -220,6 +256,15 @@ $('#filterButton').click(function(){
     	 $('#rank').hide(); 
     	 $('#inventoryBrand').show(); 
     	 $('#userTransactions').hide();
+    	 $('#services').hide(); 
+	} else if($('#filter').val() == 'services'){
+		$('#inventoryIn').hide(); 
+    	$('#inventoryCount').hide(); 
+   	 	$('#summary').hide(); 
+   	 	$('#rank').hide(); 
+   	 	$('#inventoryBrand').hide(); 
+   	 	$('#userTransactions').hide();
+   	 	$('#services').show(); 
 	}
 	else{
 		 $('#inventoryIn').hide(); 
@@ -227,6 +272,7 @@ $('#filterButton').click(function(){
     	 $('#summary').hide(); 
     	 $('#rank').hide(); 
     	 $('#inventoryBrand').hide(); 
+    	 $('#services').hide(); 
     	 $('#userTransactions').show();
 	}
 });

@@ -32,5 +32,9 @@
    <definition name="accessDenied" extends="plain">
     <put-attribute name="body" value="/WEB-INF/views/accessDenied.jsp" />
    </definition>
+   
+   <definition name="test" extends="default">
+	<put-attribute name="body" value="/WEB-INF/views/test.jsp" />
+  </definition>
 
 </tiles-definitions>

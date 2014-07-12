@@ -29,6 +29,9 @@ import com.altostratus.bionicwheels.model.InventoryTransaction;
 import com.altostratus.bionicwheels.model.InventoryTransactionProduct;
 import com.altostratus.bionicwheels.model.LineItemProductReport;
 import com.altostratus.bionicwheels.model.Product;
+import com.altostratus.bionicwheels.model.ServiceRendered;
+import com.altostratus.bionicwheels.model.ServiceTransaction;
+import com.altostratus.bionicwheels.model.ServiceTransactionItem;
 import com.altostratus.bionicwheels.model.TransactionsWithinDateCategory;
 import com.altostratus.bionicwheels.model.TransactionsWithinDateUser;
 import com.altostratus.bionicwheels.service.BrandService;
@@ -36,10 +39,13 @@ import com.altostratus.bionicwheels.service.CategoryService;
 import com.altostratus.bionicwheels.service.InventoryService;
 import com.altostratus.bionicwheels.service.InventoryTransactionService;
 import com.altostratus.bionicwheels.service.ProductService;
+import com.altostratus.bionicwheels.service.ServiceRenderedService;
+import com.altostratus.bionicwheels.service.ServiceTransactionService;
 import com.altostratus.bionicwheels.service.SettingsService;
 import com.altostratus.core.model.User;
 import com.altostratus.core.service.UserManagementService;
 import com.altostratus.core.util.CustomComparatorQtyDescending;
+import com.altostratus.core.util.CustomComparatorServiceDescending;
 
 @Controller
 @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -56,7 +62,7 @@ public class ReportsController {
 
 	@Autowired
 	CategoryService categoryService;
-	
+
 	@Autowired
 	BrandService brandService;
 
@@ -65,6 +71,12 @@ public class ReportsController {
 
 	@Autowired
 	InventoryTransactionService inventoryTransactionService;
+
+	@Autowired
+	ServiceTransactionService serviceTransactionService;
+
+	@Autowired
+	ServiceRenderedService serviceRenderedService;
 
 	private Logger logger = LoggerFactory.getLogger(DefaultController.class);
 
@@ -75,12 +87,18 @@ public class ReportsController {
 
 		ModelAndView mnv = new ModelAndView("admin.reports.index");
 		mnv.addObject("dateToday", new Date());
-		mnv.addObject("transactionDatesCategoryIn", new TransactionsWithinDateCategory());
+		mnv.addObject("transactionDatesCategoryIn",
+				new TransactionsWithinDateCategory());
 		mnv.addObject("inventoryCount", new TransactionsWithinDateCategory());
-		mnv.addObject("inventoryCountBrand", new TransactionsWithinDateCategory());
-		mnv.addObject("transactionDatesSummaryCategory", new TransactionsWithinDateCategory());
-		mnv.addObject("transactionDatesRankingInventoryCategory", new TransactionsWithinDateCategory());
+		mnv.addObject("inventoryCountBrand",
+				new TransactionsWithinDateCategory());
+		mnv.addObject("transactionDatesSummaryCategory",
+				new TransactionsWithinDateCategory());
+		mnv.addObject("transactionDatesRankingInventoryCategory",
+				new TransactionsWithinDateCategory());
 		mnv.addObject("transactionDatesUser", new TransactionsWithinDateUser());
+		mnv.addObject("transactionDatesService",
+				new TransactionsWithinDateUser());
 		mnv.addObject("categories", categoryService.getAllCategories());
 		mnv.addObject("brands", brandService.getAllBrands());
 		mnv.addObject("users", userManagementService.getBasicUsers());
@@ -251,10 +269,13 @@ public class ReportsController {
 		}
 		return mnv;
 	}
-	
-//	new June 25, 2014
+
+	// new June 25, 2014
 	@RequestMapping(value = "/report-brand-inventory", method = RequestMethod.POST)
-	public ModelAndView viewTotalInventoryCountByBrandReport(HttpServletRequest request, @ModelAttribute("inventoryCountBrand") TransactionsWithinDateCategory transactionsWithinDateCategory, BindingResult result, Principal principal) {
+	public ModelAndView viewTotalInventoryCountByBrandReport(
+			HttpServletRequest request,
+			@ModelAttribute("inventoryCountBrand") TransactionsWithinDateCategory transactionsWithinDateCategory,
+			BindingResult result, Principal principal) {
 
 		logger.info("report accessed by " + principal.getName());
 
@@ -268,8 +289,7 @@ public class ReportsController {
 		List<LineItemProductReport> lipr = new ArrayList<LineItemProductReport>();
 
 		try {
-			List<Product> products = productService
-					.getProductsByBrand(brand);
+			List<Product> products = productService.getProductsByBrand(brand);
 
 			for (Product product : products) {
 				totalQty = totalQty + product.getTotalQty();
@@ -503,6 +523,7 @@ public class ReportsController {
 						.getId());
 			}
 
+			// i believe this is not needed
 			HashSet<Long> hs = new HashSet<Long>();
 			hs.addAll(longProducts);
 			longProducts.clear();
@@ -547,7 +568,10 @@ public class ReportsController {
 	}
 
 	@RequestMapping(value = "/report-category-user-transactions", method = RequestMethod.POST)
-	public ModelAndView viewTransactionsByCategoryUserReport(HttpServletRequest request, @ModelAttribute("transactionDatesUser") TransactionsWithinDateUser transactionsWithinDateUser, BindingResult result, Principal principal) {
+	public ModelAndView viewTransactionsByCategoryUserReport(
+			HttpServletRequest request,
+			@ModelAttribute("transactionDatesUser") TransactionsWithinDateUser transactionsWithinDateUser,
+			BindingResult result, Principal principal) {
 
 		logger.info("report accessed by " + principal.getName());
 
@@ -555,7 +579,8 @@ public class ReportsController {
 
 		String date1 = transactionsWithinDateUser.getDate1();
 		String date2 = transactionsWithinDateUser.getDate2();
-		User user = userManagementService.getUser(transactionsWithinDateUser.getUserId());
+		User user = userManagementService.getUser(transactionsWithinDateUser
+				.getUserId());
 
 		Double totalCost = 0.0;
 		Double totalSRP = 0.0;
@@ -567,44 +592,55 @@ public class ReportsController {
 			Date startDate = df.parse(date1);
 			Date endDate = df.parse(date2);
 
-			List<InventoryTransaction> inventoryTransactions = inventoryTransactionService.getAllInventoryTransactionsWithinDateByUser(user, startDate, endDate);
+			List<InventoryTransaction> inventoryTransactions = inventoryTransactionService
+					.getAllInventoryTransactionsWithinDateByUser(user,
+							startDate, endDate);
 			List<InventoryTransactionProduct> inventoryTransactionProductsPurchases = new ArrayList<InventoryTransactionProduct>();
 			List<InventoryTransactionProduct> inventoryTransactionProducts = new ArrayList<InventoryTransactionProduct>();
 			List<LineItemProductReport> liprs = new ArrayList<LineItemProductReport>();
 
 			for (InventoryTransaction inventoryTransaction : inventoryTransactions) {
-				if(inventoryTransaction.getTransactionType().equalsIgnoreCase(InventoryTransaction.TRANSACTION_TYPE.INVENTORY_IN.toString())){
-					inventoryTransactionProductsPurchases.addAll(inventoryTransaction.getInventoryTransactionProducts());
-				}
-				else{
-					inventoryTransactionProducts.addAll(inventoryTransaction.getInventoryTransactionProducts());
+				if (inventoryTransaction.getTransactionType().equalsIgnoreCase(
+						InventoryTransaction.TRANSACTION_TYPE.INVENTORY_IN
+								.toString())) {
+					inventoryTransactionProductsPurchases
+							.addAll(inventoryTransaction
+									.getInventoryTransactionProducts());
+				} else {
+					inventoryTransactionProducts.addAll(inventoryTransaction
+							.getInventoryTransactionProducts());
 				}
 			}
 
-			for(InventoryTransactionProduct inventoryTransactionProduct : inventoryTransactionProductsPurchases) {
+			for (InventoryTransactionProduct inventoryTransactionProduct : inventoryTransactionProductsPurchases) {
 
 				LineItemProductReport lipr = new LineItemProductReport();
 				lipr.setProduct(inventoryTransactionProduct.getProduct());
-				Double totalCOGS = inventoryTransactionProduct.getProductCost() * inventoryTransactionProduct.getQty();
+				Double totalCOGS = inventoryTransactionProduct.getProductCost()
+						* inventoryTransactionProduct.getQty();
 				lipr.setTotalCostOfGoodSold(totalCOGS);
 				lipr.setTotalSRP(0.0);
 				lipr.setTotalProfit(0.0);
 				lipr.setQty(inventoryTransactionProduct.getQty());
 
 				liprs.add(lipr);
-				
+
 				totalPurchases += totalCOGS;
 			}
-			
+
 			for (InventoryTransactionProduct inventoryTransactionProduct : inventoryTransactionProducts) {
 
-				totalCost += inventoryTransactionProduct.getProductCost() * inventoryTransactionProduct.getQty();
-				totalSRP += inventoryTransactionProduct.getProductSale() * inventoryTransactionProduct.getQty();
+				totalCost += inventoryTransactionProduct.getProductCost()
+						* inventoryTransactionProduct.getQty();
+				totalSRP += inventoryTransactionProduct.getProductSale()
+						* inventoryTransactionProduct.getQty();
 
 				LineItemProductReport lipr = new LineItemProductReport();
 				lipr.setProduct(inventoryTransactionProduct.getProduct());
-				Double totalCOGS = inventoryTransactionProduct.getProductCost() * inventoryTransactionProduct.getQty();
-				Double totalSale = inventoryTransactionProduct.getProductSale() * inventoryTransactionProduct.getQty();
+				Double totalCOGS = inventoryTransactionProduct.getProductCost()
+						* inventoryTransactionProduct.getQty();
+				Double totalSale = inventoryTransactionProduct.getProductSale()
+						* inventoryTransactionProduct.getQty();
 				lipr.setTotalCostOfGoodSold(totalCOGS);
 				lipr.setTotalSRP(totalSale);
 				lipr.setTotalProfit(totalSale - totalCOGS);
@@ -613,7 +649,8 @@ public class ReportsController {
 				liprs.add(lipr);
 			}
 
-			logger.info("USER REPORT FILTER SUCCESS! - ITP size: " + inventoryTransactionProducts.size());
+			logger.info("USER REPORT FILTER SUCCESS! - ITP size: "
+					+ inventoryTransactionProducts.size());
 
 			DateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
 
@@ -636,4 +673,133 @@ public class ReportsController {
 		}
 		return mnv;
 	}
+
+	// new july 12
+	@RequestMapping(value = "/report-service-transactions", method = RequestMethod.POST)
+	public ModelAndView viewTransactionsByServices(HttpServletRequest request, @ModelAttribute("transactionDatesService") TransactionsWithinDateCategory transactionsWithinDateCategory, BindingResult result, Principal principal) {
+
+		logger.info("service report accessed by " + principal.getName());
+
+		ModelAndView mnv = new ModelAndView("admin.report.service.transactions");
+
+		String date1 = transactionsWithinDateCategory.getDate1();
+		String date2 = transactionsWithinDateCategory.getDate2();
+
+		List<LineItemProductReport> liprs = new ArrayList<LineItemProductReport>();
+		List<LineItemProductReport> liprsBuffer = new ArrayList<LineItemProductReport>();
+		List<ServiceTransaction> serviceTransactions = new ArrayList<ServiceTransaction>();
+		List<ServiceTransactionItem> serviceTransactionItems = new ArrayList<ServiceTransactionItem>();
+		Double totalProfit = 0.0;
+		Double totalSale = 0.0;
+
+		try {
+
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			Date startDate = df.parse(date1);
+			Date endDate = df.parse(date2);
+
+			serviceTransactions = serviceTransactionService.getServiceTransactionsByDateBetween(startDate, endDate);
+
+			for (ServiceTransaction serviceTransaction : serviceTransactions) {
+				serviceTransactionItems.addAll(serviceTransaction.getServiceTransactionItems());
+			}
+
+			for (ServiceRendered serviceRendered : serviceRenderedService.getAllServiceRendered()) {
+				
+				LineItemProductReport lineItemBuffer = new LineItemProductReport();
+				lineItemBuffer.setServiceMadePart(serviceRendered.getServiceMadePart());
+				lineItemBuffer.setQty(0.0);
+				lineItemBuffer.setTotalProfit(0.0);
+				lineItemBuffer.setTotalSRP(0.0);
+
+				liprsBuffer.add(lineItemBuffer);
+
+//				logger.info(lineItemBuffer.getServiceMadePart());
+			}
+
+			for (ServiceTransactionItem sti : serviceTransactionItems) {
+				for (LineItemProductReport lipr : liprsBuffer) {
+					
+					if (sti.getServiceMadePart().equalsIgnoreCase(lipr.getServiceMadePart())) {
+
+						// LineItemProductReport lineItemProductReport = new
+						// LineItemProductReport();
+						lipr.setQty(lipr.getQty() + 1);
+						lipr.setTotalProfit(lipr.getTotalProfit() + sti.getServiceProfit());
+						lipr.setTotalSRP(lipr.getTotalSRP() + sti.getServicePrice());
+						totalProfit += sti.getServiceProfit();
+						totalSale += sti.getServicePrice();
+
+						break;
+					}
+				}
+			}
+
+			Collections.sort(liprsBuffer, new CustomComparatorServiceDescending());
+			// ended here
+
+			// Collections.sort(liprs, new CustomComparatorQtyDescending());
+
+			DateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+
+			logger.info("SUCCESS!");
+
+			mnv.addObject("date1", sdf.format(startDate));
+			mnv.addObject("date2", sdf.format(endDate));
+			mnv.addObject("lineItemProducts", liprsBuffer);
+			mnv.addObject("summaryTotalSales", totalSale);
+			mnv.addObject("summaryTotalProfit", totalProfit);
+			// mnv.addObject("category", categoryService.getCategory(id));
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			mnv.addObject("users", userManagementService.getBasicUsers());
+			mnv.addObject("ERROR_MESSAGE", "Something went wrong.");
+			return mnv;
+		}
+		return mnv;
+
+	}
+
+//	@RequestMapping(value = "/test", method = RequestMethod.GET)
+//	public ModelAndView viewTest(HttpServletRequest request) {
+//
+//		logger.info("TEST VIEW");
+//
+//		ModelAndView mnv = new ModelAndView("test");
+//
+//		List<ServiceTransactionItem> serviceTransactionItems = new ArrayList<ServiceTransactionItem>();
+//		List<String> serviceRenderedBuffer = new ArrayList<String>();
+//
+//		for (ServiceTransaction serviceTransaction : serviceTransactionService
+//				.getAllServiceTransactions()) {
+//			serviceTransactionItems.addAll(serviceTransaction
+//					.getServiceTransactionItems());
+//		}
+//
+//		for (ServiceTransactionItem serviceTransactionItem : serviceTransactionItems) {
+//			serviceRenderedBuffer.add(serviceTransactionItem.getServiceMadePart());
+//		}
+//
+//		HashSet<String> hs = new HashSet<String>();
+//		hs.addAll(serviceRenderedBuffer);
+//		serviceRenderedBuffer.clear();
+//		serviceRenderedBuffer.addAll(hs);
+//		
+//		for(String serviceMadePartBuffer : serviceRenderedBuffer){
+//			ServiceRendered serviceRendered = new ServiceRendered();
+//			serviceRendered.setServiceMadePart(serviceMadePartBuffer);
+//			
+//			serviceRendered = (ServiceRendered) serviceRenderedService.saveServiceRendered(serviceRendered);
+//		}
+//
+//		logger.info("DONE SAVING SERVICES RENDERED (BATCH)");
+//		
+//		mnv.addObject("serviceRenderedBuffer", serviceRenderedBuffer);
+//
+//		return mnv;
+//
+//	}
 }

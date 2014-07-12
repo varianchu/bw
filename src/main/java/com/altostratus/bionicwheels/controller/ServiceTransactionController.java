@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -23,11 +24,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.altostratus.bionicwheels.model.MechanicTireMan;
+import com.altostratus.bionicwheels.model.ServiceRendered;
 import com.altostratus.bionicwheels.model.ServiceTransaction;
 import com.altostratus.bionicwheels.model.ServiceTransactionItem;
 import com.altostratus.bionicwheels.service.MechanicTireManService;
+import com.altostratus.bionicwheels.service.ServiceRenderedService;
 import com.altostratus.bionicwheels.service.ServiceTransactionItemService;
 import com.altostratus.bionicwheels.service.ServiceTransactionService;
+import com.altostratus.bionicwheels.validator.ServiceRenderedValidator;
 import com.altostratus.bionicwheels.validator.ServiceTransactionItemValidator;
 import com.altostratus.bionicwheels.validator.ServiceTransactionValidator;
 import com.altostratus.core.model.User;
@@ -54,6 +59,12 @@ public class ServiceTransactionController {
 	@Autowired
 	MechanicTireManService mechanicTireManService;
 	
+	@Autowired
+	ServiceRenderedService serviceRenderedService;
+	
+	@Autowired
+	ServiceRenderedValidator serviceRenderedValidator;
+	
 	private Logger logger = LoggerFactory.getLogger(ServiceTransactionController.class);
 
 	@RequestMapping(value = "/admin/service-transaction/form", method = RequestMethod.GET)
@@ -76,6 +87,7 @@ public class ServiceTransactionController {
 		mnv.addObject("serviceTransactionItem", new ServiceTransactionItem());
 		mnv.addObject("users", userManagementService.getBasicUsers());
 		mnv.addObject("workers", mechanicTireManService.getAllMechanicTireMan());
+		mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
 		
 		return mnv;
 	}
@@ -102,6 +114,7 @@ public class ServiceTransactionController {
 		users.add(userManagementService.getUserByUsername(request.getUserPrincipal().getName()));
 		mnv.addObject("users", users);
 		mnv.addObject("workers", mechanicTireManService.getAllMechanicTireMan());
+		mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
 		
 		return mnv;
 	}
@@ -123,6 +136,7 @@ public class ServiceTransactionController {
 			mnv.addObject("users", userManagementService.getBasicUsers());
 			mnv.addObject("workers", mechanicTireManService.getAllMechanicTireMan());
 			mnv.addObject("ERROR_MESSAGE", "Unsuccessful in saving service transaction");
+			mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
 			
 			logger.info("Unsuccessfully saved service transaction by " + principal.getName());
 			
@@ -140,6 +154,7 @@ public class ServiceTransactionController {
 			mnv.addObject("serviceTransactionItem", new ServiceTransactionItem());
 			mnv.addObject("users", userManagementService.getBasicUsers());
 			mnv.addObject("workers", mechanicTireManService.getAllMechanicTireMan());
+			mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
 			mnv.addObject("ERROR_MESSAGE", "Unsuccessful in saving service transaction - add a transaction item first");
 			
 			return mnv;
@@ -185,6 +200,7 @@ public class ServiceTransactionController {
 		mnv.addObject("serviceTransactionItem", new ServiceTransactionItem());
 		mnv.addObject("users", userManagementService.getBasicUsers());
 		mnv.addObject("workers", mechanicTireManService.getAllMechanicTireMan());
+		mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
 		mnv.addObject("SUCCESS_MESSAGE", "Successfully saved service transaction.");
 		
 		logger.info("successfully saved service transaction by " + principal.getName());
@@ -439,6 +455,90 @@ public class ServiceTransactionController {
 		
 		mnv.addObject("serviceTransaction", serviceTransaction);
 		
+		return mnv;
+	}
+	
+	//place service rendered here (also add the services rendered options in the drop down for service transaction)
+	
+	@RequestMapping(value = "/admin/service-rendered/{message}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView serviceRenderedFormIndex(HttpServletRequest request, @PathVariable("message") String message, Principal principal) {
+		
+		logger.info("Entering service rendered form " + principal.getName());
+		String successMessage = request.getHeader("successMessage");
+		logger.info("RESPONSE HEADER: " + successMessage);
+		ModelAndView mnv = new ModelAndView("service.rendered.form");
+		mnv.addObject("serviceRenderedForm", new ServiceRendered());
+		mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
+		if(message.equalsIgnoreCase("SUCCESS")){
+			mnv.addObject("SUCCESS_MESSAGE", "Successfully saved service Rendered");
+			logger.info("successfully saved service rendered by " + principal.getName());
+		}
+		return mnv;
+	}
+	
+	@RequestMapping(value = "/admin/service-rendered/edit/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView editServiceRendered(@PathVariable("id") Long id, HttpServletRequest request, Principal principal) {
+		
+		logger.info("Editing service rendered id: " + id.toString() + " viewed by " + principal.getName());
+		ModelAndView mnv = new ModelAndView("service.rendered.form");
+		mnv.addObject("serviceRenderedForm", serviceRenderedService.getServiceRendered(id));
+		mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
+		
+		return mnv;
+	}
+
+	@RequestMapping(value = "/admin/service-rendered/remove/{id}", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView removeServiceRendered(@PathVariable("id") Long id, HttpServletRequest request, Principal principal) {
+		
+		logger.info("Removing service rendered id: " + id.toString());
+		
+		ModelAndView mnv = new ModelAndView("service.rendered.form");
+		
+		try {
+			serviceRenderedService.removeServiceRendered(id);
+			mnv.addObject("serviceRenderedForm", new ServiceRendered());
+			mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
+			mnv.addObject("SUCCESS_MESSAGE", "Delete successful for service rendered.");
+			logger.info("successfully removed service rendered by " + principal.getName());
+			return mnv;
+		} catch (Exception e) {
+			// TODO: handle exception
+			logger.info(e.getMessage());
+			logger.info("remove unsuccessful (Service Rendered).");
+			mnv.addObject("serviceRenderedForm", new ServiceRendered());
+			mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
+			mnv.addObject("ERROR_MESSAGE", "Delete unsuccessful for service rendered");
+			logger.info("Unsuccessfully removed service rendered by " + principal.getName());
+			return mnv;
+		}
+	}
+
+	@RequestMapping(value = "/admin/service-rendered/form", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'CASHIER', 'ROLE_SYSTEM_MANAGER')")
+	public ModelAndView saveServiceRendered(HttpServletRequest request, @ModelAttribute("serviceRenderedForm") ServiceRendered serviceRendered, BindingResult result, HttpServletResponse response, Principal principal) {
+
+		logger.info("Saving service rendered by " + principal.getName());
+
+		serviceRenderedValidator.validate(serviceRendered, result);
+
+		if (result.hasErrors()) {
+			logger.info(result.toString());
+			logger.info("Failed to save service rendered");
+
+			ModelAndView mnv = new ModelAndView("service.rendered.form");
+			mnv.addObject("serviceRenderedForm", new ServiceRendered());
+			mnv.addObject("servicesRendered", serviceRenderedService.getAllServiceRendered());
+			mnv.addObject("ERROR_MESSAGE", "Service rendered not saved. Kindly check inputted fields.");
+			return mnv;
+		}
+		// add success message
+		serviceRendered.setServiceMadePart(serviceRendered.getServiceMadePart().toUpperCase());
+		serviceRenderedService.saveServiceRendered(serviceRendered);
+		
+		ModelAndView mnv = new ModelAndView("redirect:/admin/service-rendered/SUCCESS");
 		return mnv;
 	}
 	
